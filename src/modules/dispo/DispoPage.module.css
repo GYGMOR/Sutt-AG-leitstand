@@ -1,0 +1,62 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/DispoPage.module.css                 │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Modulraster: Planfläche links, Panel rechts, Konflikt-Badge           │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Raster ─────────────────────────────────────────────── */
+
+.dispo {
+  position: relative;
+  display: flex;
+  height: 100%;
+  min-height: 0;
+}
+
+.plan-bereich {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ── §2 · Konflikt-Badge (Topbar) ────────────────────────────── */
+
+.konflikte {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--sl-signal);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-chrome-2);
+  color: var(--sl-chrome-ink);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  white-space: nowrap;
+}
+
+.konflikte svg {
+  color: var(--sl-signal);
+}
+
+.konflikte:not(:disabled):hover {
+  background: var(--sl-chrome-line);
+}
+
+.konflikte:focus-visible {
+  outline-color: var(--sl-chrome-ink);
+}
+
+.konflikte-leer {
+  border-color: var(--sl-chrome-line);
+  color: var(--sl-chrome-mute);
+}
+
+.konflikte-leer svg {
+  color: var(--sl-chrome-mute);
+}
+
+/* ◆ jh · eof */

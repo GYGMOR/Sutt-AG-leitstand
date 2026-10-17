@@ -1,0 +1,38 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/karte/MapCanvas.module.css           │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Kartenrahmen                                                          │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rahmen ─────────────────────────────────────────────── */
+
+.canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 90px;
+  overflow: hidden;
+  background: var(--sl-paper);
+}
+
+.typwahl {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+}
+
+.quelle {
+  position: absolute;
+  bottom: 4px;
+  left: 8px;
+  z-index: 2;
+  font-size: 10px;
+  color: var(--sl-mute);
+  pointer-events: none;
+}
+
+/* ◆ jh · eof */

@@ -1,0 +1,239 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/druck/TechnikerDruck.module.css      │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Druckansicht A4 (Bildschirm und @media print)                         │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Bildschirm ─────────────────────────────────────────── */
+
+.seite {
+  min-height: 100vh;
+  padding: 0 0 48px;
+  background: var(--sl-paper);
+}
+
+.steuerung {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-space-4);
+  padding: 10px 24px;
+  border-bottom: var(--sl-hairline);
+  background: var(--sl-surface);
+}
+
+.steuerung-text {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* jh› Das Blatt ist am Bildschirm echtes A4 (210 mm) – was man sieht, wird gedruckt. */
+.blatt {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 24px auto 0;
+  padding: 16mm 14mm;
+  background: #ffffff;
+  color: #1a1a1a;
+  box-shadow: var(--sl-shadow-float);
+  font-size: 10pt;
+  line-height: 1.35;
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.klein {
+  display: block;
+  font-size: 8pt;
+  color: #6b6b6b;
+}
+
+/* ── §2 · Kopf & Techniker ───────────────────────────────────── */
+
+.kopf {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #1a1a1a;
+}
+
+.wortmarke {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.raute {
+  width: 10px;
+  height: 10px;
+  margin-right: 4px;
+  background: #f86c04;
+  transform: rotate(45deg);
+}
+
+.firma {
+  font-size: 14pt;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.produkt {
+  font-size: 14pt;
+  color: #6b6b6b;
+}
+
+.kopf-rechts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.titel {
+  font-size: 9pt;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+}
+
+.datum {
+  font-size: 14pt;
+  font-weight: 600;
+}
+
+.techniker {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 0;
+  border-bottom: 1px solid #dad7d2;
+}
+
+.techniker-daten {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 3px 12px;
+  align-content: start;
+}
+
+.techniker-daten div {
+  display: contents;
+}
+
+.techniker-daten dt {
+  font-size: 8pt;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+}
+
+.qr {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.qr-bild {
+  width: 26mm;
+  height: 26mm;
+}
+
+.qr-bild svg {
+  width: 100%;
+  height: 100%;
+}
+
+.qr-platzhalter {
+  width: 26mm;
+  height: 26mm;
+  border: 1px dashed #bdb8b0;
+}
+
+.qr-text {
+  font-size: 8pt;
+  color: #6b6b6b;
+}
+
+/* ── §3 · Tabelle & Fuss ─────────────────────────────────────── */
+
+.tabelle {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: collapse;
+  font-size: 9pt;
+}
+
+.tabelle th {
+  padding: 4px 6px;
+  border-bottom: 1px solid #1a1a1a;
+  font-size: 8pt;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+  text-align: left;
+}
+
+.tabelle td {
+  padding: 7px 6px;
+  border-bottom: 1px solid #dad7d2;
+  vertical-align: top;
+}
+
+.tabelle tr {
+  break-inside: avoid;
+}
+
+.hinweis {
+  display: block;
+  padding-left: 6px;
+  border-left: 2px solid #dad7d2;
+  margin-bottom: 3px;
+  font-size: 8.5pt;
+}
+
+.fuss {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 8px;
+  border-top: 1px solid #dad7d2;
+  font-size: 8pt;
+  color: #6b6b6b;
+}
+
+/* ── §4 · Druck ──────────────────────────────────────────────── */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  .seite {
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .steuerung {
+    display: none;
+  }
+
+  .blatt {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+}
+
+/* ◆ jh · eof */

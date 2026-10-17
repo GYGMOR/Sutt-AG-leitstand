@@ -1,0 +1,85 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/akte/AkteErsatzteile.module.css      │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Ersatzteil-Tabelle                                                    │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Tabelle ────────────────────────────────────────────── */
+
+.tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sl-fs-12);
+}
+
+.tabelle th {
+  padding: 0 8px 6px 0;
+  border-bottom: var(--sl-hairline);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+  text-align: left;
+}
+
+.tabelle td {
+  padding: 7px 8px 7px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+  vertical-align: top;
+}
+
+.tabelle th:last-child,
+.tabelle td:last-child {
+  padding-right: 0;
+  text-align: right;
+}
+
+.tabelle tfoot td {
+  border-bottom: 0;
+}
+
+/* ── §2 · Zellen ─────────────────────────────────────────────── */
+
+.bezeichnung {
+  display: block;
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+}
+
+.artikel {
+  display: block;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.swatch {
+  width: 3px;
+  height: 12px;
+  background: var(--sl-status);
+}
+
+.termin,
+.total {
+  font-family: var(--sl-font-mono);
+  white-space: nowrap;
+}
+
+.total-label {
+  color: var(--sl-mute);
+}
+
+.leer {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

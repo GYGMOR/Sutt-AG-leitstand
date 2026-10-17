@@ -1,0 +1,41 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/drag/DispoDnd.module.css             │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Drag-Overlay (Geist unter dem Zeiger)                                 │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Overlay ────────────────────────────────────────────── */
+
+.overlay {
+  z-index: var(--sl-z-drag-overlay);
+}
+
+/* jh› Der Geist ist bewusst klein: die eigentliche Vorschau liegt eingerastet in der Zeile. */
+.ghost {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 5px 10px 5px 12px;
+  border: 1px solid var(--sl-ink-2);
+  border-left: 3px solid var(--sl-signal);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  box-shadow: var(--sl-shadow-float);
+  cursor: grabbing;
+  pointer-events: none;
+}
+
+.ghost-titel {
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-semibold);
+  white-space: nowrap;
+}
+
+.ghost-zeit {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+}
+
+/* ◆ jh · eof */

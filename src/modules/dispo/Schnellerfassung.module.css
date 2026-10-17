@@ -1,0 +1,226 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/Schnellerfassung.module.css          │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Schnellerfassung (schlankes Panel von rechts)                         │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Panel ──────────────────────────────────────────────── */
+
+.panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--sl-z-drawer);
+  display: flex;
+  flex-direction: column;
+  width: 440px;
+  border-left: var(--sl-hairline);
+  background: var(--sl-surface);
+  box-shadow: var(--sl-shadow-float);
+  animation: einfahren var(--sl-dur-base) var(--sl-ease);
+}
+
+@keyframes einfahren {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+
+.kopf {
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+  padding: 12px 12px 12px var(--sl-space-5);
+  border-bottom: var(--sl-hairline);
+}
+
+.titel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--sl-fs-16);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+}
+
+.uhr {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 3px 8px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.uhr-ueber {
+  border-color: var(--sl-signal);
+  color: var(--sl-signal-ink);
+}
+
+.inhalt {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--sl-space-3);
+  min-height: 0;
+  padding: var(--sl-space-4) var(--sl-space-5);
+  overflow-y: auto;
+}
+
+.zeile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sl-space-3);
+}
+
+.feld {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hinweis {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Treffer ────────────────────────────────────────────── */
+
+.treffer {
+  display: flex;
+  flex-direction: column;
+  margin-top: -6px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+}
+
+.treffer li + li {
+  border-top: 1px solid var(--sl-line-soft);
+}
+
+.treffer-knopf {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.treffer-knopf:hover {
+  background: var(--sl-hover);
+}
+
+.treffer-name {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+}
+
+.treffer-meta {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* ── §3 · Kategorien & Slots ─────────────────────────────────── */
+
+.kategorien {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.kategorie-knopf {
+  position: relative;
+  padding: 2px;
+  border: 1px solid transparent;
+  border-radius: var(--sl-radius-1);
+}
+
+.kategorie-aktiv {
+  border-color: var(--sl-ink-2);
+}
+
+.kategorie-aktiv::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.slots {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.slot {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  padding: 7px 10px 7px 12px;
+  border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius-1);
+  text-align: left;
+}
+
+.slot:hover {
+  border-color: var(--sl-ink-2);
+}
+
+.slot-aktiv,
+.slot-aktiv:hover {
+  border-color: var(--sl-ink-2);
+}
+
+.slot-aktiv::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: 3px;
+  background: var(--sl-signal);
+}
+
+.slot-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.slot-termin {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+}
+
+.slot-gruende {
+  overflow: hidden;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ── §4 · Fuss ───────────────────────────────────────────────── */
+
+.fuss {
+  display: flex;
+  flex: none;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px var(--sl-space-5);
+  border-top: var(--sl-hairline);
+  background: var(--sl-paper);
+}
+
+/* ◆ jh · eof */

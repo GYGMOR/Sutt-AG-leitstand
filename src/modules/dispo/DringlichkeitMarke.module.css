@@ -1,0 +1,40 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/DringlichkeitMarke.module.css        │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Dringlichkeits-Marke                                                  │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Marke ──────────────────────────────────────────────── */
+
+.marke {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+  white-space: nowrap;
+}
+
+.quadrat {
+  width: 7px;
+  height: 7px;
+  border: 1px solid currentColor;
+}
+
+.signal {
+  color: var(--sl-signal-ink);
+}
+
+.signal .quadrat {
+  border-color: var(--sl-signal);
+  background: var(--sl-signal);
+}
+
+.notfall {
+  font-weight: var(--sl-fw-semibold);
+}
+
+/* ◆ jh · eof */

@@ -1,0 +1,163 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/panel/PendenzCard.module.css         │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Karte im Auftragseingang                                              │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Karte ──────────────────────────────────────────────── */
+
+.karte {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px 10px 26px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  cursor: grab;
+  transition: border-color var(--sl-dur-fast) var(--sl-ease);
+}
+
+.karte:hover {
+  border-color: var(--sl-line-strong);
+}
+
+.karte:active {
+  cursor: grabbing;
+}
+
+/* jh› Kategorie-Kante links – dieselbe Farbe wie der spätere Block im Plan. */
+.karte::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: 3px;
+  background: var(--sl-edge);
+}
+
+.aktiv,
+.aktiv:hover {
+  border-color: var(--sl-ink-2);
+  outline: 1px solid var(--sl-ink-2);
+}
+
+.gezogen {
+  opacity: 0.4;
+}
+
+.markiert {
+  animation: markiert 1.6s var(--sl-ease) 1;
+}
+
+@keyframes markiert {
+  0%,
+  40% {
+    border-color: var(--sl-signal);
+  }
+}
+
+.griff {
+  position: absolute;
+  top: 12px;
+  left: 6px;
+  color: var(--sl-mute-2);
+}
+
+/* ── §2 · Inhalt ─────────────────────────────────────────────── */
+
+.kopf {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sl-space-2);
+  margin-bottom: 2px;
+}
+
+.kunde {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+}
+
+.ort {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: var(--sl-fs-12);
+  line-height: 16px;
+  color: var(--sl-ink-2);
+}
+
+.ort svg {
+  flex: none;
+  color: var(--sl-mute);
+}
+
+.wohnung {
+  font-family: var(--sl-font-mono);
+  color: var(--sl-mute);
+}
+
+.mitte {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sl-space-2);
+  margin: 2px 0;
+}
+
+.geraet {
+  min-width: 0;
+}
+
+.fehler {
+  font-size: var(--sl-fs-12);
+  line-height: 16px;
+  color: var(--sl-ink);
+}
+
+.hinweis {
+  font-size: var(--sl-fs-12);
+  line-height: 16px;
+  color: var(--sl-mute);
+}
+
+/* ── §3 · Fusszeile ──────────────────────────────────────────── */
+
+.fuss {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 2px;
+  padding-top: 6px;
+  border-top: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.eingang {
+  margin-left: auto;
+}
+
+.tag {
+  padding: 0 4px;
+  border: 1px solid var(--sl-st-wartet-teil);
+  border-radius: var(--sl-radius-1);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-st-wartet-teil);
+}
+
+.tag-offen {
+  border-color: var(--sl-line-strong);
+  color: var(--sl-ink-2);
+}
+
+/* ◆ jh · eof */

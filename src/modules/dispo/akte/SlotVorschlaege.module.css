@@ -1,0 +1,95 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/akte/SlotVorschlaege.module.css      │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Slot-Vorschläge                                                       │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Block ──────────────────────────────────────────────── */
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.keiner {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Slot ───────────────────────────────────────────────── */
+
+.slot {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 16px;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  padding: 7px 10px 7px 12px;
+  border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  text-align: left;
+}
+
+.slot::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: 3px;
+  background: var(--sl-line-strong);
+}
+
+.slot:hover {
+  border-color: var(--sl-ink-2);
+}
+
+/* jh› Bester Vorschlag mit Messmarke in Signal – die anderen in Bewertungsfarbe. */
+.bester::before {
+  background: var(--sl-signal);
+}
+
+.stufe-gut:not(.bester)::before {
+  background: var(--sl-ok);
+}
+
+.stufe-ok:not(.bester)::before {
+  background: var(--sl-warn);
+}
+
+.stufe-schlecht:not(.bester)::before {
+  background: var(--sl-danger);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.termin {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+}
+
+.gruende {
+  overflow: hidden;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.icon {
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

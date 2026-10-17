@@ -1,0 +1,172 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/KapazitaetsBand.module.css           │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Kapazitätsband und Heatmap                                            │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Band ───────────────────────────────────────────────── */
+
+.band {
+  flex: none;
+  padding: 10px var(--sl-space-4) 12px;
+  background: var(--sl-paper);
+  overflow-y: auto;
+}
+
+.kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.legende {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.legende-feld {
+  width: 10px;
+  height: 6px;
+  margin-left: 8px;
+}
+
+.legende-verplant {
+  background: var(--sl-ink-2);
+}
+
+.legende-fahrt {
+  background: var(--sl-mute-2);
+}
+
+.legende-frei {
+  background: var(--sl-line);
+}
+
+/* ── §2 · Tag ────────────────────────────────────────────────── */
+
+.liste {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 6px 24px;
+}
+
+.zeile {
+  display: grid;
+  grid-template-columns: 22px 92px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.name {
+  overflow: hidden;
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.balken {
+  position: relative;
+  display: block;
+  height: 6px;
+  background: var(--sl-line);
+}
+
+.verplant {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--sl-ink-2);
+}
+
+.fahrt {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--sl-mute-2);
+}
+
+.ueber .verplant {
+  background: var(--sl-signal);
+}
+
+.zahlen {
+  display: inline-flex;
+  gap: 4px;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-ink-2);
+  white-space: nowrap;
+}
+
+.trenn {
+  color: var(--sl-mute-2);
+}
+
+.frei {
+  color: var(--sl-mute);
+}
+
+/* ── §3 · Heatmap ────────────────────────────────────────────── */
+
+.heatmap {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 2px;
+  font-size: var(--sl-fs-label);
+}
+
+.heatmap th {
+  padding: 2px 6px;
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-mute);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.heat-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sl-ink);
+}
+
+.heat-zelle {
+  padding: 4px 8px;
+  border-radius: var(--sl-radius-1);
+  font-family: var(--sl-font-mono);
+  text-align: center;
+  color: var(--sl-ink);
+}
+
+/* jh› Fünf Stufen aus einer Farbe (Steel) – keine Ampel, nur Dichte. */
+.heat0 {
+  background: var(--sl-surface);
+  color: var(--sl-mute-2);
+}
+
+.heat1 {
+  background: color-mix(in srgb, var(--sl-st-geplant) 12%, var(--sl-surface));
+}
+
+.heat2 {
+  background: color-mix(in srgb, var(--sl-st-geplant) 26%, var(--sl-surface));
+}
+
+.heat3 {
+  background: color-mix(in srgb, var(--sl-st-geplant) 42%, var(--sl-surface));
+}
+
+.heat4 {
+  background: color-mix(in srgb, var(--sl-signal) 36%, var(--sl-surface));
+}
+
+.heat-absenz {
+  background: repeating-linear-gradient(135deg, transparent 0 5px, var(--sl-line-soft) 5px 6px);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

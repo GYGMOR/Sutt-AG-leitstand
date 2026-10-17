@@ -1,0 +1,77 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/ProtokollPopover.module.css          │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Änderungsprotokoll                                                    │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Aufbau ─────────────────────────────────────────────── */
+
+.protokoll {
+  display: flex;
+  flex-direction: column;
+}
+
+.kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+  padding: 10px 12px 8px;
+  border-bottom: var(--sl-hairline);
+}
+
+.knoepfe {
+  display: flex;
+  gap: 2px;
+}
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  max-height: 320px;
+  padding: 6px 0;
+  overflow-y: auto;
+}
+
+/* ── §2 · Zeile ──────────────────────────────────────────────── */
+
+.zeile {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: baseline;
+  padding: 4px 12px;
+  font-size: var(--sl-fs-12);
+}
+
+.zeit {
+  font-family: var(--sl-font-mono);
+  color: var(--sl-mute);
+}
+
+.text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.benutzer {
+  font-family: var(--sl-font-mono);
+  color: var(--sl-mute);
+}
+
+.verworfen {
+  color: var(--sl-mute-2);
+}
+
+.verworfen .text {
+  text-decoration: line-through;
+}
+
+.leer {
+  padding: 8px 12px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

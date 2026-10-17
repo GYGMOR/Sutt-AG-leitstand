@@ -1,0 +1,225 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/views/EinsatzBlock.module.css        │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Einsatzblock: Tönung, Kante, Container-Queries, Statusmuster          │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Block ──────────────────────────────────────────────── */
+
+.block {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+  padding: 3px 22px 3px 9px;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-tint);
+  color: var(--sl-tint-ink);
+  text-align: left;
+  container-type: inline-size;
+  transition:
+    border-color var(--sl-dur-fast) var(--sl-ease),
+    opacity var(--sl-dur-fast) var(--sl-ease);
+}
+
+/* jh› Kräftige Kante links, getönte Fläche, dunkle Schrift – keine Vollfläche. */
+.block::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: 3px;
+  background: var(--sl-edge);
+}
+
+.block:hover {
+  border-color: var(--sl-edge);
+}
+
+.ziehbar {
+  cursor: grab;
+}
+
+.ziehbar:active {
+  cursor: grabbing;
+}
+
+/* ── §2 · Inhalt & Stufen ────────────────────────────────────── */
+
+.kunde,
+.ort,
+.geraet,
+.kurz {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 15px;
+}
+
+.kunde {
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.ort {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.geraet {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.kurz {
+  display: none;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+}
+
+/* 80–139 px: Kunde / Gerät */
+@container (max-width: 139px) {
+  .ort {
+    display: none;
+  }
+}
+
+/* < 80 px: nur Kurznummer + Statusicon */
+@container (max-width: 79px) {
+  .block {
+    padding-right: 4px;
+  }
+  .kunde,
+  .ort,
+  .geraet {
+    display: none;
+  }
+  .kurz {
+    display: block;
+  }
+  .status-icon {
+    top: auto;
+    bottom: 3px;
+    right: 3px;
+  }
+}
+
+/* ── §3 · Statusicons & Muster ───────────────────────────────── */
+
+.status-icon {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  color: var(--sl-ink-2);
+}
+
+.vor-ort {
+  display: inline-grid;
+  place-items: center;
+}
+
+.puls-punkt {
+  position: absolute;
+  right: -1px;
+  top: -1px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sl-st-vor-ort);
+  animation: pulsieren 1.6s ease-in-out infinite;
+}
+
+@keyframes pulsieren {
+  50% {
+    transform: scale(1.5);
+    opacity: 0.4;
+  }
+}
+
+/* jh› Wartet auf Teil: diagonale Schraffur über der Tönung. */
+.status-wartet-teil {
+  background-image: repeating-linear-gradient(135deg, transparent 0 6px, rgb(0 0 0 / 0.045) 6px 7px);
+}
+
+.status-erledigt {
+  filter: saturate(0.25);
+  opacity: 0.8;
+}
+
+.status-erledigt .kunde {
+  text-decoration: line-through;
+  text-decoration-color: var(--sl-mute-2);
+}
+
+/* ── §4 · Zustände ───────────────────────────────────────────── */
+
+/* Dringend: Signal-Ecke oben rechts */
+.dringend::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  border-style: solid;
+  border-width: 0 9px 9px 0;
+  border-color: transparent var(--sl-st-dringend) transparent transparent;
+}
+
+/* Fahrzeit zu knapp / überzogen: rote Ecke unten rechts */
+.ecke {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  border-style: solid;
+  border-width: 0 0 9px 9px;
+  border-color: transparent transparent var(--sl-danger) transparent;
+}
+
+.konflikt {
+  border-style: dashed;
+  border-color: var(--sl-danger);
+}
+
+.abgeblendet {
+  opacity: 0.28;
+}
+
+.ausgewaehlt,
+.ausgewaehlt:hover {
+  z-index: 2;
+  border-color: var(--sl-ink);
+  outline: 1px solid var(--sl-ink);
+  outline-offset: 0;
+}
+
+.gezogen {
+  opacity: 0.35;
+}
+
+/* jh› Kurzes Aufleuchten nach Drop/Undo – Rahmen, nicht Fläche. */
+.markiert {
+  animation: markiert 1.6s var(--sl-ease) 1;
+}
+
+@keyframes markiert {
+  0%,
+  40% {
+    border-color: var(--sl-signal);
+    outline: 1px solid var(--sl-signal);
+  }
+  100% {
+    outline-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .puls-punkt {
+    animation: none;
+  }
+}
+
+/* ◆ jh · eof */

@@ -1,0 +1,419 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/akte/Akte.module.css                 │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Akte im rechten Panel                                                 │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rahmen ─────────────────────────────────────────────── */
+
+.akte {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--sl-surface);
+}
+
+.inhalt {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+/* ── §2 · Kartenkopf ─────────────────────────────────────────── */
+
+.kartenkopf {
+  position: relative;
+  flex: none;
+  height: var(--sl-akte-map-h);
+  border-bottom: var(--sl-hairline);
+}
+
+.karte {
+  height: 100%;
+}
+
+.karten-aktionen {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+}
+
+.karten-knopf {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 8px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-ink);
+  text-decoration: none;
+}
+
+.karten-knopf:hover {
+  border-color: var(--sl-line-strong);
+  background: var(--sl-hover);
+}
+
+.schliessen {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  background: var(--sl-surface);
+  border: var(--sl-hairline);
+}
+
+.fahrzeit {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 6px var(--sl-space-4);
+  border-bottom: var(--sl-hairline);
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.fahrzeit .mono {
+  color: var(--sl-ink);
+  font-weight: var(--sl-fw-medium);
+}
+
+/* ── §3 · Kopf & Abschnitte ──────────────────────────────────── */
+
+.kopf {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px var(--sl-space-4) 12px;
+  border-bottom: var(--sl-hairline);
+}
+
+.kopf-zeile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titel {
+  font-size: var(--sl-fs-16);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.status-chip {
+  gap: 6px;
+}
+
+.swatch {
+  width: 3px;
+  height: 12px;
+  background: var(--sl-status);
+}
+
+.abschnitt {
+  padding: 12px var(--sl-space-4) 14px;
+  border-bottom: var(--sl-hairline);
+}
+
+.abschnitt-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+  margin-bottom: 8px;
+}
+
+.hinweis {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.hinweis a {
+  color: var(--sl-ink-2);
+}
+
+/* ── §4 · Planen (Pendenz) ───────────────────────────────────── */
+
+.fakten {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px var(--sl-space-4);
+  margin-bottom: 12px;
+}
+
+.fakten dt {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.fakten dd {
+  font-size: var(--sl-fs-13);
+}
+
+.breit {
+  grid-column: 1 / -1;
+}
+
+/* ── §5 · Einsatz ────────────────────────────────────────────── */
+
+.techniker-zeile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+}
+
+.techniker-name {
+  font-size: var(--sl-fs-14);
+  font-weight: var(--sl-fw-medium);
+}
+
+.techniker-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.statusleiste {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: var(--sl-space-3);
+  border: 1px solid var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-paper);
+}
+
+.status-knopf {
+  position: relative;
+  min-height: 30px;
+  padding: 4px 4px 4px 8px;
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  line-height: 1.15;
+  color: var(--sl-mute);
+  text-align: left;
+}
+
+.status-knopf + .status-knopf {
+  border-left: 1px solid var(--sl-line);
+}
+
+.status-knopf::before {
+  content: '';
+  position: absolute;
+  inset: 6px auto 6px 3px;
+  width: 2px;
+  background: var(--sl-status);
+  opacity: 0.45;
+}
+
+.status-knopf:hover {
+  color: var(--sl-ink);
+}
+
+.status-aktiv {
+  background: var(--sl-surface);
+  color: var(--sl-ink);
+}
+
+.status-aktiv::before {
+  inset: -1px auto -1px -1px;
+  width: 3px;
+  opacity: 1;
+}
+
+/* ── §6 · Parteien, Gerät ────────────────────────────────────── */
+
+.telefon {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--sl-radius-1);
+  color: var(--sl-ink-2);
+}
+
+.telefon:hover {
+  background: var(--sl-hover);
+  color: var(--sl-ink);
+}
+
+.gesperrt-icon {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: var(--sl-mute-2);
+  cursor: not-allowed;
+}
+
+.schloss-klein {
+  position: absolute;
+  right: -3px;
+  bottom: -2px;
+  width: 10px;
+  height: 10px;
+  color: var(--sl-mute);
+}
+
+.wohnung {
+  color: var(--sl-ink-2);
+}
+
+.historie {
+  margin-top: 8px;
+}
+
+.historie-kopf {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.historie-kopf:hover {
+  color: var(--sl-ink);
+}
+
+.chevron {
+  transition: transform var(--sl-dur-base) var(--sl-ease);
+}
+
+.chevron-offen {
+  transform: rotate(180deg);
+}
+
+.historie-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 6px;
+  padding-left: 10px;
+  border-left: 2px solid var(--sl-line);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.fehlerbild {
+  margin-top: var(--sl-space-3);
+  padding: 2px 0 2px 10px;
+  border-left: 2px solid var(--sl-ink-2);
+  font-size: var(--sl-fs-14);
+  line-height: var(--sl-lh-base);
+}
+
+.notiz {
+  margin-top: var(--sl-space-2);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* ── §7 · Einsatzliste & Aktionen ────────────────────────────── */
+
+.einsatz-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.einsatz-eintrag {
+  position: relative;
+  display: grid;
+  grid-template-columns: 76px 92px 1fr 16px;
+  align-items: center;
+  gap: var(--sl-space-2);
+  width: 100%;
+  padding: 5px 8px 5px 11px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-12);
+  text-align: left;
+}
+
+.einsatz-eintrag::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: 3px;
+  background: var(--sl-status);
+}
+
+.einsatz-eintrag:hover {
+  border-color: var(--sl-line-strong);
+  background: var(--sl-hover);
+}
+
+.einsatz-status {
+  color: var(--sl-mute);
+}
+
+.einsatz-aktuell {
+  border-color: var(--sl-ink-2);
+}
+
+.aktionen {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px var(--sl-space-4);
+  border-top: var(--sl-hairline);
+  background: var(--sl-paper);
+}
+
+.gesperrt {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px dashed var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+  cursor: not-allowed;
+}
+
+/* jh› Löschen ganz rechts, abgesetzt – der gefährliche Knopf steht nie neben «Speichern». */
+.loeschen {
+  margin-left: auto;
+}
+
+.grosse-karte {
+  height: 440px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  overflow: hidden;
+}
+
+/* ◆ jh · eof */

@@ -1,0 +1,183 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/DispoToolbar.module.css              │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Toolbar                                                               │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Leiste ─────────────────────────────────────────────── */
+
+.toolbar {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px var(--sl-space-3);
+  min-height: 46px;
+  padding: 6px var(--sl-space-4);
+  border-bottom: var(--sl-hairline);
+  background: var(--sl-surface);
+}
+
+.gruppe {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 28px;
+  padding: 0 2px;
+  border: 1px solid var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+}
+
+.zoom-wert {
+  min-width: 46px;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  text-align: center;
+}
+
+.filter-aktiv {
+  border-color: var(--sl-ink-2);
+}
+
+.badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  margin-left: 4px;
+  padding: 0 4px;
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-ink);
+  color: var(--sl-paper);
+  font-family: var(--sl-font-mono);
+  font-size: 10px;
+}
+
+/* ── §2 · Rechts ─────────────────────────────────────────────── */
+
+.rechts {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+
+.letzte {
+  overflow: hidden;
+  max-width: 260px;
+  margin: 0 8px 0 4px;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 1360px) {
+  .letzte {
+    display: none;
+  }
+}
+
+/* ── §3 · Filter-Popover ─────────────────────────────────────── */
+
+.filter {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px 10px;
+}
+
+.filter-gruppe {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.techniker-chip,
+.status-chip,
+.kategorie-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 8px 0 4px;
+  border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.techniker-chip {
+  font-family: var(--sl-font-mono);
+  font-weight: var(--sl-fw-medium);
+}
+
+.status-chip {
+  padding-left: 8px;
+}
+
+.kategorie-chip {
+  padding: 0 2px;
+  border-color: transparent;
+}
+
+.techniker-chip:hover,
+.status-chip:hover,
+.kategorie-chip:hover {
+  border-color: var(--sl-line-strong);
+  background: var(--sl-hover);
+}
+
+/* jh› Gewählter Filter = Messmarke + Anthrazit-Rahmen, keine Farbfläche. */
+.chip-aktiv,
+.chip-aktiv:hover {
+  border-color: var(--sl-ink-2);
+  color: var(--sl-ink);
+}
+
+.chip-aktiv::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.swatch {
+  width: 3px;
+  height: 12px;
+  background: var(--sl-status);
+}
+
+.filter-fuss {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+  padding-top: 8px;
+  border-top: var(--sl-hairline);
+}
+
+.filter-hinweis {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

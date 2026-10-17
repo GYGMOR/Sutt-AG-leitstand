@@ -1,0 +1,207 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/views/Liste.module.css               │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Listenansicht                                                         │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rahmen & Werkzeuge ─────────────────────────────────── */
+
+.liste {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--sl-surface);
+}
+
+.werkzeuge {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sl-space-3);
+  padding: 6px var(--sl-space-4);
+  border-bottom: var(--sl-hairline);
+}
+
+.anzahl {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.gruppierung {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--sl-mute);
+}
+
+.gruppierung select {
+  height: 28px;
+  width: auto;
+  font-size: var(--sl-fs-12);
+}
+
+.spaltenwahl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+}
+
+/* ── §2 · Sammelleiste ───────────────────────────────────────── */
+
+.sammelleiste {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sl-space-4);
+  padding: 6px var(--sl-space-4);
+  border-bottom: var(--sl-hairline);
+  border-left: 3px solid var(--sl-signal);
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-13);
+}
+
+.sammelfeld {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.sammelfeld select,
+.sammelfeld input {
+  width: auto;
+  height: 28px;
+  font-size: var(--sl-fs-12);
+}
+
+/* ── §3 · Tabelle ────────────────────────────────────────────── */
+
+.tabellen-rahmen {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sl-fs-13);
+}
+
+.tabelle thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0 10px;
+  border-bottom: var(--sl-hairline);
+  background: var(--sl-surface);
+  text-align: left;
+}
+
+.sort-knopf {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+  white-space: nowrap;
+}
+
+.sort-knopf:hover,
+.sort-aktiv {
+  color: var(--sl-ink);
+}
+
+.sort-leer {
+  opacity: 0.4;
+}
+
+.kasten {
+  width: 36px;
+  padding: 0 10px !important;
+  text-align: center;
+}
+
+.kasten input {
+  margin: 0;
+  accent-color: var(--sl-ink);
+}
+
+.zeile {
+  cursor: pointer;
+}
+
+.zeile td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--sl-line-soft);
+  white-space: nowrap;
+}
+
+.zeile:hover td {
+  background: var(--sl-hover);
+}
+
+.zeile-aktiv td {
+  background: var(--sl-press);
+}
+
+.zeile-aktiv td:first-child {
+  box-shadow: inset var(--sl-mark-width) 0 0 var(--sl-signal);
+}
+
+.zeile-gewaehlt td {
+  background: color-mix(in srgb, var(--sl-signal) 6%, var(--sl-surface));
+}
+
+.zeile-abgeblendet td {
+  opacity: 0.4;
+}
+
+.gruppen-zeile th {
+  padding: 10px 10px 4px;
+  border-bottom: var(--sl-hairline);
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-semibold);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-ink-2);
+  text-align: left;
+}
+
+.techniker-zelle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 3px;
+  height: 12px;
+  background: var(--sl-status);
+}
+
+.leer {
+  padding: var(--sl-space-8) var(--sl-space-4);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

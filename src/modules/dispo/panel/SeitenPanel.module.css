@@ -1,0 +1,235 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/panel/SeitenPanel.module.css         │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Rechtes Panel, Ziehgriff, Schiene                                     │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Panel ──────────────────────────────────────────────── */
+
+.panel {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  min-height: 0;
+  border-left: var(--sl-hairline);
+  background: var(--sl-paper);
+}
+
+.zieht {
+  user-select: none;
+}
+
+.griff {
+  position: absolute;
+  inset: 0 auto 0 -3px;
+  z-index: 3;
+  width: 6px;
+  cursor: col-resize;
+}
+
+.griff:hover,
+.zieht .griff {
+  background: var(--sl-signal);
+  opacity: 0.6;
+}
+
+.kopf {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 6px 8px 0 8px;
+  background: var(--sl-surface);
+}
+
+/* ── §2 · Tabs ───────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  height: 34px;
+  padding: 0 8px;
+  border-bottom: 2px solid transparent;
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-mute);
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--sl-ink);
+}
+
+/* jh› Aktiver Tab: Unterstrich in Ink, Zähler kräftig – Orange nur für Dringendes. */
+.tab-aktiv,
+.tab-aktiv:hover {
+  border-bottom-color: var(--sl-ink);
+  color: var(--sl-ink);
+}
+
+.tab-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zahl {
+  min-width: 18px;
+  padding: 0 4px;
+  border: 1px solid var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  line-height: 16px;
+  text-align: center;
+}
+
+.zahl-dringend {
+  border-color: var(--sl-signal);
+  color: var(--sl-signal-ink);
+}
+
+/* ── §3 · Suche & Inhalt ─────────────────────────────────────── */
+
+.suchzeile {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border-top: var(--sl-hairline);
+  border-bottom: var(--sl-hairline);
+  background: var(--sl-surface);
+}
+
+.lupe {
+  color: var(--sl-mute);
+}
+
+.suche {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink);
+}
+
+.suche::placeholder {
+  color: var(--sl-mute-2);
+}
+
+.suche:focus-visible {
+  outline: none;
+}
+
+.suche::-webkit-search-cancel-button {
+  display: none;
+}
+
+.inhalt {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ── §4 · Drop-Ziel «zurückstellen» ──────────────────────────── */
+
+.zurueck {
+  margin: var(--sl-space-3) var(--sl-space-3) 0;
+  padding: var(--sl-space-4) var(--sl-space-3);
+  border: 1px dashed var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+  text-align: center;
+}
+
+.ueber .zurueck {
+  border-color: var(--sl-ink-2);
+  color: var(--sl-ink);
+}
+
+.ueber::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 -1px;
+  z-index: 2;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+/* ── §5 · Schiene (eingeklappt) ──────────────────────────────── */
+
+.schiene {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: var(--sl-panel-rail-w);
+  padding: 6px 0;
+  border-left: var(--sl-hairline);
+  background: var(--sl-surface);
+}
+
+.schiene-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 32px;
+  padding: 6px 0 4px;
+  border-radius: var(--sl-radius-1);
+  color: var(--sl-mute);
+}
+
+.schiene-tab:hover {
+  background: var(--sl-hover);
+  color: var(--sl-ink);
+}
+
+.schiene-tab-aktiv {
+  color: var(--sl-ink);
+}
+
+.schiene-tab-aktiv::before {
+  content: '';
+  position: absolute;
+  inset: 4px auto 4px -4px;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.schiene-zahl {
+  font-family: var(--sl-font-mono);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.schiene-zahl-dringend {
+  color: var(--sl-signal-ink);
+  font-weight: var(--sl-fw-semibold);
+}
+
+/* ◆ jh · eof */

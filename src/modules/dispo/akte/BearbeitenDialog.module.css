@@ -1,0 +1,21 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/akte/BearbeitenDialog.module.css     │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Bearbeiten-Formular                                                   │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Formular ───────────────────────────────────────────── */
+
+.formular {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-4);
+}
+
+.zeile {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--sl-space-3);
+}
+
+/* ◆ jh · eof */

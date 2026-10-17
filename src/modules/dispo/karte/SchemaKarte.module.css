@@ -1,0 +1,137 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/karte/SchemaKarte.module.css         │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Schemakarte                                                           │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Fläche ─────────────────────────────────────────────── */
+
+.karte {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  font-family: var(--sl-font-sans);
+}
+
+.grund {
+  fill: var(--sl-paper);
+}
+
+.raster {
+  stroke: var(--sl-line-soft);
+  stroke-width: 1;
+}
+
+.ort circle {
+  fill: var(--sl-mute-2);
+}
+
+.ort text {
+  fill: var(--sl-mute);
+  font-size: 11px;
+}
+
+.hq rect {
+  fill: var(--sl-ink);
+}
+
+.hq text {
+  fill: var(--sl-ink-2);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* ── §2 · Linien & Pins ──────────────────────────────────────── */
+
+.linie {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+.linie-gestrichelt {
+  stroke-dasharray: 4 4;
+}
+
+.pin {
+  --sl-edge: var(--sl-ink-2);
+}
+
+.pin-kreis {
+  fill: var(--sl-edge);
+  stroke: var(--sl-surface);
+  stroke-width: 2;
+}
+
+.pin-label {
+  fill: #ffffff;
+  font-family: var(--sl-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.pin-ring {
+  fill: none;
+  stroke: var(--sl-signal);
+  stroke-width: 2;
+}
+
+.pin-gedimmt {
+  opacity: 0.35;
+}
+
+.pin-klickbar {
+  cursor: pointer;
+}
+
+.pin-klickbar:hover .pin-kreis {
+  stroke: var(--sl-ink);
+}
+
+.pin-klickbar:focus-visible {
+  outline: none;
+}
+
+.pin-klickbar:focus-visible .pin-kreis {
+  stroke: var(--sl-signal);
+  stroke-width: 3;
+}
+
+/* ── §3 · Massstab & Hinweis ─────────────────────────────────── */
+
+.massstab line {
+  stroke: var(--sl-ink-2);
+  stroke-width: 1;
+}
+
+.massstab text {
+  fill: var(--sl-mute);
+  font-family: var(--sl-font-mono);
+  font-size: 10px;
+}
+
+.hinweis {
+  fill: var(--sl-mute-2);
+  font-size: 10px;
+}
+
+.kompakt .raster {
+  stroke: var(--sl-line-soft);
+}
+
+.kompakt .hq text,
+.kompakt .ort text {
+  font-size: 10px;
+}
+
+.luftlinie {
+  stroke: var(--sl-line-strong);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+/* ◆ jh · eof */

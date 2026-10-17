@@ -1,0 +1,369 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/views/Kalender.module.css            │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Kalender: Zeitraster, Ganztagleiste, Spalten, Monat                   │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Raster & Kopf ──────────────────────────────────────── */
+
+.raster {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--sl-surface);
+}
+
+.kopf {
+  display: flex;
+  flex: none;
+  border-bottom: var(--sl-hairline);
+}
+
+.kopf-ecke {
+  flex: none;
+  border-right: var(--sl-hairline);
+}
+
+.spalten-kopf {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  border-right: 1px solid var(--sl-line-soft);
+  text-align: left;
+}
+
+.spalten-kopf:hover {
+  background: var(--sl-hover);
+}
+
+.kopf-heute::before {
+  content: '';
+  position: absolute;
+  inset: 6px auto 6px 0;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.spalten-titel {
+  overflow: hidden;
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.spalten-untertitel {
+  flex: none;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Ganztag ────────────────────────────────────────────── */
+
+.ganztag {
+  display: flex;
+  flex: none;
+  min-height: 30px;
+  border-bottom: var(--sl-hairline);
+  background: var(--sl-paper);
+}
+
+.ganztag-label {
+  flex: none;
+  padding: 7px 8px;
+  border-right: var(--sl-hairline);
+  font-size: 10px;
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.ganztag-zelle {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 3px;
+  min-width: 0;
+  padding: 4px 6px;
+  border-right: 1px solid var(--sl-line-soft);
+}
+
+.ganztag-chip {
+  padding: 1px 6px;
+  border: 1px dashed var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-ink-2);
+  white-space: nowrap;
+}
+
+/* ── §3 · Körper, Rinne, Spalte ──────────────────────────────── */
+
+.koerper {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.rinne {
+  position: relative;
+  flex: none;
+  border-right: var(--sl-hairline);
+}
+
+.stunde {
+  position: absolute;
+  right: 6px;
+  transform: translateY(-50%);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.spalte {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  border-right: 1px solid var(--sl-line-soft);
+}
+
+.spalte-heute {
+  background: color-mix(in srgb, var(--sl-signal) 3%, var(--sl-surface));
+}
+
+.spalte-wochenende {
+  background: var(--sl-paper);
+}
+
+.spalte-ziel::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 3;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.randzeit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: var(--sl-past-wash);
+  pointer-events: none;
+}
+
+.mittag {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: repeating-linear-gradient(135deg, transparent 0 5px, var(--sl-line-soft) 5px 6px);
+  pointer-events: none;
+}
+
+.linie {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--sl-line-soft);
+  pointer-events: none;
+}
+
+.linie-stunde {
+  background: var(--sl-line);
+}
+
+.absenz {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: repeating-linear-gradient(135deg, transparent 0 8px, var(--sl-line-soft) 8px 9px);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.ghost {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  z-index: var(--sl-z-plan-drag);
+  display: flex;
+  flex-direction: column;
+  padding: 2px 6px;
+  overflow: hidden;
+  border: 1px dashed var(--sl-ink-2);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface-veil);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  pointer-events: none;
+}
+
+.ghost-konflikt {
+  border-color: var(--sl-danger);
+  color: var(--sl-danger-ink);
+}
+
+.ghost-grund {
+  font-family: var(--sl-font-sans);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-regular);
+  color: var(--sl-mute);
+}
+
+.jetzt {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: var(--sl-z-plan-now);
+  height: 1px;
+  background: var(--sl-signal);
+  pointer-events: none;
+}
+
+.jetzt::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sl-signal);
+}
+
+/* ── §4 · Monat ──────────────────────────────────────────────── */
+
+.monat {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--sl-surface);
+}
+
+.monat-kopf {
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-bottom: var(--sl-hairline);
+}
+
+.monat-kopf span {
+  padding: 8px 10px;
+  border-right: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.monat-raster {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  min-height: 0;
+}
+
+.monat-zelle {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  padding: 4px 6px 6px;
+  border-right: 1px solid var(--sl-line-soft);
+  border-bottom: 1px solid var(--sl-line-soft);
+  overflow: hidden;
+}
+
+.monat-fremd {
+  background: var(--sl-paper);
+}
+
+.monat-fremd .monat-tag {
+  color: var(--sl-mute-2);
+}
+
+.monat-heute .monat-tag {
+  background: var(--sl-ink);
+  color: var(--sl-paper);
+}
+
+.monat-tag {
+  align-self: flex-start;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--sl-radius-1);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+}
+
+.monat-tag:hover {
+  background: var(--sl-hover);
+}
+
+.pillen {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+}
+
+.mehr {
+  align-self: flex-start;
+  padding: 0 4px;
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-ink-2);
+}
+
+.mehr:hover {
+  color: var(--sl-signal-ink);
+}
+
+.tages-popover {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px 12px;
+}
+
+.tages-popover-kopf {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+  font-size: var(--sl-fs-13);
+}
+
+.tages-popover-link {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ◆ jh · eof */

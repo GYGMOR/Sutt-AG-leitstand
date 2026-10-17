@@ -1,0 +1,310 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/views/Plantafel.module.css           │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Plantafel: Scroller, Kopf, Spur, Puffer, Slots, Vorschau, Jetzt       │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Scroller & Kopf ────────────────────────────────────── */
+
+.scroller {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  background: var(--sl-surface);
+  border-bottom: var(--sl-hairline);
+}
+
+.inhalt {
+  position: relative;
+  min-width: 100%;
+}
+
+.kopf {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  height: 36px;
+  border-bottom: var(--sl-hairline);
+  background: var(--sl-surface);
+}
+
+.ecke {
+  position: sticky;
+  left: 0;
+  z-index: 7;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  width: var(--sl-plan-tech-w);
+  padding: 0 12px 0 16px;
+  border-right: var(--sl-hairline);
+  background: var(--sl-surface);
+}
+
+.ecke-label {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.ecke-anzahl {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.achse {
+  position: relative;
+  flex: none;
+  height: 100%;
+}
+
+.stunde {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  padding: 0 0 6px 5px;
+  border-left: 1px solid var(--sl-line);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  transition: opacity var(--sl-dur-fast) var(--sl-ease);
+}
+
+.stunde-verdeckt {
+  opacity: 0;
+}
+
+/* jh› Die Pille sitzt über der Achse, halbiert auf der Linie – Stundenlabels weichen aus. */
+.jetzt-pille {
+  position: absolute;
+  bottom: 5px;
+  z-index: 2;
+  padding: 1px 5px;
+  transform: translateX(-50%);
+  border: 1px solid var(--sl-signal);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  line-height: 14px;
+  color: var(--sl-signal-ink);
+  white-space: nowrap;
+}
+
+/* ── §2 · Zeile & Spur ───────────────────────────────────────── */
+
+.zeile {
+  display: flex;
+  border-bottom: var(--sl-hairline);
+}
+
+.techniker-spalte {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  flex: none;
+}
+
+.spur {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+}
+
+/* Zielzeile beim Ziehen: Messmarke am linken Rand der Spur */
+.spur-ziel::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 3;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.randzeit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--sl-past-wash);
+  pointer-events: none;
+}
+
+.vergangen {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--sl-past-wash);
+  pointer-events: none;
+}
+
+.mittag {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(135deg, transparent 0 5px, var(--sl-line-soft) 5px 6px);
+  pointer-events: none;
+}
+
+.linie {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--sl-line-soft);
+  pointer-events: none;
+}
+
+.linie-stunde {
+  background: var(--sl-line);
+}
+
+/* ── §3 · Absenz, Slots, Puffer ──────────────────────────────── */
+
+.absenz {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px dashed var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: repeating-linear-gradient(135deg, transparent 0 8px, var(--sl-line-soft) 8px 9px);
+  color: var(--sl-mute);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+}
+
+.absenz-notiz {
+  font-weight: var(--sl-fw-regular);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* jh› Smart-Slots: Rasterschritte in Grün/Gelb/Rot – transluzent, damit Linien lesbar bleiben. */
+.slot {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  pointer-events: none;
+}
+
+.slot-gut {
+  background: var(--sl-slot-gut);
+}
+
+.slot-ok {
+  background: var(--sl-slot-ok);
+}
+
+.slot-schlecht {
+  background: var(--sl-slot-schlecht);
+}
+
+.puffer {
+  position: absolute;
+  border-radius: var(--sl-radius-1);
+  background: repeating-linear-gradient(135deg, transparent 0 3px, var(--sl-line-strong) 3px 4px);
+  opacity: 0.4;
+  pointer-events: auto;
+}
+
+.puffer-knapp {
+  background: repeating-linear-gradient(135deg, var(--sl-danger-wash) 0 3px, var(--sl-danger) 3px 4px);
+  opacity: 0.7;
+}
+
+/* ── §4 · Vorschau & Jetzt ───────────────────────────────────── */
+
+.ghost {
+  position: absolute;
+  z-index: var(--sl-z-plan-drag);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  padding: 0 6px;
+  overflow: hidden;
+  border: 1px dashed var(--sl-ink-2);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface-veil);
+  pointer-events: none;
+}
+
+.ghost-gut {
+  border-color: var(--sl-ok);
+}
+
+.ghost-ok {
+  border-color: var(--sl-warn);
+}
+
+.ghost-schlecht,
+.ghost-konflikt {
+  border-color: var(--sl-danger);
+}
+
+.ghost-zeit {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  white-space: nowrap;
+}
+
+.ghost-grund {
+  overflow: hidden;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ghost-gut .ghost-grund {
+  color: var(--sl-slot-gut-ink);
+}
+
+.ghost-ok .ghost-grund {
+  color: var(--sl-slot-ok-ink);
+}
+
+.ghost-schlecht .ghost-grund,
+.ghost-konflikt .ghost-grund,
+.ghost-konflikt .ghost-zeit {
+  color: var(--sl-danger-ink);
+}
+
+.jetzt {
+  position: absolute;
+  top: 0;
+  bottom: -1px;
+  z-index: var(--sl-z-plan-now);
+  width: 1px;
+  background: var(--sl-signal);
+  pointer-events: none;
+}
+
+.leer {
+  padding: var(--sl-space-8) var(--sl-space-5);
+  color: var(--sl-mute);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ◆ jh · eof */

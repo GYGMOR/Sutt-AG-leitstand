@@ -1,0 +1,159 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/views/Karte.module.css               │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Kartenansicht mit Tourenliste                                         │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Raster ─────────────────────────────────────────────── */
+
+.karte {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 300px minmax(0, 1fr);
+  min-height: 0;
+  background: var(--sl-surface);
+}
+
+.flaeche {
+  position: relative;
+  min-height: 0;
+}
+
+/* ── §2 · Tourenliste ────────────────────────────────────────── */
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: var(--sl-hairline);
+  overflow-y: auto;
+}
+
+.liste-kopf {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  padding: 10px var(--sl-space-4) 8px;
+  border-bottom: var(--sl-hairline);
+}
+
+.titel {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.untertitel {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.tour {
+  border-bottom: var(--sl-hairline);
+}
+
+.tour-kopf {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 2px 10px;
+  align-items: center;
+  padding: 8px var(--sl-space-4) 6px;
+}
+
+.tour-name {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+}
+
+.tour-meta {
+  grid-column: 2;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.stationen {
+  display: flex;
+  flex-direction: column;
+  padding: 0 8px 8px;
+}
+
+.station {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px 44px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  padding: 4px 8px;
+  border-radius: var(--sl-radius-1);
+  text-align: left;
+}
+
+.station:hover {
+  background: var(--sl-hover);
+}
+
+.station-aktiv,
+.station-aktiv:hover {
+  background: var(--sl-press);
+}
+
+.station-aktiv::before {
+  content: '';
+  position: absolute;
+  inset: 3px auto 3px 0;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.station-abgeblendet {
+  opacity: 0.4;
+}
+
+/* jh› Stopp-Nummer im Technikerfarbkreis – identisch mit dem Pin auf der Karte. */
+.nummer {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--sl-edge);
+  color: #ffffff;
+  font-family: var(--sl-font-mono);
+  font-size: 10px;
+  font-weight: var(--sl-fw-semibold);
+}
+
+.zeit {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+}
+
+.station-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.station-kunde {
+  overflow: hidden;
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.station-ort {
+  overflow: hidden;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.leer {
+  padding: var(--sl-space-6) var(--sl-space-4);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

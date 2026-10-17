@@ -1,0 +1,109 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/views/KompaktBlock.module.css        │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Kompakter Einsatz / Monatspille                                       │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Block ──────────────────────────────────────────────── */
+
+.block {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 6px;
+  width: 100%;
+  padding: 2px 4px 2px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-tint);
+  color: var(--sl-tint-ink);
+  text-align: left;
+  cursor: grab;
+}
+
+.block::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: 3px;
+  background: var(--sl-edge);
+}
+
+.block:hover {
+  border-color: var(--sl-edge);
+}
+
+.zeit {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  line-height: 15px;
+}
+
+.ort {
+  overflow: hidden;
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  line-height: 15px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.kunde {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  font-size: var(--sl-fs-label);
+  line-height: 14px;
+  color: var(--sl-ink-2);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ── §2 · Pille (Monat) ──────────────────────────────────────── */
+
+.pille {
+  grid-template-columns: auto 1fr;
+  padding: 1px 4px 1px 7px;
+}
+
+.pille .kunde {
+  grid-column: auto;
+  color: var(--sl-tint-ink);
+  font-weight: var(--sl-fw-medium);
+}
+
+/* ── §3 · Zustände ───────────────────────────────────────────── */
+
+.dringend::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  border-style: solid;
+  border-width: 0 7px 7px 0;
+  border-color: transparent var(--sl-st-dringend) transparent transparent;
+}
+
+.erledigt {
+  filter: saturate(0.25);
+  opacity: 0.8;
+}
+
+.abgeblendet {
+  opacity: 0.28;
+}
+
+.ausgewaehlt,
+.ausgewaehlt:hover {
+  border-color: var(--sl-ink);
+  outline: 1px solid var(--sl-ink);
+}
+
+.markiert {
+  border-color: var(--sl-signal);
+}
+
+.gezogen {
+  opacity: 0.35;
+}
+
+/* ◆ jh · eof */

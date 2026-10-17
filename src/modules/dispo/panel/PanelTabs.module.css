@@ -1,0 +1,131 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/panel/PanelTabs.module.css           │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Gemeinsame Stile der Panel-Tabs (Eingang, Wartet, Erledigt)           │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Liste ──────────────────────────────────────────────── */
+
+.untertitel {
+  flex: none;
+  padding: 8px var(--sl-space-3) 4px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-2);
+  padding: 6px var(--sl-space-3) var(--sl-space-4);
+}
+
+.leer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sl-space-2);
+  padding: var(--sl-space-8) var(--sl-space-4);
+  color: var(--sl-mute);
+}
+
+.fuss {
+  flex: none;
+  margin-top: auto;
+  padding: 8px var(--sl-space-3);
+  border-top: var(--sl-hairline);
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Eintrag (Wartet / Erledigt) ────────────────────────── */
+
+.eintrag {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+}
+
+.eintrag-aktiv {
+  border-color: var(--sl-ink-2);
+}
+
+.eintrag-aktiv::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.eintrag-kopf {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+}
+
+.eintrag-kopf:hover .eintrag-kunde {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--sl-line-strong);
+}
+
+.eintrag-kunde {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.eintrag-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.eintrag-text {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.teile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  border-left: 2px solid var(--sl-st-wartet-teil);
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-12);
+}
+
+.teile dt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: var(--sl-fw-medium);
+}
+
+.teile dd {
+  color: var(--sl-mute);
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* ◆ jh · eof */

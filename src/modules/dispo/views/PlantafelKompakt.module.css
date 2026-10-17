@@ -1,0 +1,167 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/views/PlantafelKompakt.module.css    │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Mehrtages-Plantafel                                                   │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rahmen ─────────────────────────────────────────────── */
+
+.tafel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--sl-surface);
+}
+
+.koerper {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ── §2 · Kopf ───────────────────────────────────────────────── */
+
+.kopf {
+  display: flex;
+  flex: none;
+  border-bottom: var(--sl-hairline);
+}
+
+.ecke {
+  display: flex;
+  align-items: center;
+  width: var(--sl-plan-tech-w);
+  flex: none;
+  padding: 0 12px 0 16px;
+  border-right: var(--sl-hairline);
+}
+
+.ecke-label {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.tag-kopf {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  border-right: 1px solid var(--sl-line-soft);
+  text-align: left;
+}
+
+.tag-kopf:hover {
+  background: var(--sl-hover);
+}
+
+.wochentag {
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.tag-datum,
+.tag-anzahl {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.tag-anzahl {
+  margin-left: auto;
+  font-size: var(--sl-fs-label);
+}
+
+.heute::before {
+  content: '';
+  position: absolute;
+  inset: 6px auto 6px 0;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.gewaehlt::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px 0;
+  height: 2px;
+  background: var(--sl-ink);
+}
+
+/* ── §3 · Zeilen & Zellen ────────────────────────────────────── */
+
+.zeile {
+  display: flex;
+  min-height: 112px;
+  border-bottom: var(--sl-hairline);
+}
+
+.zelle {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  padding: 6px 6px 18px;
+  border-right: 1px solid var(--sl-line-soft);
+}
+
+.vergangen {
+  background: var(--sl-past-wash);
+}
+
+.zelle-ziel {
+  outline: 1px dashed var(--sl-ink-2);
+  outline-offset: -3px;
+}
+
+.liste {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.absenz {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: repeating-linear-gradient(135deg, transparent 0 8px, var(--sl-line-soft) 8px 9px);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.vorschau {
+  margin-top: 2px;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+}
+
+.vorschau-konflikt {
+  color: var(--sl-danger-ink);
+}
+
+.summe {
+  position: absolute;
+  right: 8px;
+  bottom: 3px;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

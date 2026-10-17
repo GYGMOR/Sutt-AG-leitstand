@@ -1,0 +1,77 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/hover/EinsatzHovercard.module.css    │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Hovercard-Inhalt                                                      │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Aufbau ─────────────────────────────────────────────── */
+
+.karte {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px 12px;
+}
+
+.kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-space-2);
+  margin-bottom: 4px;
+}
+
+.kunde {
+  font-size: var(--sl-fs-14);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+}
+
+.adresse,
+.geraet {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.fehler {
+  margin-top: 2px;
+  padding-left: 8px;
+  border-left: 2px solid var(--sl-line-strong);
+  font-size: var(--sl-fs-12);
+  line-height: 16px;
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Zeit & Karte ───────────────────────────────────────── */
+
+.zeit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: var(--sl-fs-12);
+}
+
+.zeit .mono {
+  color: var(--sl-ink);
+  font-weight: var(--sl-fw-medium);
+}
+
+.swatch {
+  width: 3px;
+  height: 14px;
+  background: var(--sl-status);
+}
+
+.minikarte {
+  margin-top: 6px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  overflow: hidden;
+}
+
+/* ◆ jh · eof */

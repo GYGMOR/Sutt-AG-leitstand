@@ -1,0 +1,106 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/akte/AkteFotos.module.css            │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Fotoraster und Lightbox                                               │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Raster ─────────────────────────────────────────────── */
+
+.raster {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.foto {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  text-align: left;
+}
+
+.foto:hover .kachel {
+  border-color: var(--sl-ink-2);
+}
+
+.kachel {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius-1);
+}
+
+.kachel-gross {
+  width: 420px;
+  max-width: 100%;
+}
+
+.kachel-grund {
+  fill: var(--sl-paper);
+}
+
+.kachel-strich {
+  fill: none;
+  stroke: var(--sl-mute);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.beschriftung {
+  overflow: hidden;
+  font-size: 10px;
+  color: var(--sl-mute);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.leer {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.leer svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+/* ── §2 · Lightbox ───────────────────────────────────────────── */
+
+.lightbox {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 32px;
+  gap: var(--sl-space-3);
+  align-items: center;
+  justify-items: center;
+  padding-bottom: 24px;
+}
+
+.zaehler {
+  position: absolute;
+  left: 44px;
+  bottom: 0;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.schliessen-hinweis {
+  position: absolute;
+  right: 44px;
+  bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */
