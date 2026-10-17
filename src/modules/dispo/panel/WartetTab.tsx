@@ -5,10 +5,10 @@
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useState } from 'react';
-import { CalendarPlus, PackageSearch } from 'lucide-react';
+import { CalendarCheck, CalendarPlus, PackageSearch } from 'lucide-react';
 import type { IsoDatum, Minuten } from '../../../core/datum';
 import { isTeilOffen } from '../../../core/domain/auftrag';
-import { formatDatum, formatDatumKurz } from '../../../core/format';
+import { formatDatum, formatDatumKurz, formatWochentag, formatZeit } from '../../../core/format';
 import { Avatar } from '../../../core/ui/Avatar';
 import { Button } from '../../../core/ui/Button';
 import { Typenschild } from '../../../core/ui/Typenschild';
@@ -43,6 +43,7 @@ export function WartetTab({ eintraege, stammdaten, einsaetze, heute, jetztMin, a
         {eintraege.map((view) => {
           const teile = view.auftrag.ersatzteile.filter(isTeilOffen);
           const pendenzId = pendenzIdFuer(view.auftrag.id);
+          const folge = view.folgeGeplant;
           const zeigtVorschlaege = offen === view.einsatz.id;
           return (
             <li key={view.einsatz.id} className={cx(styles.eintrag, view.einsatz.id === ausgewaehltId && styles.eintragAktiv)}>
@@ -70,7 +71,11 @@ export function WartetTab({ eintraege, stammdaten, einsaetze, heute, jetztMin, a
                   </div>
                 )}
               </dl>
-              {pendenzId ? (
+              {folge ? (
+                <Button variant="secondary" size="sm" icon={CalendarCheck} onClick={() => onSelectEinsatz(folge.id)} title="Geplanten Folgetermin öffnen">
+                  Folgetermin {formatWochentag(folge.datum, 'kurz')} {formatDatumKurz(folge.datum)} {formatZeit(folge.startMin)}
+                </Button>
+              ) : pendenzId ? (
                 <Button variant="secondary" size="sm" icon={CalendarPlus} onClick={() => onSelectPendenz(pendenzId)}>
                   Folgetermin im Eingang zeigen
                 </Button>
@@ -79,7 +84,7 @@ export function WartetTab({ eintraege, stammdaten, einsaetze, heute, jetztMin, a
                   {zeigtVorschlaege ? 'Vorschläge ausblenden' : 'Folgetermin vorschlagen'}
                 </Button>
               )}
-              {zeigtVorschlaege && !pendenzId && (
+              {zeigtVorschlaege && !pendenzId && !folge && (
                 <SlotVorschlaege
                   stammdaten={stammdaten}
                   einsaetze={einsaetze}

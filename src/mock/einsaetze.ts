@@ -18,7 +18,8 @@ const PLAN_HEUTE: Readonly<Record<string, readonly PlanZeile[]>> = {
   'T-MB': [['A01', '07:30', 90], ['A02', '09:30', 60], ['A03', '11:00', 60], ['A04', '13:30', 90], ['A05', '16:30', 60]],
   'T-SK': [['A06', '07:30', 60], ['A07', '09:00', 90], ['A08', '11:00', 30], ['A09', '13:00', 90], ['A10', '15:00', 60]],
   'T-DM': [['A11', '08:00', 90], ['A12', '10:00', 60], ['A13', '11:30', 30], ['A14', '13:30', 120], ['A15', '16:30', 60]],
-  'T-LF': [['A16', '07:30', 60], ['A17', '08:30', 90], ['A18', '10:30', 60], ['A19', '13:00', 60], ['A20', '15:30', 90]],
+  // jh› A39 = Mietgerät zur Reparatur 26-04788 (MB, 07:30) – bewusst am selben Tag, damit die Verknüpfung im Plan sichtbar ist.
+  'T-LF': [['A16', '07:30', 60], ['A17', '08:30', 90], ['A18', '10:30', 60], ['A19', '13:00', 60], ['A39', '14:00', 60], ['A20', '15:30', 90]],
   'T-RH': [['A21', '08:00', 60], ['A22', '09:30', 90], ['A23', '13:00', 60], ['A24', '14:30', 60]],
   'T-NA': [['A25', '07:30', 90], ['A26', '09:30', 30], ['A27', '10:30', 90], ['A28', '14:00', 90]],
 };
@@ -83,7 +84,14 @@ const EINSATZ_GESTERN: Einsatz = {
   status: 'wartet-teil',
 };
 
-export const HAND_EINSAETZE: readonly Einsatz[] = [...buildTagesplan(), EINSATZ_GESTERN];
+// jh› Geplante Folgetermine: zweiter Einsatz desselben Auftrags nach der Teillieferung –
+//     im Plan als Verknüpfung (Linie) zum Ersttermin sichtbar.
+const FOLGETERMINE: readonly Einsatz[] = [
+  { id: 'E-A01-F', auftragId: 'A01', technikerId: 'T-MB', datum: tag(5), startMin: hm('08:00'), dauerMin: 60, status: 'geplant' },
+  { id: 'E-A25-F', auftragId: 'A25', technikerId: 'T-NA', datum: tag(3), startMin: hm('10:00'), dauerMin: 60, status: 'geplant' },
+];
+
+export const HAND_EINSAETZE: readonly Einsatz[] = [...buildTagesplan(), EINSATZ_GESTERN, ...FOLGETERMINE];
 
 // ── §3 · Pendenzen (Auftragseingang) ─────────────────────────────
 
@@ -100,7 +108,6 @@ export const HAND_PENDENZEN: readonly Pendenz[] = [
   { id: 'P-A36', auftragId: 'A36', anlass: 'neu', dauerMin: 60, erstelltAm: zeitpunkt(-1, '09:55') },
   { id: 'P-A37', auftragId: 'A37', anlass: 'neu', dauerMin: 90, erstelltAm: zeitpunkt(-5, '11:35') },
   { id: 'P-A38', auftragId: 'A38', anlass: 'neu', dauerMin: 30, erstelltAm: zeitpunkt(-2, '15:20') },
-  { id: 'P-A39', auftragId: 'A39', anlass: 'neu', dauerMin: 60, erstelltAm: zeitpunkt(0, '09:02'), hinweis: 'Mietgerät MIET-0417 reserviert' },
   { id: 'P-A40', auftragId: 'A40', anlass: 'neu', dauerMin: 180, erstelltAm: zeitpunkt(-2, '10:20'), fruehestensAm: tag(5), hinweis: 'Nach Pumpentausch 26-04790' },
   { id: 'P-A41', auftragId: 'A41', anlass: 'neu', dauerMin: 90, erstelltAm: zeitpunkt(0, '09:45'), fruehestensAm: tag(2), hinweis: 'Gerät trifft übermorgen im Lager ein' },
 ];

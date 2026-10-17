@@ -4,7 +4,7 @@
    │  Auftrags-Akte: Karte, Kopf, Detailzeilen, Fotos, Teile, Verlauf, Tun  │
    └────────────────────────────────────────────────────────────────────────┘ */
 
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import {
   ArrowRight,
@@ -16,6 +16,7 @@ import {
   Copy,
   FileText,
   Inbox,
+  Link2,
   Lock,
   MapPin,
   Maximize2,
@@ -51,6 +52,7 @@ import { MapCanvas } from '../karte/MapCanvas';
 import type { KartenLinie, KartenPin } from '../karte/karte.types';
 import { KundenChips } from '../KundenChips';
 import type { EinsatzAenderung } from '../store/dispo.reducer';
+import { verknuepfungenFuerAuftrag } from '../store/dispo.selectors';
 import { AkteErsatzteile } from './AkteErsatzteile';
 import { AkteFotos } from './AkteFotos';
 import { AkteVerlauf } from './AkteVerlauf';
@@ -133,6 +135,8 @@ export function Akte({ akte, stammdaten, einsaetze, heute, jetztMin, onClose, on
   const routeUrl = googleRouteUrl(koordinaten, vorgaenger?.koordinaten);
   const garantie = geraet.garantieBis ? (geraet.garantieBis < heute ? `abgelaufen ${formatDatum(geraet.garantieBis)}` : `bis ${formatDatum(geraet.garantieBis)}`) : 'keine';
   const zeigeEinsatzListe = akte.einsaetze.length > 1 || (pendenz !== null && akte.einsaetze.length > 0);
+  // jh› Zusammenhänge zu anderen Aufträgen (Mietgerät, Ersatzlieferung, Folgearbeiten) – anklickbar, wenn disponiert.
+  const verknuepfungen = useMemo(() => verknuepfungenFuerAuftrag(stammdaten, einsaetze, auftrag.id, einsatz).filter((eintrag) => eintrag.art === 'bezug' || eintrag.art === 'bezogen'), [stammdaten, einsaetze, auftrag.id, einsatz]);
 
   return (
     <div className={styles.akte} role="region" aria-label={`Akte ${auftrag.nummer}`}>
@@ -183,6 +187,26 @@ export function Akte({ akte, stammdaten, einsaetze, heute, jetztMin, onClose, on
               </Chip>
             )}
           </div>
+          {verknuepfungen.length > 0 && (
+            <div className={styles.verknuepfungen}>
+              {verknuepfungen.map((verknuepfung, index) => {
+                const ziel = verknuepfung.einsatzId ? einsaetze.find((kandidat) => kandidat.id === verknuepfung.einsatzId) : undefined;
+                return (
+                  <button
+                    key={`${verknuepfung.auftragId}-${index}`}
+                    type="button"
+                    className={styles.verknuepfung}
+                    disabled={!ziel}
+                    title={ziel ? 'Verknüpften Einsatz öffnen' : verknuepfung.text}
+                    onClick={() => ziel && onOpenEinsatz(ziel)}
+                  >
+                    <Link2 size={14} strokeWidth={1.5} aria-hidden />
+                    <span>{verknuepfung.text}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
           <KundenChips kunde={kunde} liegenschaft={liegenschaft} />
         </header>
 

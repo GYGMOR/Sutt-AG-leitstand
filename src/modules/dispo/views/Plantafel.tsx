@@ -11,11 +11,11 @@ import type { IsoDatum, Minuten } from '../../../core/datum';
 import { ABSENZ_LABEL } from '../../../core/domain/stammdaten';
 import { formatDauer, formatZeit, formatZeitspanne } from '../../../core/format';
 import { useElementSize } from '../../../core/hooks/useElementSize';
-import { cx } from '../../../core/ui/cx';
+import { cx, modulKlasse } from '../../../core/ui/cx';
 import { useDispoDnd, vorschauText } from '../drag/DispoDnd';
 import type { DropZoneData } from '../drag/DispoDnd';
 import type { FarbeNach, Zoom } from '../dispo.types';
-import type { Puls, TagesZeile } from '../store/dispo.selectors';
+import type { EinsatzView, Puls, TagesZeile } from '../store/dispo.selectors';
 import {
   ACHSE_ENDE,
   ACHSE_START,
@@ -31,6 +31,7 @@ import {
 import type { Skala } from '../zeitraster';
 import { EinsatzBlock } from './EinsatzBlock';
 import { TechnikerZelle } from './TechnikerZelle';
+import { BlockRegistryProvider, Verbindungen } from './Verbindungen';
 import styles from './Plantafel.module.css';
 
 // ── §1 · Geometrie ───────────────────────────────────────────────
@@ -92,10 +93,12 @@ interface SpurProps {
   farbeNach: FarbeNach;
   ausgewaehltId: string | null;
   markiertId: string | null;
+  /** Einsätze, die mit der Auswahl verknüpft sind (gestrichelter Ring). */
+  verwandteIds: ReadonlySet<string>;
   onSelectEinsatz: (einsatzId: string) => void;
 }
 
-function Spur({ zeile, skala, rowH, heute, jetztMin, farbeNach, ausgewaehltId, markiertId, onSelectEinsatz }: SpurProps) {
+function Spur({ zeile, skala, rowH, heute, jetztMin, farbeNach, ausgewaehltId, markiertId, verwandteIds, onSelectEinsatz }: SpurProps) {
   const spurRef = useRef<HTMLDivElement | null>(null);
   const skalaRef = useRef(skala);
   skalaRef.current = skala;
@@ -151,7 +154,7 @@ function Spur({ zeile, skala, rowH, heute, jetztMin, farbeNach, ausgewaehltId, m
       {slots?.map((fenster) => (
         <div
           key={fenster.startMin}
-          className={cx(styles.slot, styles[`slot-${fenster.bewertung.stufe}`])}
+          className={cx(styles.slot, modulKlasse(styles, `slot-${fenster.bewertung.stufe}`))}
           style={{ left: xOf(skala, fenster.startMin), width: breiteOf(skala, skala.rasterMin) }}
           title={`${formatZeit(fenster.startMin)} · ${fenster.bewertung.gruende.join(' · ')}`}
         />
@@ -175,13 +178,14 @@ function Spur({ zeile, skala, rowH, heute, jetztMin, farbeNach, ausgewaehltId, m
           farbeNach={farbeNach}
           ausgewaehlt={view.einsatz.id === ausgewaehltId}
           markiert={view.einsatz.id === markiertId}
+          verwandt={verwandteIds.has(view.einsatz.id)}
           onSelect={onSelectEinsatz}
         />
       ))}
 
       {vorschau && vorschau.passt && (
         <div
-          className={cx(styles.ghost, vorschau.pruefung.konflikt && styles.ghostKonflikt, vorschau.bewertung && styles[`ghost-${vorschau.bewertung.stufe}`])}
+          className={cx(styles.ghost, vorschau.pruefung.konflikt && styles.ghostKonflikt, vorschau.bewertung && modulKlasse(styles, `ghost-${vorschau.bewertung.stufe}`))}
           style={blockPosition(skala, vorschau.startMin, vorschau.dauerMin, 0, rowH)}
           aria-hidden
         >
@@ -217,8 +221,13 @@ interface PlantafelProps {
 
 export function Plantafel({ zeilen, datum, heute, jetztMin, zoom, farbeNach, pulse, ausgewaehltId, markiertId, onSelectEinsatz, onZoom, onDrucken, onSkala, onRestHoehe }: PlantafelProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const inhaltRef = useRef<HTMLDivElement>(null);
   const groesse = useElementSize(scrollerRef);
   const techW = 176;
+
+  // jh› Gewählter Einsatz samt Verknüpfungen – Linien und gestrichelte Ringe hängen daran.
+  const aktiv = useMemo<EinsatzView | null>(() => zeilen.flatMap((zeile) => zeile.einsaetze).find((view) => view.einsatz.id === ausgewaehltId) ?? null, [zeilen, ausgewaehltId]);
+  const verwandteIds = useMemo(() => new Set((aktiv?.verknuepfungen ?? []).flatMap((verknuepfung) => (verknuepfung.einsatzId ? [verknuepfung.einsatzId] : []))), [aktiv]);
 
   const skala = useMemo(() => createSkala(Math.max(groesse.width - techW - 1, 320), zoom), [groesse.width, zoom]);
   const zeigeJetzt = datum === heute && jetztMin >= ACHSE_START && jetztMin <= ACHSE_ENDE;
@@ -268,42 +277,46 @@ export function Plantafel({ zeilen, datum, heute, jetztMin, zoom, farbeNach, pul
 
   return (
     <div ref={scrollerRef} className={styles.scroller} style={{ maxHeight: inhaltHoehe + 2 }}>
-      <div className={styles.inhalt} style={{ width: techW + gesamtBreite(skala) }}>
-        <div className={styles.kopf}>
-          <div className={styles.ecke}>
-            <span className={styles.eckeLabel}>Techniker</span>
-            <span className={styles.eckeAnzahl}>{zeilen.length}</span>
+      <BlockRegistryProvider>
+        <div ref={inhaltRef} className={styles.inhalt} style={{ width: techW + gesamtBreite(skala) }}>
+          <div className={styles.kopf}>
+            <div className={styles.ecke}>
+              <span className={styles.eckeLabel}>Techniker</span>
+              <span className={styles.eckeAnzahl}>{zeilen.length}</span>
+            </div>
+            <Zeitachse skala={skala} jetztMin={jetztAnzeige} />
           </div>
-          <Zeitachse skala={skala} jetztMin={jetztAnzeige} />
-        </div>
 
-        {zeilen.map((zeile) => (
-          <div key={zeile.techniker.id} className={styles.zeile} style={{ height: zeile.spuren * rowH }}>
-            <div className={styles.technikerSpalte}>
-              <TechnikerZelle
-                techniker={zeile.techniker}
-                geplantMin={zeile.geplantMin}
-                fahrzeitMin={zeile.fahrzeitMin}
-                sollMin={zeile.absenz ? 0 : zeile.techniker.sollMinuten}
-                puls={pulse.get(zeile.techniker.id) ?? null}
-                onDrucken={onDrucken}
+          {zeilen.map((zeile) => (
+            <div key={zeile.techniker.id} className={styles.zeile} style={{ height: zeile.spuren * rowH }}>
+              <div className={styles.technikerSpalte}>
+                <TechnikerZelle
+                  techniker={zeile.techniker}
+                  geplantMin={zeile.geplantMin}
+                  fahrzeitMin={zeile.fahrzeitMin}
+                  sollMin={zeile.absenz ? 0 : zeile.techniker.sollMinuten}
+                  puls={pulse.get(zeile.techniker.id) ?? null}
+                  onDrucken={onDrucken}
+                />
+              </div>
+              <Spur
+                zeile={zeile}
+                skala={skala}
+                rowH={rowH}
+                heute={heute}
+                jetztMin={jetztAnzeige}
+                farbeNach={farbeNach}
+                ausgewaehltId={ausgewaehltId}
+                markiertId={markiertId}
+                verwandteIds={verwandteIds}
+                onSelectEinsatz={onSelectEinsatz}
               />
             </div>
-            <Spur
-              zeile={zeile}
-              skala={skala}
-              rowH={rowH}
-              heute={heute}
-              jetztMin={jetztAnzeige}
-              farbeNach={farbeNach}
-              ausgewaehltId={ausgewaehltId}
-              markiertId={markiertId}
-              onSelectEinsatz={onSelectEinsatz}
-            />
-          </div>
-        ))}
-        {zeilen.length === 0 && <p className={styles.leer}>Kein Techniker im Filter – Filter zurücksetzen.</p>}
-      </div>
+          ))}
+          {zeilen.length === 0 && <p className={styles.leer}>Kein Techniker im Filter – Filter zurücksetzen.</p>}
+          <Verbindungen containerRef={inhaltRef} aktiv={aktiv} signatur={`${skala.pxPerMin}:${rowH}:${zeilen.length}:${groesse.width}`} richtung="horizontal" />
+        </div>
+      </BlockRegistryProvider>
       <span className={styles.srOnly}>{zeilen.length} Techniker · Summe geplant {formatDauer(zeilen.reduce((summe, zeile) => summe + zeile.geplantMin, 0))}</span>
     </div>
   );

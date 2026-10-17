@@ -145,6 +145,8 @@ export interface Auftrag {
   /** Geschätzte Einsatzdauer vor Ort. */
   dauerMin: Minuten;
   notiz?: string;
+  /** Zusammenhang mit einem anderen Auftrag: Mietgerät zur Reparatur, Lieferung als Ersatz, Malerarbeiten nach dem Schaden. */
+  bezugAuftragId?: string;
 }
 
 /* ◆ jh · eof */

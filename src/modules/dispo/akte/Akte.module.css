@@ -108,6 +108,43 @@
   justify-content: space-between;
 }
 
+/* jh› Verknüpfte Aufträge (Mietgerät, Ersatz, Folgearbeit): gestrichelt wie die Linie im Plan. */
+.verknuepfungen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.verknuepfung {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  height: 24px;
+  padding: 0 8px 0 6px;
+  border: 1px dashed var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+  text-align: left;
+}
+
+.verknuepfung span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.verknuepfung:not(:disabled):hover {
+  border-color: var(--sl-ink-2);
+  color: var(--sl-ink);
+}
+
+.verknuepfung:disabled {
+  cursor: default;
+}
+
 .titel {
   font-size: var(--sl-fs-16);
   font-weight: var(--sl-fw-semibold);

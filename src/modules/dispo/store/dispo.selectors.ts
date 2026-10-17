@@ -13,7 +13,7 @@ import type { Einsatz, Pendenz } from '../../../core/domain/einsatz';
 import { KATEGORIE_LABEL } from '../../../core/domain/kategorie';
 import { formatStrasse, fullName, isAbwesend, regionOf } from '../../../core/domain/stammdaten';
 import type { Absenz, Geraet, Kunde, Liegenschaft, Region, Techniker } from '../../../core/domain/stammdaten';
-import { formatDatum, formatZeit, formatZeitpunkt, formatZeitspanne } from '../../../core/format';
+import { formatDatum, formatDatumKurz, formatWochentag, formatZeit, formatZeitpunkt, formatZeitspanne } from '../../../core/format';
 import { SUTT_HQ, fahrzeitMin, strassenKm } from '../../../core/geo';
 import type { Koordinaten } from '../../../core/geo';
 import { normalizeSuchtext } from '../../../core/suche';
@@ -49,6 +49,26 @@ export interface EinsatzView extends AuftragKontext {
   /** Fahrzeit reicht nicht in die Lücke. */
   fahrzeitKnapp: boolean;
   ueberzogen: boolean;
+  /** Zusammenhänge: Erst-/Folgetermin desselben Auftrags, Bezugsaufträge. */
+  verknuepfungen: readonly Verknuepfung[];
+}
+
+export type VerknuepfungArt = 'folgetermin' | 'ersttermin' | 'bezug' | 'bezogen';
+
+export interface Verknuepfung {
+  art: VerknuepfungArt;
+  /** Geplanter Einsatz am anderen Ende – fehlt, solange der Bezug im Eingang liegt. */
+  einsatzId?: string;
+  auftragId: string;
+  nummer: string;
+  datum?: IsoDatum;
+  startMin?: Minuten;
+  /** Beschriftung auf der Linie, z. B. «Folgetermin» oder «Mietgerät 26-04819». */
+  kurz: string;
+  /** Wann und wer am anderen Ende, z. B. «Do 22.10. 08:00 · MB» – fehlt ohne Einsatz. */
+  wann?: string;
+  /** Langform für Hovercard und Akte, z. B. «Folgetermin · Do 22.10. 08:00 · MB». */
+  text: string;
 }
 
 export interface FahrzeitPuffer {
@@ -145,7 +165,119 @@ export function visibleTechniker(stammdaten: DispoStammdaten, filter: DispoFilte
   return stammdaten.techniker.filter((techniker) => filter.technikerIds.includes(techniker.id));
 }
 
-// ── §3 · Tageszeile mit Fahrzeit-Puffern ─────────────────────────
+// ── §3 · Verknüpfungen ───────────────────────────────────────────
+
+export const VERKNUEPFUNG_LABEL: Readonly<Record<VerknuepfungArt, string>> = {
+  folgetermin: 'Folgetermin',
+  ersttermin: 'Ersttermin',
+  bezug: 'Bezug',
+  bezogen: 'Bezugsauftrag',
+};
+
+export type VerknuepfungsIndex = ReadonlyMap<string, readonly Verknuepfung[]>;
+
+const KEINE_VERKNUEPFUNGEN: readonly Verknuepfung[] = [];
+
+interface AuftragsBezuege {
+  proAuftrag: ReadonlyMap<string, readonly Einsatz[]>;
+  /** Ziel-Auftrag → Aufträge, die sich auf ihn beziehen. */
+  bezogenVon: ReadonlyMap<string, readonly Auftrag[]>;
+}
+
+function zeitpunktOf(einsatz: Einsatz): string {
+  return toZeitpunkt(einsatz.datum, einsatz.startMin);
+}
+
+function nachZeit(einsaetze: readonly Einsatz[]): Einsatz[] {
+  return [...einsaetze].sort((a, b) => zeitpunktOf(a).localeCompare(zeitpunktOf(b)));
+}
+
+function sammleBezuege(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[]): AuftragsBezuege {
+  const proAuftrag = new Map<string, Einsatz[]>();
+  for (const einsatz of einsaetze) {
+    const liste = proAuftrag.get(einsatz.auftragId) ?? [];
+    liste.push(einsatz);
+    proAuftrag.set(einsatz.auftragId, liste);
+  }
+  const bezogenVon = new Map<string, Auftrag[]>();
+  for (const auftrag of stammdaten.auftraege.values()) {
+    if (!auftrag.bezugAuftragId) continue;
+    const liste = bezogenVon.get(auftrag.bezugAuftragId) ?? [];
+    liste.push(auftrag);
+    bezogenVon.set(auftrag.bezugAuftragId, liste);
+  }
+  return { proAuftrag, bezogenVon };
+}
+
+function bezugEintraege(art: 'bezug' | 'bezogen', anderer: Auftrag, einsaetze: readonly Einsatz[], wann: (einsatz: Einsatz) => string): Verknuepfung[] {
+  const kurz = `${anderer.art} ${anderer.nummer}`;
+  const praefix = art === 'bezug' ? 'Bezug: ' : '';
+  const suffix = art === 'bezogen' ? ' bezieht sich hierauf' : '';
+  if (einsaetze.length === 0) return [{ art, auftragId: anderer.id, nummer: anderer.nummer, kurz, text: `${praefix}${kurz}${suffix} · noch nicht disponiert` }];
+  return nachZeit(einsaetze).map((einsatz) => ({
+    art,
+    einsatzId: einsatz.id,
+    auftragId: anderer.id,
+    nummer: anderer.nummer,
+    datum: einsatz.datum,
+    startMin: einsatz.startMin,
+    kurz,
+    wann: wann(einsatz),
+    text: `${praefix}${kurz}${suffix} · ${wann(einsatz)}`,
+  }));
+}
+
+// jh› Zusammenhänge, die ein Disponent sehen muss: weitere Einsätze desselben
+//     Auftrags (Erst-/Folgetermin) und Aufträge, die sich aufeinander beziehen
+//     (Mietgerät zur Reparatur, Lieferung als Ersatz, Malerarbeiten nach Schaden).
+function verknuepfungenAus(stammdaten: DispoStammdaten, bezuege: AuftragsBezuege, auftragId: string, eigener: Einsatz | null): Verknuepfung[] {
+  const auftrag = stammdaten.auftraege.get(auftragId);
+  if (!auftrag) return [];
+  const kuerzel = (technikerId: string) => stammdaten.techniker.find((techniker) => techniker.id === technikerId)?.kuerzel ?? '?';
+  const wann = (einsatz: Einsatz) => `${formatWochentag(einsatz.datum, 'kurz')} ${formatDatumKurz(einsatz.datum)} ${formatZeit(einsatz.startMin)} · ${kuerzel(einsatz.technikerId)}`;
+  const liste: Verknuepfung[] = [];
+
+  for (const anderer of nachZeit(bezuege.proAuftrag.get(auftragId) ?? [])) {
+    if (eigener && anderer.id === eigener.id) continue;
+    const art: VerknuepfungArt = eigener && zeitpunktOf(anderer) < zeitpunktOf(eigener) ? 'ersttermin' : 'folgetermin';
+    liste.push({
+      art,
+      einsatzId: anderer.id,
+      auftragId,
+      nummer: auftrag.nummer,
+      datum: anderer.datum,
+      startMin: anderer.startMin,
+      kurz: VERKNUEPFUNG_LABEL[art],
+      wann: wann(anderer),
+      text: `${eigener ? VERKNUEPFUNG_LABEL[art] : 'Einsatz'} · ${wann(anderer)}`,
+    });
+  }
+  if (auftrag.bezugAuftragId) {
+    const ziel = stammdaten.auftraege.get(auftrag.bezugAuftragId);
+    if (ziel) liste.push(...bezugEintraege('bezug', ziel, bezuege.proAuftrag.get(ziel.id) ?? [], wann));
+  }
+  for (const quelle of bezuege.bezogenVon.get(auftragId) ?? []) {
+    liste.push(...bezugEintraege('bezogen', quelle, bezuege.proAuftrag.get(quelle.id) ?? [], wann));
+  }
+  return liste;
+}
+
+export function buildVerknuepfungsIndex(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[]): VerknuepfungsIndex {
+  const bezuege = sammleBezuege(stammdaten, einsaetze);
+  const index = new Map<string, Verknuepfung[]>();
+  for (const einsatz of einsaetze) {
+    const liste = verknuepfungenAus(stammdaten, bezuege, einsatz.auftragId, einsatz);
+    if (liste.length > 0) index.set(einsatz.id, liste);
+  }
+  return index;
+}
+
+/** Verknüpfungen eines Auftrags – für die Akte auch ohne eigenen Einsatz (Pendenz). */
+export function verknuepfungenFuerAuftrag(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[], auftragId: string, eigener: Einsatz | null): Verknuepfung[] {
+  return verknuepfungenAus(stammdaten, sammleBezuege(stammdaten, einsaetze), auftragId, eigener);
+}
+
+// ── §4 · Tageszeile mit Fahrzeit-Puffern ─────────────────────────
 
 function buildEinsatzViews(
   stammdaten: DispoStammdaten,
@@ -153,6 +285,7 @@ function buildEinsatzViews(
   eigene: readonly Einsatz[],
   filter: DispoFilter,
   jetztMin: Minuten | null,
+  verknuepfungen: VerknuepfungsIndex,
 ): { views: EinsatzView[]; puffer: FahrzeitPuffer[]; spuren: number; fahrzeitMin: Minuten } {
   const { belegung, spuren } = assignLanes(eigene);
   const sortiert = [...eigene].sort((a, b) => a.startMin - b.startMin);
@@ -198,6 +331,7 @@ function buildEinsatzViews(
       lueckeMin,
       fahrzeitKnapp,
       ueberzogen,
+      verknuepfungen: verknuepfungen.get(eintrag.id) ?? KEINE_VERKNUEPFUNGEN,
     };
   });
 
@@ -211,9 +345,10 @@ export function buildTagesZeilen(
   filter: DispoFilter,
   jetztMin: Minuten | null,
 ): TagesZeile[] {
+  const verknuepfungen = buildVerknuepfungsIndex(stammdaten, einsaetze);
   return visibleTechniker(stammdaten, filter).map((techniker) => {
     const eigene = einsaetze.filter((einsatz) => einsatz.technikerId === techniker.id && einsatz.datum === datum);
-    const { views, puffer, spuren, fahrzeitMin: fahrzeit } = buildEinsatzViews(stammdaten, techniker, eigene, filter, jetztMin);
+    const { views, puffer, spuren, fahrzeitMin: fahrzeit } = buildEinsatzViews(stammdaten, techniker, eigene, filter, jetztMin, verknuepfungen);
     return {
       techniker,
       datum,
@@ -233,11 +368,12 @@ export function buildMehrtagesZeilen(
   tage: readonly IsoDatum[],
   filter: DispoFilter,
 ): MehrtagesZeile[] {
+  const verknuepfungen = buildVerknuepfungsIndex(stammdaten, einsaetze);
   return visibleTechniker(stammdaten, filter).map((techniker) => ({
     techniker,
     zellen: tage.map((datum) => {
       const eigene = einsaetze.filter((einsatz) => einsatz.technikerId === techniker.id && einsatz.datum === datum);
-      const { views } = buildEinsatzViews(stammdaten, techniker, eigene, filter, null);
+      const { views } = buildEinsatzViews(stammdaten, techniker, eigene, filter, null, verknuepfungen);
       views.sort((a, b) => a.einsatz.startMin - b.einsatz.startMin);
       return { datum, einsaetze: views, geplantMin: sumDauer(eigene), absenz: isAbwesend(stammdaten.absenzen, techniker.id, datum) };
     }),
@@ -253,16 +389,17 @@ export function buildEinsatzViewsFuer(
   jetztMin: Minuten | null,
 ): EinsatzView[] {
   const tageSet = new Set(tage);
+  const verknuepfungen = buildVerknuepfungsIndex(stammdaten, einsaetze);
   return visibleTechniker(stammdaten, filter).flatMap((techniker) =>
     tage.flatMap((datum) => {
       const eigene = einsaetze.filter((einsatz) => einsatz.technikerId === techniker.id && einsatz.datum === datum && tageSet.has(einsatz.datum));
       if (eigene.length === 0) return [];
-      return buildEinsatzViews(stammdaten, techniker, eigene, filter, datum === tage[0] ? jetztMin : null).views;
+      return buildEinsatzViews(stammdaten, techniker, eigene, filter, datum === tage[0] ? jetztMin : null, verknuepfungen).views;
     }),
   );
 }
 
-// ── §4 · Eingang, Wartet, Erledigt ───────────────────────────────
+// ── §5 · Eingang, Wartet, Erledigt ───────────────────────────────
 
 // jh› Sortierung: Dringlichkeit, dann ältester Eingang zuerst – wer am
 //     längsten wartet, steht bei gleicher Dringlichkeit oben.
@@ -283,6 +420,8 @@ export interface WartetView extends AuftragKontext {
   techniker: Techniker;
   liefertermin: IsoDatum | undefined;
   folgeOffen: boolean;
+  /** Bereits geplanter Folgetermin desselben Auftrags. */
+  folgeGeplant: Einsatz | undefined;
 }
 
 export function buildWartetViews(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[], pendenzen: readonly Pendenz[]): WartetView[] {
@@ -301,6 +440,7 @@ export function buildWartetViews(stammdaten: DispoStammdaten, einsaetze: readonl
         techniker: technikerOf(stammdaten, einsatz.technikerId),
         liefertermin: termine[termine.length - 1],
         folgeOffen: pendenzen.some((pendenz) => pendenz.auftragId === einsatz.auftragId),
+        folgeGeplant: nachZeit(einsaetze.filter((kandidat) => kandidat.auftragId === einsatz.auftragId && zeitpunktOf(kandidat) > zeitpunktOf(einsatz)))[0],
       };
     })
     .sort((a, b) => (a.liefertermin ?? '9999').localeCompare(b.liefertermin ?? '9999'));
@@ -319,7 +459,7 @@ export function buildErledigtViews(stammdaten: DispoStammdaten, einsaetze: reado
     .sort((a, b) => b.einsatz.datum.localeCompare(a.einsatz.datum) || b.einsatz.startMin - a.einsatz.startMin);
 }
 
-// ── §5 · Live-Puls & Kapazität ───────────────────────────────────
+// ── §6 · Live-Puls & Kapazität ───────────────────────────────────
 
 export function pulsFor(einsaetzeHeute: readonly Einsatz[], jetztMin: Minuten, absenz: Absenz | undefined): Puls {
   if (absenz) return { art: 'abwesend', text: 'abwesend' };
@@ -351,7 +491,7 @@ export function kapazitaetFor(zeile: TagesZeile): Kapazitaet {
   };
 }
 
-// ── §6 · Status-Verlauf ──────────────────────────────────────────
+// ── §7 · Status-Verlauf ──────────────────────────────────────────
 
 const ANFAHRT_MIN = 45;
 
@@ -402,7 +542,7 @@ function buildErledigtSchritt(erreicht: boolean, letzter: Einsatz | undefined, o
   return { phase: 'erledigt', label: 'Erledigt', erreicht: false };
 }
 
-// ── §7 · Suche ───────────────────────────────────────────────────
+// ── §8 · Suche ───────────────────────────────────────────────────
 
 export function buildSuchIndex(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[], pendenzen: readonly Pendenz[]): SuchEintrag[] {
   const auftragIds = new Set([...einsaetze.map((einsatz) => einsatz.auftragId), ...pendenzen.map((pendenz) => pendenz.auftragId)]);

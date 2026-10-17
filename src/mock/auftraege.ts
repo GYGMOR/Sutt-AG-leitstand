@@ -53,6 +53,8 @@ interface AuftragEntwurf {
   teile?: readonly TeilEntwurf[];
   dauerMin: Minuten;
   notiz?: string;
+  /** Auftrag, auf den sich dieser bezieht (Mietgerät → Reparatur, Ersatzlieferung → Altauftrag). */
+  bezug?: string;
 }
 
 function mieter(name: string, telefon: string): KontaktVorOrt {
@@ -288,21 +290,21 @@ const ENTWUERFE: readonly AuftragEntwurf[] = [
     wohnung: wohnung('W 2.03', '3½-Zi · 2. OG links'), vorOrt: mieter('Lea Hofstetter', '079 381 22 64'),
     geraet: { key: 'miele-wm', sn: 'MIET-0417', baujahr: 2023 },
     fehler: 'Ersatz-Waschmaschine (Mietgerät) bis zur Reparatur 26-04788 stellen', dauerMin: 60,
-    notiz: 'Verwaltung übernimmt Miete. Gerät MIET-0417 ab Lager.',
+    notiz: 'Verwaltung übernimmt Miete. Gerät MIET-0417 ab Lager, heute 14:00 durch LF gestellt.', bezug: 'A01',
   },
   {
     id: 'A40', nummer: '26-04782', art: 'Malerarbeiten', dringlichkeit: 'tief', kanal: 'E-Mail', angefragt: zeitpunkt(-3, '09:05'),
     bestelltNach: 2000, liegenschaftId: 'L06', wohnung: wohnung('W 1.01', '4½-Zi · 1. OG'), vorOrt: mieter('Roger Egli', '078 402 66 18'),
     geraet: { key: 'vzug-wm', sn: '4468-2207', baujahr: 2016 },
     fehler: 'Malerarbeiten Küchenwand nach Wasserschaden (Offerte 26-O-118 bewilligt)', dauerMin: 180,
-    notiz: 'Erst nach Pumpentausch 26-04790. Farbton gemäss Verwaltung NCS S 0502-Y.',
+    notiz: 'Erst nach Pumpentausch 26-04790. Farbton gemäss Verwaltung NCS S 0502-Y.', bezug: 'A25',
   },
   {
     id: 'A41', nummer: '26-04820', art: 'Lieferung', kanal: 'Telefon', angefragt: zeitpunkt(0, '09:30'), bestelltNach: 15,
     liegenschaftId: 'L14', wohnung: wohnung('W 4.03', '3½-Zi · 4. OG'), vorOrt: mieter('Elena Rossi', '076 812 55 20'),
     geraet: { key: 'lh-ks', sn: '3066-2211', baujahr: 2026, garantieBis: tag(730) },
     fehler: 'Lieferung Kühlschrank Liebherr IRBd 5150, Anschluss, Altgerät entsorgen', dauerMin: 90,
-    notiz: 'Ersatz für 26-04814 (Kompressor defekt, Reparatur unwirtschaftlich).',
+    notiz: 'Ersatz für 26-04814 (Kompressor defekt, Reparatur unwirtschaftlich).', bezug: 'A10',
   },
 ];
 
@@ -353,6 +355,7 @@ function buildAuftrag(entwurf: AuftragEntwurf): { auftrag: Auftrag; geraet: Gera
     rechnungStatus: 'offen',
     dauerMin: entwurf.dauerMin,
     ...(entwurf.notiz ? { notiz: entwurf.notiz } : {}),
+    ...(entwurf.bezug ? { bezugAuftragId: entwurf.bezug } : {}),
   };
   return { auftrag, geraet };
 }

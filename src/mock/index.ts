@@ -80,11 +80,12 @@ const HISTORIE_TEXTE = [
 // jh› Fotos und Rapportstatus hängen am Einsatz, nicht am Entwurf: erledigt
 //     heisst «Fotos vorhanden, Rapport erstellt», früher heisst «unterschrieben».
 function veredleAuftrag(auftrag: Auftrag, einsaetze: readonly Einsatz[], technikerById: ReadonlyMap<string, Techniker>): Auftrag {
-  const eigene = einsaetze.filter((einsatz) => einsatz.auftragId === auftrag.id);
-  const letzter = [...eigene].sort((a, b) => a.datum.localeCompare(b.datum) || a.startMin - b.startMin).pop();
+  // jh› Massgebend ist der letzte Einsatz, der vor Ort war – ein geplanter Folgetermin hat noch keine Fotos.
+  const letzter = einsaetze
+    .filter((einsatz) => einsatz.auftragId === auftrag.id && einsatz.status !== 'geplant' && einsatz.status !== 'unterwegs')
+    .sort((a, b) => a.datum.localeCompare(b.datum) || a.startMin - b.startMin)
+    .pop();
   if (!letzter) return auftrag;
-  const begonnen = letzter.status !== 'geplant' && letzter.status !== 'unterwegs';
-  if (!begonnen) return auftrag;
 
   const zufall = mulberry32(seedFrom(`foto·${auftrag.id}`));
   const kuerzel = technikerById.get(letzter.technikerId)?.kuerzel ?? '??';
