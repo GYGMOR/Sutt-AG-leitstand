@@ -117,15 +117,18 @@ Hero-Sektionen · «Welcome back» · Inter · zentrierte Leerlayouts · knallig
 | `--sl-signal-ink`  | `#B84D00` | Signal als Schrift                               |
 | `--sl-chrome`      | `#1A1A1A` | Topbar und Login links – in beiden Modi Anthrazit |
 
-**Kategorien** (Kante · Fläche · Schrift) – Farbe kommt wie bei Outlook-Kategorien in die Fläche:
+**Kategorien** (Kante · Schrift) – Farbe kommt wie bei Outlook-Kategorien in die Fläche:
 Reparatur `#2F6FB2` · Installation/Montage `#2E8B57` · Lieferung `#C98A00` · Garantie `#7B4FA6` ·
 Mietgerät `#0F8A8A` · Malerarbeiten `#A0522D` · Offerte/Besichtigung `#5C6B7A` · Notfall `#F86C04`.
-Jede Kategorie hat `--sl-kat-<id>-edge/-bg/-ink`; die Fläche ist hell getönt, die Kante kräftig, die Schrift dunkel.
+Jede Kategorie hat `--sl-kat-<id>-edge/-ink`; die Fläche entsteht aus `color-mix(Kante, --sl-tint-mix, Oberfläche)`
+(hell 30 %, dunkel 36 %) – ein Token für alle Flächen, `jh:contrast` rechnet die Mischung nach. Erledigte Einsätze
+bleiben farbig (Häkchen, 90 % Deckkraft): ein Plan voller Grau sagt nichts. Im überlagerten Kalender trägt der Balken
+links zusätzlich die Technikerfarbe (`--sl-balken`), die Fläche bleibt bei «Farbe nach».
 
-**Status** wird nicht über Farbe gezeigt, sondern über Icon und Muster: unterwegs `Truck` · vor Ort `MapPin` +
-pulsierender Punkt · wartet auf Teil Schraffur + `PackageSearch` · erledigt entsättigt + `Check` ·
-überzogen / Fahrzeit knapp rote Ecke · dringend Signal-Ecke. Die Status-Töne (`--sl-st-*`) bleiben für
-Swatches und Legenden.
+**Status** wird nicht über Farbe gezeigt, sondern über Icon und Kante: unterwegs `Truck` · vor Ort `MapPin` +
+pulsierender Punkt · wartet auf Teil gestrichelte Kante + `PackageSearch` · erledigt `Check` ·
+überzogen / Fahrzeit knapp rote Ecke · dringend Signal-Ecke · verknüpft `Link2`. Die Status-Töne (`--sl-st-*`)
+bleiben für Swatches und Legenden.
 
 **«Farbe nach»** (Toolbar): Kategorie (Standard) · Techniker (`--sl-tech-1…9`, Avatar + Zeilenmarke) ·
 Region · Status. Umgesetzt als Klassentausch in `core/ui/farben.module.css`: jede Klasse setzt
@@ -161,7 +164,7 @@ Umschaltung im Benutzermenü (persistiert), kein Automatismus über `prefers-col
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/views/Kalender.tsx                   │
    │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Outlook-Kalender: Tag / AW / Woche / Monat, Split pro Techniker       │
+   │  Outlook-Kalender: Techniker-Kalender, Tag/AW/Woche/Monat, Split       │
    └────────────────────────────────────────────────────────────────────────┘ */
 ```
 
@@ -197,7 +200,9 @@ In CSS: `/* ── §1 · Rahmen ──── */`.
 - Keine generischen Namen (`data`, `item`, `handleClick`) – sprechend: `offeneTeile`, `onSpurDrop`.
 - Kleine Funktionen, **frühe Returns**, **keine verschachtelten Ternaries**, **kein `any`**.
 - **Props-Typ direkt über der Komponente.** **Nur benannte Exporte** (Ausnahme: `vite.config.ts`).
-- CSS-Klassen **kebab-case**, Token-Präfix **`--sl-`**, Kategorie-Tokens `--sl-kat-<id>-edge/-bg/-ink`.
+- CSS-Klassen **kebab-case**, Token-Präfix **`--sl-`**, Kategorie-Tokens `--sl-kat-<id>-edge/-ink`, Flächen über `--sl-tint-mix`.
+- **Dynamische Klassen nur über `modulKlasse(styles, 'status-vor-ort')`** (`core/ui/cx.ts`): Vite exportiert mit
+  `camelCaseOnly` nur `styles.statusVorOrt` – `styles['status-vor-ort']` ist still `undefined` und färbt nichts.
 - **Keine Inline-Styles** – ausser dynamischen Positionen/Massen (Zeitraster, Kalenderraster, Balken, Pins).
 - Kein KI-Ton: keine Füllkommentare, keine Platzhaltertexte, keine Emojis im Code.
 
@@ -235,9 +240,14 @@ Seitenleiste zeigt `v0.2.0 · ◆ JH`; der Tooltip trägt Build-Datum und Commit
 - **Ansichten** (Toolbar, Tasten `1–4`): Plantafel · Kalender · Liste · Karte; Zeitraum je Ansicht; Zoom 15/30/60;
   Farbe nach Kategorie/Techniker/Region/Status; Filter (Region, Techniker, Status, Kategorie) blendet ab statt aus.
 - **Plantafel Tag**: 9 Techniker × 06–20 Uhr (Arbeitszeit 07–18 hell), Zeilen 72–120 px, Spuren bei Überschneidung,
-  Fahrzeit-Puffer (schraffiert, rot wenn zu knapp), Absenzen als Ganztagsblock, Jetzt-Pille, Live-Puls am Avatar,
+  Fahrzeit-Puffer (graue Fläche, rot wenn zu knapp), Absenzen als Ganztagsblock, Jetzt-Pille, Live-Puls am Avatar,
   Klick auf den Namen → Druckansicht. Mehrtägig: Tagesspalten mit kompakten Blöcken, Klick auf den Tag zoomt hinein.
-- **Kalender**: Tag (Nebeneinander pro Techniker), Arbeitswoche, Woche, Monat (Pillen, «+n weitere»), Ganztag-Leiste für Absenzen, Drop in Spalten.
+- **Kalender**: Kalenderleiste mit einem farbigen Chip pro Techniker (Klick blendet ein/aus, Doppelklick zeigt nur ihn, «Alle»);
+  Tag nebeneinander pro Techniker (Standard), Arbeitswoche/Woche überlagert mit Kürzel und Technikerbalken (nebeneinander bis
+  3 Kalender), Monat (Pillen, «+n weitere»), Ganztag-Leiste für Absenzen, Drop in Spalten.
+- **Verknüpfungen**: Erst-/Folgetermin desselben Auftrags und Bezugsaufträge (`bezugAuftragId`: Mietgerät ↔ Reparatur,
+  Ersatzlieferung, Malerarbeiten nach Schaden). Kettenglied im Block; beim Auswählen Winkel-Linien zu sichtbaren Partnern,
+  Pfeil-Stummel mit Datum zu anderen Tagen, gestrichelter Ring am Partner; Chips in der Akte; «Folgetermin … zeigen» im Wartet-Tab.
 - **Liste**: sortierbar, gruppierbar (Techniker/Status/Kategorie/Region), Spalten ein-/ausblendbar, Mehrfachauswahl → Techniker zuweisen, auf Datum verschieben.
 - **Karte**: Pins in Tagesreihenfolge, Linien pro Techniker ab Werkhof, synchrone Tourenliste, Karte/Schema umschaltbar.
 - **Rechtes Panel**: Eingang (nach Dringlichkeit, dann Alter) · Wartet auf Teil (Liefertermin, «Folgetermin vorschlagen») ·
@@ -259,7 +269,7 @@ Alle Firmen, Personen, Nummern und E-Mails (`.example`) sind **erfunden**.
 1. **Smart-Slot beim Ziehen** – Freie Fenster färben sich grün/gelb/rot (Region, Markenkompetenz, Fahrzeit, Auslastung),
    die Vorschau nennt den Grund. *Warum:* Der Disponent entscheidet in Sekunden; die Bewertung macht sein Bauchgefühl sichtbar
    und ist mit vier Kriterien nachvollziehbar – kein schwarzer Kasten.
-2. **Fahrzeit-Puffer sichtbar** – Zwischen Einsätzen ein schraffierter Streifen in Fahrzeitlänge, rot bei zu knapper Lücke.
+2. **Fahrzeit-Puffer sichtbar** – Zwischen Einsätzen ein grauer Streifen in Fahrzeitlänge, rot bei zu knapper Lücke.
    *Warum:* Papier- und Excel-Pläne kennen keine Fahrzeit; genau dort entstehen Verspätungen.
 3. **Konflikt-Wächter** – Badge in der Topbar zählt Überschneidungen, Arbeitszeit, fehlende Teile, knappe Fahrten, Absenzen;
    Klick springt der Reihe nach hin. *Warum:* Fehler fallen auf, bevor der Techniker losfährt.
@@ -279,6 +289,12 @@ Alle Firmen, Personen, Nummern und E-Mails (`.example`) sind **erfunden**.
     *Warum:* Der Zettel im Fahrzeug bleibt Realität; der QR-Code bringt die Route aufs Telefon.
 11. **Kunden-Info-Chips** – Rechnung offen seit 34 Tagen, Stammkunde, Schlüssel bei Verwaltung, Hund im Haus, Parkieren.
     *Warum:* Kleine Hinweise ersparen den Rückruf vor der Haustür.
+12. **Verknüpfungslinien** – Wählt man einen Einsatz, führen Gantt-artige Winkel zu Folgetermin, Ersttermin und Bezugsaufträgen
+    (Mietgerät zur Reparatur, Ersatzlieferung); liegt der Partner an einem anderen Tag, zeigt ein Pfeil-Stummel mit Datum dorthin.
+    *Warum:* «Gehört das zusammen?» ist die häufigste Rückfrage im Büro. Outlook kennt keine Abhängigkeiten – ein Serviceplan braucht sie.
+13. **Techniker-Kalender wie in Outlook** – Jeder Techniker ist ein Kalender mit eigener Farbe, per Chip ein- und ausblendbar;
+    im Tag nebeneinander, in der Woche überlagert mit Kürzel und Farbbalken. *Warum:* Das Modell kennt jeder aus Outlook –
+    niemand muss lernen, wie man drei Kollegen vergleicht.
 
 ---
 
@@ -308,8 +324,9 @@ kein Routing-Dienst (Fahrzeit ist Luftlinie × Faktor), OSM-Kacheln nur fürs Mo
 ## 11 · Screenshots
 
 `docs/screenshots/` – aufgenommen am 17.10.2026 bei 1440 × 860, hell (`hell-*`) und dunkel (`dunkel-*`):
-Login, Plantafel, Kalender (Arbeitswoche), Liste, Karte, Akte, Tagesplan-Druck; dunkel zusätzlich Seitenleiste
-eingeklappt, Kommandopalette, Schnellerfassung, Panel «Wartet auf Teil», Panel «Erledigt», Panel-Schiene, Hovercard.
+Login, Plantafel (mit Verknüpfungslinien), Kalender (Tag nebeneinander, Arbeitswoche überlagert), Liste, Karte, Akte,
+Tagesplan-Druck; dunkel zusätzlich Seitenleiste eingeklappt, Kommandopalette, Schnellerfassung, Panel «Wartet auf Teil»,
+Panel «Erledigt», Panel-Schiene, Hovercard.
 
 Die grosse Karte zeigt auf den Bildern die Schemakarte: der eingebettete Prüf-Browser drosselt `requestAnimationFrame`,
 MapLibre meldet kein `load`, nach 10 s greift der Fallback. Im normalen Browser erscheinen die OSM-Kacheln – wie im

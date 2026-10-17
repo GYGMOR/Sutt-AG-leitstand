@@ -21,7 +21,7 @@ Format: ein Abschnitt pro Revision, Bereiche wie im Commit-Stil (`dispo(kalender
 - **Innovationen**: Smart-Slot beim Ziehen, Fahrzeit-Puffer mit Konfliktmarke, Konflikt-Wächter, Ersatzteil-Kopplung (3 Slots ab Liefertermin), Kommandopalette `Strg+K`, Kapazitätsband (Woche als Heatmap), Telefon-Schnellerfassung `N`, Live-Puls, Undo/Redo mit Protokoll, Tagesplan drucken mit QR-Code, Kunden-Info-Chips.
 - **Drag & Drop** auf `@dnd-kit/core`: Zeiger und Tastatur (Leertaste aufnehmen, Pfeile bewegen, ↵ ablegen), Vorschau mit Begründung.
 - **Dark Mode** (`tokens.dark.css`), Umschaltung im Benutzermenü; Header bleibt Anthrazit.
-- **Mock**: 9 Techniker mit Farbe und Markenkompetenz, Koordinaten für alle Liegenschaften, Ferien/Absenzen, 12 Eingangs-Aufträge, Fotos, Rapport-/Rechnungsstatus, Gerätehistorie, Telefonbuch.
+- **Mock**: 9 Techniker mit Farbe und Markenkompetenz, Koordinaten für alle Liegenschaften, Ferien/Absenzen, 11 Eingangs-Aufträge, Fotos, Rapport-/Rechnungsstatus, Gerätehistorie, Telefonbuch.
 - **Qualität**: `npm run jh:contrast` prüft 44 Textpaare in beiden Modi (alle AA), `jh-sign` erweitert, `CHANGELOG.jh.md`, Footer `v0.2.0 · ◆ JH` mit Build-Datum und Commit, Screenshots aller Ansichten hell/dunkel in `docs/screenshots/`.
 
 ### Geändert
@@ -29,8 +29,16 @@ Format: ein Abschnitt pro Revision, Bereiche wie im Commit-Stil (`dispo(kalender
 - Dispo-State als Store (`useSyncExternalStore`) statt `useReducer`; Reducer um Redo, Bearbeiten, Kopieren, Löschen, Sammelaktionen erweitert.
 - Topbar 48 → 56 px, Seitenleiste 76 → 248/64 px, Panel 344 → 360 px.
 
+### Nachtrag 17.10. abends – Outlook-Look
+- **Farbe**: Blockflächen aus Kante × `--sl-tint-mix` (hell 30 %, dunkel 36 %) statt blasser `-bg`-Töne; Erledigt bleibt farbig (Häkchen, 90 % Deckkraft); Chips, Pillen und Avatare ziehen mit. `jh:contrast` rechnet die Mischflächen nach (61 Paare × 2 Modi, alle AA).
+- **Behoben**: Farb- und Statusklassen griffen nie – Vite exportiert mit `camelCaseOnly` nur `styles.katReparatur`, der Code las `styles['kat-reparatur']`. Alle dynamischen Zugriffe laufen jetzt über `modulKlasse()` in `core/ui/cx.ts`.
+- **Kalender**: Kalenderleiste mit farbigen Techniker-Chips (ein-/ausblenden, Doppelklick = nur dieser, «Alle»), Tag standardmässig nebeneinander, Arbeitswoche/Woche überlagert mit Kürzel und Technikerbalken (nebeneinander bis 3 Kalender), farbige Spaltenköpfe, Tageszeile im Split. Umschalter aus der Toolbar in die Leiste gezogen.
+- **Verknüpfungen**: `Auftrag.bezugAuftragId`; Erst-/Folgetermin und Bezugsaufträge als Winkel-Linien (Plantafel, Kalender) mit Beschriftung, Pfeil-Stummel mit Datum zu anderen Tagen, Kettenglied im Block, gestrichelter Ring am Partner, Chips in der Akte, «Folgetermin … zeigen» im Wartet-Tab.
+- **Ruhe**: Fahrzeit-Puffer, Mittag und «Wartet auf Teil» ohne Schraffur; Blockstufen messen die Inhaltsbreite; Toolbar-Gruppen brechen um statt abzuschneiden.
+- **Mock**: Folgetermine `E-A01-F` (Do, MB) und `E-A25-F` (Di, NA); Mietgerät 26-04819 heute 14:00 bei LF mit Bezug auf 26-04788 (Eingang 11 statt 12); Bezüge 26-04782 → 26-04790 und 26-04820 → 26-04814.
+
 ### Offen
-- `jh# 001` Mitternachtswechsel · `jh# 007` OSM-Kacheln nur fürs Mockup · `jh# 008` Routing-API statt Luftlinie · `jh# 009` virtuelle Zeilen · `jh# 010` Gerätedaten nach Schnellerfassung.
+- `jh# 001` Mitternachtswechsel · `jh# 007` OSM-Kacheln nur fürs Mockup · `jh# 008` Routing-API statt Luftlinie · `jh# 009` virtuelle Zeilen · `jh# 010` Gerätedaten nach Schnellerfassung · `jh# 011` Verknüpfungslinien auch in Monat und Mehrtages-Plantafel.
 
 ## rev 01 · 2026.10 · v0.1.0 – Disposition Mockup
 
