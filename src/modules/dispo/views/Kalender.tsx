@@ -185,11 +185,13 @@ function Zeitraster({ spalten, views, heute, jetztMin, zoom, farbeNach, absenzen
       )}
       <div className={styles.koerper}>
         <div className={styles.rinne} style={{ width: RINNE_W, height: yOf(ACHSE_ENDE, skala) }}>
-          {stunden.map((minuten) => (
-            <span key={minuten} className={styles.stunde} style={{ top: yOf(minuten, skala) }}>
-              {formatZeit(minuten)}
-            </span>
-          ))}
+          {stunden
+            .filter((minuten) => minuten > ACHSE_START && minuten < ACHSE_ENDE)
+            .map((minuten) => (
+              <span key={minuten} className={styles.stunde} style={{ top: yOf(minuten, skala) }}>
+                {formatZeit(minuten)}
+              </span>
+            ))}
         </div>
         {spalten.map((spalte) => (
           <Spalte
