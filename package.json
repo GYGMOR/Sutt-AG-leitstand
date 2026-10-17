@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "jh:sign": "node scripts/jh-sign.mjs",
-    "jh:check": "node scripts/jh-sign.mjs --check"
+    "jh:check": "node scripts/jh-sign.mjs --check",
+    "jh:contrast": "node scripts/contrast.jh.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
