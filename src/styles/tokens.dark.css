@@ -58,37 +58,32 @@
 /* ── §3 · Kategorien ─────────────────────────────────────────── */
 
 :root[data-theme='dark'] {
+  /* jh› Dunkle Oberfläche schluckt Farbe – die Mischung darf kräftiger sein. */
+  --sl-tint-mix: 36%;
+
   --sl-kat-reparatur-edge: #5a95d6;
-  --sl-kat-reparatur-bg: #1b2a3b;
-  --sl-kat-reparatur-ink: #a9cbef;
+  --sl-kat-reparatur-ink: #c6ddf5;
 
   --sl-kat-montage-edge: #4fae7d;
-  --sl-kat-montage-bg: #18301f;
-  --sl-kat-montage-ink: #9ad6b2;
+  --sl-kat-montage-ink: #bfe8d0;
 
   --sl-kat-lieferung-edge: #d9a520;
-  --sl-kat-lieferung-bg: #33290f;
-  --sl-kat-lieferung-ink: #ebc766;
+  --sl-kat-lieferung-ink: #f5dc96;
 
   --sl-kat-garantie-edge: #a07cc8;
-  --sl-kat-garantie-bg: #2a1f36;
-  --sl-kat-garantie-ink: #cdb2e6;
+  --sl-kat-garantie-ink: #e0ccf2;
 
   --sl-kat-mietgeraet-edge: #3aabab;
-  --sl-kat-mietgeraet-bg: #123131;
-  --sl-kat-mietgeraet-ink: #8cd6d6;
+  --sl-kat-mietgeraet-ink: #b4e6e6;
 
   --sl-kat-malerarbeiten-edge: #c47a56;
-  --sl-kat-malerarbeiten-bg: #33221a;
-  --sl-kat-malerarbeiten-ink: #e3b49a;
+  --sl-kat-malerarbeiten-ink: #f0cdb9;
 
   --sl-kat-offerte-edge: #8694a3;
-  --sl-kat-offerte-bg: #232a31;
-  --sl-kat-offerte-ink: #b9c4cf;
+  --sl-kat-offerte-ink: #d2dae2;
 
   --sl-kat-notfall-edge: #f86c04;
-  --sl-kat-notfall-bg: #3a2414;
-  --sl-kat-notfall-ink: #ffb27a;
+  --sl-kat-notfall-ink: #ffcfa6;
 }
 
 /* ── §4 · Techniker, Regionen, Slots ─────────────────────────── */

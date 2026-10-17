@@ -10,7 +10,7 @@ import type { IsoDatum, Minuten } from '../../../core/datum';
 import { formatDatumKurz, formatWochentag, formatZeitspanne } from '../../../core/format';
 import { Avatar } from '../../../core/ui/Avatar';
 import { CapsLabel } from '../../../core/ui/CapsLabel';
-import { cx } from '../../../core/ui/cx';
+import { cx, modulKlasse } from '../../../core/ui/cx';
 import type { DispoStammdaten, Einsatz, PlanZiel } from '../dispo.types';
 import { suggestSlots } from '../scoring';
 import styles from './SlotVorschlaege.module.css';
@@ -47,7 +47,7 @@ export function SlotVorschlaege({ stammdaten, einsaetze, auftragId, dauerMin, ab
           <li key={`${slot.technikerId}-${slot.datum}-${slot.startMin}`}>
             <button
               type="button"
-              className={cx(styles.slot, styles[`stufe-${slot.bewertung.stufe}`], index === 0 && styles.bester)}
+              className={cx(styles.slot, modulKlasse(styles, `stufe-${slot.bewertung.stufe}`), index === 0 && styles.bester)}
               onClick={() => onPlan({ technikerId: slot.technikerId, datum: slot.datum, startMin: slot.startMin })}
               title={`${slot.bewertung.punkte} Punkte`}
             >

@@ -4,7 +4,7 @@
    │  Live-Puls: Punkt neben dem Namen – vor Ort, unterwegs, überzieht      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
-import { cx } from '../../core/ui/cx';
+import { cx, modulKlasse } from '../../core/ui/cx';
 import type { Puls } from './store/dispo.selectors';
 import styles from './LivePuls.module.css';
 
@@ -19,7 +19,7 @@ interface LivePulsProps {
 // jh› Der Mock tickt mit der Echtzeit (useNow, 30 s) – «vor Ort seit 25 min» wächst wirklich.
 export function LivePuls({ puls, kompakt = false }: LivePulsProps) {
   return (
-    <span className={cx(styles.puls, styles[puls.art], kompakt && styles.kompakt)} title={puls.text}>
+    <span className={cx(styles.puls, modulKlasse(styles, puls.art), kompakt && styles.kompakt)} title={puls.text}>
       <span className={styles.punkt} aria-hidden />
       {!kompakt && <span className={styles.text}>{puls.text}</span>}
     </span>

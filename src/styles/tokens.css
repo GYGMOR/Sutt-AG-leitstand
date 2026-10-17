@@ -60,39 +60,35 @@
   --sl-st-dringend: var(--sl-signal);
 }
 
-/* ── §3 · Kategorien (Kante · Fläche · Schrift) ──────────────── */
+/* ── §3 · Kategorien (Kante · Schrift) ───────────────────────── */
 
 :root {
+  /* jh› Flächen sind keine festen Töne mehr: Kante × --sl-tint-mix auf der
+         Oberfläche (color-mix) – Outlook-kräftig, in beiden Modi aus einem Token. */
+  --sl-tint-mix: 30%;
+
   --sl-kat-reparatur-edge: #2f6fb2;
-  --sl-kat-reparatur-bg: #e7f0fa;
   --sl-kat-reparatur-ink: #163a5f;
 
   --sl-kat-montage-edge: #2e8b57;
-  --sl-kat-montage-bg: #e4f4eb;
   --sl-kat-montage-ink: #17482d;
 
   --sl-kat-lieferung-edge: #c98a00;
-  --sl-kat-lieferung-bg: #fbf2db;
   --sl-kat-lieferung-ink: #5e4100;
 
   --sl-kat-garantie-edge: #7b4fa6;
-  --sl-kat-garantie-bg: #f0e8f8;
   --sl-kat-garantie-ink: #3f2560;
 
   --sl-kat-mietgeraet-edge: #0f8a8a;
-  --sl-kat-mietgeraet-bg: #def3f3;
   --sl-kat-mietgeraet-ink: #0a4646;
 
   --sl-kat-malerarbeiten-edge: #a0522d;
-  --sl-kat-malerarbeiten-bg: #f6e9e0;
   --sl-kat-malerarbeiten-ink: #5a2d17;
 
   --sl-kat-offerte-edge: #5c6b7a;
-  --sl-kat-offerte-bg: #eaeef2;
   --sl-kat-offerte-ink: #2f3943;
 
   --sl-kat-notfall-edge: #f86c04;
-  --sl-kat-notfall-bg: #feecdd;
   --sl-kat-notfall-ink: #8a3a00;
 }
 

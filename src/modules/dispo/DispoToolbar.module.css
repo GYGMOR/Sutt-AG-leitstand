@@ -18,8 +18,10 @@
   background: var(--sl-surface);
 }
 
+/* jh› Gruppen schrumpfen nicht – lieber in die zweite Zeile umbrechen als Segmente abschneiden. */
 .gruppe {
   display: flex;
+  flex: none;
   align-items: center;
   gap: 6px;
 }

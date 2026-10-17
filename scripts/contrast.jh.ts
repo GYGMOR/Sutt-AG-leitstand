@@ -20,7 +20,12 @@ interface Paar {
 }
 
 const KATEGORIEN = ['reparatur', 'montage', 'lieferung', 'garantie', 'mietgeraet', 'malerarbeiten', 'offerte', 'notfall'];
+const STATUS = ['geplant', 'unterwegs', 'vor-ort', 'wartet-teil', 'erledigt'];
+const REGIONEN = ['glattal', 'unterland', 'zuerich-nord'];
+const TECHNIKER = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
+// jh› Blockflächen entstehen zur Laufzeit aus Kante × --sl-tint-mix (color-mix in srgb).
+//     Das Script rechnet dieselbe Mischung nach und legt sie als «tint-…» in die Palette.
 const PAARE: Paar[] = [
   { text: 'ink', flaeche: 'paper', zweck: 'Text auf Arbeitsfläche', minimum: 4.5 },
   { text: 'ink', flaeche: 'surface', zweck: 'Text auf Panel', minimum: 4.5 },
@@ -42,9 +47,12 @@ const PAARE: Paar[] = [
   // jh› Sutt-Orange auf Weiss liegt bei 2.94:1 – die Jetzt-Linie ist dekorativ, die Zeit trägt die Pille (signal-ink, 4.5+).
   { text: 'signal', flaeche: 'surface', zweck: 'Jetzt-Linie, Messmarke (dekorativ)', minimum: 2.5 },
   { text: 'line-strong', flaeche: 'surface', zweck: 'Rahmen Typenschild (Grafik)', minimum: 1.4 },
-  ...KATEGORIEN.map((kat) => ({ text: `kat-${kat}-ink`, flaeche: `kat-${kat}-bg`, zweck: `Kategorie ${kat}`, minimum: 4.5 })),
+  ...KATEGORIEN.map((kat) => ({ text: `kat-${kat}-ink`, flaeche: `tint-kat-${kat}`, zweck: `Kategorie ${kat} (Blockfläche)`, minimum: 4.5 })),
   ...KATEGORIEN.map((kat) => ({ text: `kat-${kat}-edge`, flaeche: 'surface', zweck: `Kante ${kat} (Grafik)`, minimum: 2.4 })),
-  ...[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => ({ text: `tech-${n}-ink`, flaeche: `tech-${n}`, zweck: `Avatar Techniker ${n}`, minimum: 4.5 })),
+  ...TECHNIKER.map((n) => ({ text: `tech-${n}-ink`, flaeche: `tech-${n}`, zweck: `Avatar Techniker ${n}`, minimum: 4.5 })),
+  ...TECHNIKER.map((n) => ({ text: 'ink', flaeche: `tint-tech-${n}`, zweck: `Techniker ${n} (Blockfläche)`, minimum: 4.5 })),
+  ...STATUS.map((status) => ({ text: 'ink', flaeche: `tint-st-${status}`, zweck: `Status ${status} (Blockfläche)`, minimum: 4.5 })),
+  ...REGIONEN.map((region) => ({ text: 'ink', flaeche: `tint-region-${region}`, zweck: `Region ${region} (Blockfläche)`, minimum: 4.5 })),
 ];
 
 // ── §2 · Tokens lesen ────────────────────────────────────────────
@@ -71,6 +79,15 @@ function resolve(palette: Palette, name: string, tiefe = 0): string {
   return resolve(palette, verweis[1] ?? '', tiefe + 1);
 }
 
+// jh› Dark-Datei überschreibt nur Werte – fehlt ein Token, gilt Light.
+function leser(palette: Palette, basis?: Palette): (name: string) => string {
+  return (name) => {
+    if (palette.has(name)) return resolve(palette, name);
+    if (basis?.has(name)) return resolve(basis, name);
+    throw new Error(`Token --sl-${name} fehlt`);
+  };
+}
+
 // ── §3 · Farbe & Kontrast (WCAG 2.1) ─────────────────────────────
 
 interface Rgb {
@@ -85,6 +102,15 @@ function parseHex(hex: string): Rgb {
   const zahl = Number.parseInt(voll, 16);
   if (Number.isNaN(zahl) || voll.length !== 6) throw new Error(`Keine Hex-Farbe: ${hex}`);
   return { r: (zahl >> 16) & 255, g: (zahl >> 8) & 255, b: zahl & 255 };
+}
+
+function toHex(farbe: Rgb): string {
+  return `#${[farbe.r, farbe.g, farbe.b].map((wert) => Math.round(wert).toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** color-mix(in srgb, a anteil, b) – lineare Mischung je Kanal im sRGB-Raum. */
+function mischen(a: Rgb, b: Rgb, anteil: number): Rgb {
+  return { r: a.r * anteil + b.r * (1 - anteil), g: a.g * anteil + b.g * (1 - anteil), b: a.b * anteil + b.b * (1 - anteil) };
 }
 
 function kanal(wert: number): number {
@@ -102,18 +128,28 @@ function kontrast(a: Rgb, b: Rgb): number {
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 }
 
-// ── §4 · Lauf ────────────────────────────────────────────────────
+// ── §4 · Flächen nachrechnen ─────────────────────────────────────
+
+function ergaenzeTints(palette: Palette, basis?: Palette): void {
+  const lesen = leser(palette, basis);
+  const anteil = Number.parseFloat(lesen('tint-mix')) / 100;
+  if (!(anteil > 0 && anteil < 1)) throw new Error(`--sl-tint-mix unbrauchbar: ${lesen('tint-mix')}`);
+  const surface = parseHex(lesen('surface'));
+  const ablegen = (ziel: string, kante: string) => palette.set(ziel, toHex(mischen(parseHex(lesen(kante)), surface, anteil)));
+  for (const kat of KATEGORIEN) ablegen(`tint-kat-${kat}`, `kat-${kat}-edge`);
+  for (const n of TECHNIKER) ablegen(`tint-tech-${n}`, `tech-${n}`);
+  for (const status of STATUS) ablegen(`tint-st-${status}`, `st-${status}`);
+  for (const region of REGIONEN) ablegen(`tint-region-${region}`, `region-${region}`);
+}
+
+// ── §5 · Lauf ────────────────────────────────────────────────────
 
 function pruefePalette(titel: string, palette: Palette, basis?: Palette): number {
+  ergaenzeTints(palette, basis);
+  const lesen = leser(palette, basis);
   let fehler = 0;
-  console.log(`\n◆ ${titel}`);
+  console.log(`\n◆ ${titel} · Fläche = Kante × ${lesen('tint-mix')}`);
   for (const paar of PAARE) {
-    const lesen = (name: string): string => {
-      // jh› Dark-Datei überschreibt nur Werte – fehlt ein Token, gilt Light.
-      if (palette.has(name)) return resolve(palette, name);
-      if (basis?.has(name)) return resolve(basis, name);
-      throw new Error(`Token --sl-${name} fehlt`);
-    };
     const text = lesen(paar.text);
     const flaeche = lesen(paar.flaeche);
     if (text.startsWith('rgb') || flaeche.startsWith('rgb')) continue;
