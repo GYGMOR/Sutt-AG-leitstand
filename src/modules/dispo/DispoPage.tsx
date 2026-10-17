@@ -332,8 +332,6 @@ function DispoInhalt({ ansicht }: { ansicht: Ansicht }) {
               onToggleKategorie={toggleKategorie}
               onRegion={setRegion}
               onResetFilter={() => setFilter(LEERER_FILTER)}
-              nebeneinander={einstellungen.kalenderNebeneinander}
-              onNebeneinander={(wert) => setAnsicht({ kalenderNebeneinander: wert })}
               protokoll={state.protokoll}
               zukunft={state.zukunft}
               onUndo={aktionen.undo}
@@ -388,6 +386,9 @@ function DispoInhalt({ ansicht }: { ansicht: Ansicht }) {
                 techniker={techniker}
                 absenzen={stammdaten.absenzen}
                 nebeneinander={einstellungen.kalenderNebeneinander}
+                onNebeneinander={(wert) => setAnsicht({ kalenderNebeneinander: wert })}
+                technikerAuswahl={einstellungen.kalenderTechnikerIds}
+                onTechnikerAuswahl={(ids) => setAnsicht({ kalenderTechnikerIds: ids })}
                 ausgewaehltId={ausgewaehltId}
                 markiertId={state.markiertId}
                 onSelectEinsatz={(einsatzId) => aktionen.select({ art: 'einsatz', einsatzId })}

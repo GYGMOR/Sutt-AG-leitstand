@@ -5,7 +5,7 @@
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useRef, useState } from 'react';
-import { Funnel, Plus, Redo2, RotateCcw, ScrollText, SquareSplitHorizontal, Undo2, ZoomIn, ZoomOut } from 'lucide-react';
+import { Funnel, Plus, Redo2, RotateCcw, ScrollText, Undo2, ZoomIn, ZoomOut } from 'lucide-react';
 import { ZEITRAUM_LABEL } from '../../core/arbeitstag';
 import type { Zeitraum } from '../../core/arbeitstag';
 import { EINSATZ_STATUS } from '../../core/domain/einsatz';
@@ -56,8 +56,6 @@ interface DispoToolbarProps {
   onToggleKategorie: (kategorie: Kategorie) => void;
   onRegion: (region: Region | 'alle') => void;
   onResetFilter: () => void;
-  nebeneinander: boolean;
-  onNebeneinander: (wert: boolean) => void;
   protokoll: readonly ProtokollEintrag[];
   zukunft: readonly ProtokollEintrag[];
   onUndo: () => void;
@@ -66,7 +64,7 @@ interface DispoToolbarProps {
 }
 
 export function DispoToolbar(props: DispoToolbarProps) {
-  const { ansicht, onAnsicht, zeitraum, zeitraeume, onZeitraum, zoom, onZoom, farbeNach, onFarbeNach, filter, techniker, nebeneinander, onNebeneinander, protokoll, zukunft, onUndo, onRedo, onNeu } = props;
+  const { ansicht, onAnsicht, zeitraum, zeitraeume, onZeitraum, zoom, onZoom, farbeNach, onFarbeNach, filter, techniker, protokoll, zukunft, onUndo, onRedo, onNeu } = props;
   const [filterOffen, setFilterOffen] = useState(false);
   const [protokollOffen, setProtokollOffen] = useState(false);
   const filterRef = useRef<HTMLButtonElement>(null);
@@ -94,10 +92,6 @@ export function DispoToolbar(props: DispoToolbarProps) {
           <CapsLabel>Farbe</CapsLabel>
           <SegmentedControl label="Farbe nach" options={FARBE_OPTIONEN} value={farbeNach} onChange={onFarbeNach} />
         </div>
-      )}
-
-      {ansicht === 'kalender' && zeitraum === 'tag' && (
-        <IconButton icon={SquareSplitHorizontal} label="Nebeneinander: eine Spalte pro Techniker" size="md" pressed={nebeneinander} onClick={() => onNebeneinander(!nebeneinander)} />
       )}
 
       <Button ref={filterRef} variant={filterAnzahl > 0 ? 'secondary' : 'ghost'} size="sm" icon={Funnel} onClick={() => setFilterOffen((wert) => !wert)} className={cx(filterAnzahl > 0 && styles.filterAktiv)}>

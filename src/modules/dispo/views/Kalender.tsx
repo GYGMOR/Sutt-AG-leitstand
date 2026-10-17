@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/views/Kalender.tsx                   │
    │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Outlook-Kalender: Tag / AW / Woche / Monat, Split pro Techniker       │
+   │  Outlook-Kalender: Techniker-Kalender, Tag/AW/Woche/Monat, Split       │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -13,9 +13,14 @@ import type { IsoDatum, Minuten } from '../../../core/datum';
 import { ABSENZ_LABEL, fullName, isAbwesend } from '../../../core/domain/stammdaten';
 import type { Absenz, Techniker } from '../../../core/domain/stammdaten';
 import { formatDatumKurz, formatWochentag, formatZeit, formatZeitspanne } from '../../../core/format';
+import { useElementSize } from '../../../core/hooks/useElementSize';
 import { Avatar } from '../../../core/ui/Avatar';
+import { CapsLabel } from '../../../core/ui/CapsLabel';
 import { Popover } from '../../../core/ui/Popover';
+import { SegmentedControl } from '../../../core/ui/SegmentedControl';
+import type { SegmentOption } from '../../../core/ui/SegmentedControl';
 import { cx } from '../../../core/ui/cx';
+import { balkenKlasse, technikerKlasse } from '../../../core/ui/farben';
 import { useDispoDnd, vorschauText } from '../drag/DispoDnd';
 import type { DropZoneData } from '../drag/DispoDnd';
 import type { FarbeNach, Zoom } from '../dispo.types';
@@ -23,11 +28,14 @@ import type { EinsatzView } from '../store/dispo.selectors';
 import { ACHSE_ENDE, ACHSE_START, ARBEIT_ENDE, ARBEIT_START, MITTAG, assignLanes } from '../zeitraster';
 import { EinsatzBlock } from './EinsatzBlock';
 import { KompaktBlock } from './KompaktBlock';
+import { BlockRegistryProvider, Verbindungen } from './Verbindungen';
 import styles from './Kalender.module.css';
 
 // ── §1 · Geometrie ───────────────────────────────────────────────
 
 const RINNE_W = 56;
+/** Nebeneinander in Arbeitswoche/Woche nur bis zu dieser Zahl Kalender – sonst werden Spalten zu Strichen. */
+const MAX_SPLIT_WOCHE = 3;
 
 function pxPerMinY(zoom: Zoom): number {
   if (zoom === 15) return 2;
@@ -53,10 +61,13 @@ interface SpalteProps {
   absenz: Absenz | undefined;
   ausgewaehltId: string | null;
   markiertId: string | null;
+  verwandteIds: ReadonlySet<string>;
+  /** Überlagerte Kalender: Kürzel im Block, Technikerfarbe als Balken. */
+  ueberlagert: boolean;
   onSelectEinsatz: (einsatzId: string) => void;
 }
 
-function Spalte({ datum, techniker, views, heute, jetztMin, skala, zoom, farbeNach, absenz, ausgewaehltId, markiertId, onSelectEinsatz }: SpalteProps) {
+function Spalte({ datum, techniker, views, heute, jetztMin, skala, zoom, farbeNach, absenz, ausgewaehltId, markiertId, verwandteIds, ueberlagert, onSelectEinsatz }: SpalteProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const dnd = useDispoDnd();
   const hoehe = yOf(ACHSE_ENDE, skala);
@@ -120,6 +131,9 @@ function Spalte({ datum, techniker, views, heute, jetztMin, skala, zoom, farbeNa
             farbeNach={farbeNach}
             ausgewaehlt={eintrag.id === ausgewaehltId}
             markiert={eintrag.id === markiertId}
+            verwandt={verwandteIds.has(eintrag.id)}
+            zeigeTechniker={ueberlagert}
+            balkenKlasse={ueberlagert && farbeNach !== 'techniker' ? balkenKlasse(eintrag.view.techniker.farbe) : undefined}
             onSelect={onSelectEinsatz}
           />
         );
@@ -136,34 +150,132 @@ function Spalte({ datum, techniker, views, heute, jetztMin, skala, zoom, farbeNa
   );
 }
 
-// ── §3 · Zeitraster (Tag / Woche) ────────────────────────────────
+// ── §3 · Kalenderleiste: welche Kalender, wie dargestellt ────────
 
-interface RasterProps extends Omit<KalenderProps, 'zeitraum'> {
-  spalten: { schluessel: string; datum: IsoDatum; techniker: Techniker | null; titel: string; untertitel: string }[];
+type Darstellung = 'ueberlagert' | 'nebeneinander';
+
+const DARSTELLUNG_OPTIONEN: readonly SegmentOption<Darstellung>[] = [
+  { value: 'ueberlagert', label: 'Überlagert', title: 'Gewählte Kalender in einer Spalte, Techniker als Kürzel und Balken' },
+  { value: 'nebeneinander', label: 'Nebeneinander', title: 'Eine Spalte pro Techniker' },
+];
+
+interface LeisteProps {
+  techniker: readonly Techniker[];
+  auswahl: readonly string[] | null;
+  onAuswahl: (ids: readonly string[] | null) => void;
+  darstellung: Darstellung;
+  onDarstellung: (wert: Darstellung) => void;
+  splitMoeglich: boolean;
+  zeitraum: Zeitraum;
 }
 
-function Zeitraster({ spalten, views, heute, jetztMin, zoom, farbeNach, absenzen, ausgewaehltId, markiertId, onSelectEinsatz, onOpenDay }: RasterProps) {
+// jh› Wie Outlooks Kalenderliste: jeder Techniker ist ein Kalender mit eigener Farbe,
+//     per Klick ein- und ausblendbar, Doppelklick zeigt nur ihn.
+function KalenderLeiste({ techniker, auswahl, onAuswahl, darstellung, onDarstellung, splitMoeglich, zeitraum }: LeisteProps) {
+  const aktivIds = auswahl ?? techniker.map((person) => person.id);
+  const toggle = (id: string) => {
+    const neu = aktivIds.includes(id) ? aktivIds.filter((eintrag) => eintrag !== id) : [...aktivIds, id];
+    // jh› Mindestens ein Kalender bleibt sichtbar – ein leeres Raster hilft niemandem.
+    if (neu.length === 0) return;
+    onAuswahl(neu.length === techniker.length ? null : neu);
+  };
+
+  return (
+    <div className={styles.leiste} role="group" aria-label="Kalender wählen">
+      <CapsLabel>Kalender</CapsLabel>
+      <div className={styles.kalenderListe}>
+        {techniker.map((person) => {
+          const aktiv = aktivIds.includes(person.id);
+          return (
+            <button
+              key={person.id}
+              type="button"
+              className={cx(styles.kalenderChip, technikerKlasse(person.farbe), !aktiv && styles.kalenderChipAus)}
+              aria-pressed={aktiv}
+              title={`${fullName(person)} · Klick: ein-/ausblenden · Doppelklick: nur diesen Kalender`}
+              onClick={() => toggle(person.id)}
+              onDoubleClick={() => onAuswahl([person.id])}
+            >
+              <span className={styles.kalenderPunkt} aria-hidden />
+              <span className={styles.kalenderKuerzel}>{person.kuerzel}</span>
+              <span className={styles.kalenderName}>{person.nachname}</span>
+            </button>
+          );
+        })}
+        <button type="button" className={styles.kalenderAlle} onClick={() => onAuswahl(null)} disabled={auswahl === null}>
+          Alle
+        </button>
+      </div>
+      {zeitraum !== 'monat' && (
+        <div className={styles.leisteRechts}>
+          {!splitMoeglich && <span className={styles.leisteHinweis}>Nebeneinander in der Woche bis {MAX_SPLIT_WOCHE} Kalender</span>}
+          <SegmentedControl label="Darstellung" options={DARSTELLUNG_OPTIONEN} value={darstellung} onChange={onDarstellung} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── §4 · Zeitraster (Tag / Woche) ────────────────────────────────
+
+interface Spalte {
+  schluessel: string;
+  datum: IsoDatum;
+  techniker: Techniker | null;
+  titel: string;
+  untertitel: string;
+}
+
+interface RasterProps extends Omit<KalenderProps, 'zeitraum'> {
+  spalten: readonly Spalte[];
+  split: boolean;
+  /** Spalten pro Tag im Split – für die Tageszeile im Kopf. */
+  proTag: number;
+  aktiv: EinsatzView | null;
+  verwandteIds: ReadonlySet<string>;
+}
+
+function Zeitraster({ spalten, split, proTag, aktiv, verwandteIds, views, tage, heute, jetztMin, zoom, farbeNach, absenzen, ausgewaehltId, markiertId, onSelectEinsatz, onOpenDay }: RasterProps) {
   const skala = pxPerMinY(zoom);
+  const koerperRef = useRef<HTMLDivElement>(null);
+  const inhaltRef = useRef<HTMLDivElement>(null);
+  const groesse = useElementSize(koerperRef);
   const stunden = useMemo(() => Array.from({ length: (ACHSE_ENDE - ACHSE_START) / 60 + 1 }, (_, index) => ACHSE_START + index * 60), []);
   const ganztag = spalten.map((spalte) => {
-    const tage = spalte.techniker ? [spalte.techniker.id] : [...new Set(views.map((view) => view.techniker.id))];
     const alle: Absenz[] = [];
     for (const absenz of absenzen) {
       if (absenz.von <= spalte.datum && absenz.bis >= spalte.datum && (spalte.techniker ? absenz.technikerId === spalte.techniker.id : true)) alle.push(absenz);
     }
-    return { spalte, absenzen: alle, technikerIds: tage };
+    return { spalte, absenzen: alle };
   });
   const zeigeGanztag = ganztag.some((eintrag) => eintrag.absenzen.length > 0);
+  const zeigeTagZeile = split && tage.length > 1;
 
   return (
     <div className={styles.raster}>
+      {zeigeTagZeile && (
+        <div className={styles.tagZeile}>
+          <div className={styles.kopfEcke} style={{ width: RINNE_W }} />
+          {tage.map((tag) => (
+            <button key={tag} type="button" className={cx(styles.tagKopf, tag === heute && styles.kopfHeute)} style={{ flex: proTag }} onClick={() => onOpenDay(tag)} title="Tag öffnen">
+              {formatWochentag(tag, 'kurz')} <span className={styles.spaltenUntertitel}>{formatDatumKurz(tag)}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div className={styles.kopf}>
         <div className={styles.kopfEcke} style={{ width: RINNE_W }} />
         {spalten.map((spalte) => (
-          <button key={spalte.schluessel} type="button" className={cx(styles.spaltenKopf, spalte.datum === heute && styles.kopfHeute)} onClick={() => onOpenDay(spalte.datum)} title="Tag öffnen">
+          <button
+            key={spalte.schluessel}
+            type="button"
+            className={cx(styles.spaltenKopf, spalte.datum === heute && spalte.techniker === null && styles.kopfHeute, spalte.techniker && technikerKlasse(spalte.techniker.farbe), spalte.techniker && styles.spaltenKopfTechniker)}
+            onClick={() => onOpenDay(spalte.datum)}
+            title="Tag öffnen"
+          >
             {spalte.techniker ? <Avatar techniker={spalte.techniker} size="sm" /> : null}
             <span className={styles.spaltenTitel}>{spalte.titel}</span>
-            <span className={styles.spaltenUntertitel}>{spalte.untertitel}</span>
+            {spalte.untertitel && <span className={styles.spaltenUntertitel}>{spalte.untertitel}</span>}
           </button>
         ))}
       </div>
@@ -183,40 +295,48 @@ function Zeitraster({ spalten, views, heute, jetztMin, zoom, farbeNach, absenzen
           ))}
         </div>
       )}
-      <div className={styles.koerper}>
-        <div className={styles.rinne} style={{ width: RINNE_W, height: yOf(ACHSE_ENDE, skala) }}>
-          {stunden
-            .filter((minuten) => minuten > ACHSE_START && minuten < ACHSE_ENDE)
-            .map((minuten) => (
-              <span key={minuten} className={styles.stunde} style={{ top: yOf(minuten, skala) }}>
-                {formatZeit(minuten)}
-              </span>
+      <div ref={koerperRef} className={styles.koerper}>
+        <BlockRegistryProvider>
+          <div ref={inhaltRef} className={styles.koerperInhalt}>
+            <div className={styles.rinne} style={{ width: RINNE_W, height: yOf(ACHSE_ENDE, skala) }}>
+              {stunden
+                .filter((minuten) => minuten > ACHSE_START && minuten < ACHSE_ENDE)
+                .map((minuten) => (
+                  <span key={minuten} className={styles.stunde} style={{ top: yOf(minuten, skala) }}>
+                    {formatZeit(minuten)}
+                  </span>
+                ))}
+            </div>
+            {spalten.map((spalte) => (
+              <Spalte
+                key={spalte.schluessel}
+                datum={spalte.datum}
+                techniker={spalte.techniker}
+                views={views.filter((view) => view.einsatz.datum === spalte.datum && (spalte.techniker === null || view.techniker.id === spalte.techniker.id))}
+                heute={heute}
+                jetztMin={jetztMin}
+                skala={skala}
+                zoom={zoom}
+                farbeNach={farbeNach}
+                absenz={spalte.techniker ? isAbwesend(absenzen, spalte.techniker.id, spalte.datum) : undefined}
+                ausgewaehltId={ausgewaehltId}
+                markiertId={markiertId}
+                verwandteIds={verwandteIds}
+                ueberlagert={!split}
+                onSelectEinsatz={onSelectEinsatz}
+              />
             ))}
-        </div>
-        {spalten.map((spalte) => (
-          <Spalte
-            key={spalte.schluessel}
-            datum={spalte.datum}
-            techniker={spalte.techniker}
-            views={views.filter((view) => view.einsatz.datum === spalte.datum && (spalte.techniker === null || view.techniker.id === spalte.techniker.id))}
-            heute={heute}
-            jetztMin={jetztMin}
-            skala={skala}
-            zoom={zoom}
-            farbeNach={farbeNach}
-            absenz={spalte.techniker ? isAbwesend(absenzen, spalte.techniker.id, spalte.datum) : undefined}
-            ausgewaehltId={ausgewaehltId}
-            markiertId={markiertId}
-            onSelectEinsatz={onSelectEinsatz}
-          />
-        ))}
+            <Verbindungen containerRef={inhaltRef} aktiv={aktiv} signatur={`${skala}:${spalten.length}:${groesse.width}`} richtung="vertikal" />
+          </div>
+        </BlockRegistryProvider>
       </div>
     </div>
   );
 }
 
-// ── §4 · Monat ───────────────────────────────────────────────────
+// ── §5 · Monat ───────────────────────────────────────────────────
 
+// jh# 011 Verknüpfungslinien auch im Monat und in der Mehrtages-Plantafel – Pillen melden sich nicht bei der Block-Registry.
 const MAX_PILLEN = 3;
 
 function Monat({ views, datum, heute, farbeNach, ausgewaehltId, markiertId, onSelectEinsatz, onOpenDay }: KalenderProps) {
@@ -286,7 +406,7 @@ function Monat({ views, datum, heute, farbeNach, ausgewaehltId, markiertId, onSe
   );
 }
 
-// ── §5 · Kalender ────────────────────────────────────────────────
+// ── §6 · Kalender ────────────────────────────────────────────────
 
 export interface KalenderProps {
   views: readonly EinsatzView[];
@@ -300,6 +420,10 @@ export interface KalenderProps {
   techniker: readonly Techniker[];
   absenzen: readonly Absenz[];
   nebeneinander: boolean;
+  onNebeneinander: (wert: boolean) => void;
+  /** Sichtbare Kalender (Techniker-IDs); null = alle. */
+  technikerAuswahl: readonly string[] | null;
+  onTechnikerAuswahl: (ids: readonly string[] | null) => void;
   ausgewaehltId: string | null;
   markiertId: string | null;
   onSelectEinsatz: (einsatzId: string) => void;
@@ -307,16 +431,50 @@ export interface KalenderProps {
 }
 
 export function Kalender(props: KalenderProps) {
-  const { zeitraum, tage, datum, techniker, nebeneinander } = props;
-  if (zeitraum === 'monat') return <Monat {...props} />;
+  const { views, tage, zeitraum, techniker, nebeneinander, onNebeneinander, technikerAuswahl, onTechnikerAuswahl, ausgewaehltId } = props;
+  const gewaehlt = useMemo(() => (technikerAuswahl === null ? techniker : techniker.filter((person) => technikerAuswahl.includes(person.id))), [techniker, technikerAuswahl]);
+  const sichtbar = useMemo(() => (technikerAuswahl === null ? views : views.filter((view) => technikerAuswahl.includes(view.techniker.id))), [views, technikerAuswahl]);
+  const aktiv = useMemo(() => sichtbar.find((view) => view.einsatz.id === ausgewaehltId) ?? null, [sichtbar, ausgewaehltId]);
+  const verwandteIds = useMemo(() => new Set((aktiv?.verknuepfungen ?? []).flatMap((verknuepfung) => (verknuepfung.einsatzId ? [verknuepfung.einsatzId] : []))), [aktiv]);
 
-  // jh› «Nebeneinander» wie Outlooks Split view: eine Spalte pro Techniker im Tag.
-  const spalten =
-    zeitraum === 'tag' && nebeneinander
-      ? techniker.map((person) => ({ schluessel: person.id, datum, techniker: person, titel: fullName(person), untertitel: `${formatWochentag(datum, 'kurz')} ${formatDatumKurz(datum)}` }))
-      : tage.map((tag) => ({ schluessel: tag, datum: tag, techniker: null, titel: formatWochentag(tag, zeitraum === 'tag' ? 'lang' : 'kurz'), untertitel: formatDatumKurz(tag) }));
+  // jh› «Nebeneinander» wie Outlooks Split view: eine Spalte pro Techniker – im Tag immer,
+  //     in der Woche bis drei Kalender; darüber überlagert mit Kürzel und Technikerbalken.
+  const splitMoeglich = zeitraum === 'tag' || gewaehlt.length <= MAX_SPLIT_WOCHE;
+  const split = zeitraum !== 'monat' && nebeneinander && splitMoeglich;
 
-  return <Zeitraster {...props} spalten={spalten} />;
+  const spalten = useMemo<Spalte[]>(() => {
+    if (split) {
+      return tage.flatMap((tag) =>
+        gewaehlt.map((person) => ({
+          schluessel: `${tag}:${person.id}`,
+          datum: tag,
+          techniker: person,
+          titel: zeitraum === 'tag' ? fullName(person) : person.kuerzel,
+          untertitel: '',
+        })),
+      );
+    }
+    return tage.map((tag) => ({ schluessel: tag, datum: tag, techniker: null, titel: formatWochentag(tag, zeitraum === 'tag' ? 'lang' : 'kurz'), untertitel: formatDatumKurz(tag) }));
+  }, [split, tage, gewaehlt, zeitraum]);
+
+  return (
+    <div className={styles.kalender}>
+      <KalenderLeiste
+        techniker={techniker}
+        auswahl={technikerAuswahl}
+        onAuswahl={onTechnikerAuswahl}
+        darstellung={split ? 'nebeneinander' : 'ueberlagert'}
+        onDarstellung={(wert) => onNebeneinander(wert === 'nebeneinander')}
+        splitMoeglich={splitMoeglich}
+        zeitraum={zeitraum}
+      />
+      {zeitraum === 'monat' ? (
+        <Monat {...props} views={sichtbar} />
+      ) : (
+        <Zeitraster {...props} views={sichtbar} spalten={spalten} split={split} proTag={gewaehlt.length} aktiv={aktiv} verwandteIds={verwandteIds} />
+      )}
+    </div>
+  );
 }
 
 /* ◆ jh · eof */

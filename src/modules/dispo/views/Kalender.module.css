@@ -1,10 +1,121 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/views/Kalender.module.css            │
    │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Kalender: Zeitraster, Ganztagleiste, Spalten, Monat                   │
+   │  Kalender: Kalenderleiste, Zeitraster, Ganztag, Spalten, Monat         │
    └────────────────────────────────────────────────────────────────────────┘ */
 
-/* ── §1 · Raster & Kopf ──────────────────────────────────────── */
+/* ── §1 · Rahmen & Kalenderleiste ────────────────────────────── */
+
+.kalender {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.leiste {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 5px var(--sl-space-4);
+  border-bottom: var(--sl-hairline);
+  background: var(--sl-paper);
+}
+
+.kalender-liste {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* jh› Ein Chip pro Techniker-Kalender in seiner Farbe – wie Outlooks Kalenderliste, nur quer. */
+.kalender-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 9px 0 7px;
+  border: 1px solid color-mix(in srgb, var(--sl-edge) 55%, transparent);
+  border-radius: 13px;
+  background: var(--sl-tint);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink);
+  transition:
+    background-color var(--sl-dur-fast) var(--sl-ease),
+    border-color var(--sl-dur-fast) var(--sl-ease);
+}
+
+.kalender-chip:hover {
+  border-color: var(--sl-edge);
+}
+
+.kalender-punkt {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sl-edge);
+}
+
+.kalender-kuerzel {
+  font-family: var(--sl-font-mono);
+  font-weight: var(--sl-fw-medium);
+}
+
+.kalender-name {
+  color: var(--sl-ink-2);
+}
+
+.kalender-chip-aus {
+  border-color: var(--sl-line);
+  background: var(--sl-surface);
+  color: var(--sl-mute);
+}
+
+.kalender-chip-aus .kalender-punkt {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--sl-edge);
+}
+
+.kalender-chip-aus .kalender-name {
+  color: var(--sl-mute);
+}
+
+.kalender-alle {
+  height: 26px;
+  padding: 0 9px;
+  border: 1px solid var(--sl-line);
+  border-radius: 13px;
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.kalender-alle:not(:disabled):hover {
+  border-color: var(--sl-line-strong);
+  color: var(--sl-ink);
+}
+
+.kalender-alle:disabled {
+  opacity: 0.45;
+}
+
+.leiste-rechts {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.leiste-hinweis {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Raster & Kopf ──────────────────────────────────────── */
 
 .raster {
   display: flex;
@@ -12,6 +123,31 @@
   flex-direction: column;
   min-height: 0;
   background: var(--sl-surface);
+}
+
+.tag-zeile {
+  display: flex;
+  flex: none;
+  border-bottom: 1px solid var(--sl-line-soft);
+  background: var(--sl-paper);
+}
+
+.tag-kopf {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  height: 26px;
+  padding: 0 10px;
+  border-right: var(--sl-hairline);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-semibold);
+  text-align: left;
+}
+
+.tag-kopf:hover {
+  background: var(--sl-hover);
 }
 
 .kopf {
@@ -42,6 +178,11 @@
   background: var(--sl-hover);
 }
 
+/* jh› Technikerspalte trägt oben einen Farbstreifen – so liest man den Kalender auch ohne Avatar. */
+.spalten-kopf-techniker {
+  box-shadow: inset 0 3px 0 var(--sl-edge);
+}
+
 .kopf-heute::before {
   content: '';
   position: absolute;
@@ -62,10 +203,11 @@
   flex: none;
   font-family: var(--sl-font-mono);
   font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-regular);
   color: var(--sl-mute);
 }
 
-/* ── §2 · Ganztag ────────────────────────────────────────────── */
+/* ── §3 · Ganztag ────────────────────────────────────────────── */
 
 .ganztag {
   display: flex;
@@ -106,13 +248,19 @@
   white-space: nowrap;
 }
 
-/* ── §3 · Körper, Rinne, Spalte ──────────────────────────────── */
+/* ── §4 · Körper, Rinne, Spalte ──────────────────────────────── */
 
 .koerper {
-  display: flex;
   flex: 1;
   min-height: 0;
   overflow: auto;
+}
+
+/* jh› Eigener Bezugsrahmen für die Verknüpfungslinien – scrollt mit den Spalten. */
+.koerper-inhalt {
+  position: relative;
+  display: flex;
+  min-width: 100%;
 }
 
 .rinne {
@@ -162,11 +310,12 @@
   pointer-events: none;
 }
 
+/* jh› Mittag als ruhige Fläche – Schraffuren konkurrierten mit den Blöcken. */
 .mittag {
   position: absolute;
   left: 0;
   right: 0;
-  background: repeating-linear-gradient(135deg, transparent 0 5px, var(--sl-line-soft) 5px 6px);
+  background: color-mix(in srgb, var(--sl-ink) 4%, transparent);
   pointer-events: none;
 }
 
@@ -251,7 +400,7 @@
   background: var(--sl-signal);
 }
 
-/* ── §4 · Monat ──────────────────────────────────────────────── */
+/* ── §5 · Monat ──────────────────────────────────────────────── */
 
 .monat {
   display: flex;

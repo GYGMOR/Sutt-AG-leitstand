@@ -46,11 +46,14 @@ export interface AnsichtEinstellungen {
   panelEingeklappt: boolean;
   panelTab: PanelTab;
   kalenderNebeneinander: boolean;
+  /** Sichtbare Kalender (Techniker-IDs) in der Kalenderansicht; null = alle. */
+  kalenderTechnikerIds: readonly string[] | null;
 }
 
 type AnsichtAction = { kind: 'set'; aenderung: Partial<AnsichtEinstellungen> };
 
-const SPEICHER_KEY = 'sl.dispo.ansicht';
+// jh› Schlüssel mit Versionszusatz: neue Vorgaben (Nebeneinander, Kalenderwahl) greifen auch bei bestehenden Nutzern.
+const SPEICHER_KEY = 'sl.dispo.ansicht.2';
 
 const STANDARD: AnsichtEinstellungen = {
   zoom: 60,
@@ -58,7 +61,8 @@ const STANDARD: AnsichtEinstellungen = {
   panelBreite: 360,
   panelEingeklappt: false,
   panelTab: 'eingang',
-  kalenderNebeneinander: false,
+  kalenderNebeneinander: true,
+  kalenderTechnikerIds: null,
 };
 
 function isEinstellungen(wert: unknown): wert is AnsichtEinstellungen {
