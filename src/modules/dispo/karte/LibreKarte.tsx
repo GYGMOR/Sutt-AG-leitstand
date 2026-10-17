@@ -52,10 +52,16 @@ export function LibreKarte({ pins, linien = [], fokusId, onPinClick, onFehler }:
     // jh! Kacheln können im Intranet blockiert sein – dann meldet die Karte Fehler und die Schemakarte übernimmt.
     map.on('error', (ereignis: { error?: { message?: string } }) => {
       const text = ereignis.error?.message ?? '';
-      if (/tile|fetch|NetworkError|AJAXError/i.test(text)) fehlerRef.current();
+      if (/tile|fetch|NetworkError|AJAXError|Worker/i.test(text)) fehlerRef.current();
     });
+    // jh› Kommt innert 10 s kein «load» (Intranet, Proxy, WebGL aus), übernimmt die Schemakarte.
+    const wache = window.setTimeout(() => {
+      if (!map.loaded()) fehlerRef.current();
+    }, 10000);
+    map.once('load', () => window.clearTimeout(wache));
     mapRef.current = map;
     return () => {
+      window.clearTimeout(wache);
       map.remove();
       mapRef.current = null;
     };

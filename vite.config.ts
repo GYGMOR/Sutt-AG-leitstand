@@ -64,6 +64,10 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
   },
+  optimizeDeps: {
+    // jh! Vorgebündelt verliert maplibre-gl im Dev-Server seinen Worker («Worker failed to load»).
+    exclude: ['maplibre-gl'],
+  },
   build: {
     // jh› Kartenbibliotheken laden erst, wenn eine Karte sichtbar wird.
     chunkSizeWarningLimit: 900,
