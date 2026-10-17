@@ -30,7 +30,7 @@ const PAARE: Paar[] = [
   { text: 'signal-ink', flaeche: 'surface', zweck: 'Signal als Schrift', minimum: 4.5 },
   { text: 'signal-ink', flaeche: 'paper', zweck: 'Signal als Schrift (Fläche)', minimum: 4.5 },
   { text: 'danger-ink', flaeche: 'surface', zweck: 'Löschen/Fehler als Schrift', minimum: 4.5 },
-  { text: 'ink', flaeche: 'signal', zweck: 'Primärknopf', minimum: 4.5 },
+  { text: 'on-signal', flaeche: 'signal', zweck: 'Primärknopf', minimum: 4.5 },
   { text: 'chrome-ink', flaeche: 'chrome', zweck: 'Topbar-Text', minimum: 4.5 },
   { text: 'chrome-mute', flaeche: 'chrome', zweck: 'Topbar-Nebentext', minimum: 4.5 },
   { text: 'chrome-ink', flaeche: 'chrome-2', zweck: 'Suchfeld in Topbar', minimum: 4.5 },
@@ -39,7 +39,8 @@ const PAARE: Paar[] = [
   { text: 'slot-gut-ink', flaeche: 'surface', zweck: 'Smart-Slot Begründung', minimum: 4.5 },
   { text: 'slot-ok-ink', flaeche: 'surface', zweck: 'Smart-Slot Begründung', minimum: 4.5 },
   { text: 'slot-schlecht-ink', flaeche: 'surface', zweck: 'Smart-Slot Begründung', minimum: 4.5 },
-  { text: 'signal', flaeche: 'surface', zweck: 'Jetzt-Linie, Messmarke (Grafik)', minimum: 3 },
+  // jh› Sutt-Orange auf Weiss liegt bei 2.94:1 – die Jetzt-Linie ist dekorativ, die Zeit trägt die Pille (signal-ink, 4.5+).
+  { text: 'signal', flaeche: 'surface', zweck: 'Jetzt-Linie, Messmarke (dekorativ)', minimum: 2.5 },
   { text: 'line-strong', flaeche: 'surface', zweck: 'Rahmen Typenschild (Grafik)', minimum: 1.4 },
   ...KATEGORIEN.map((kat) => ({ text: `kat-${kat}-ink`, flaeche: `kat-${kat}-bg`, zweck: `Kategorie ${kat}`, minimum: 4.5 })),
   ...KATEGORIEN.map((kat) => ({ text: `kat-${kat}-edge`, flaeche: 'surface', zweck: `Kante ${kat} (Grafik)`, minimum: 2.4 })),

@@ -41,7 +41,7 @@
 .primary {
   background: var(--sl-signal);
   border-color: var(--sl-signal);
-  color: #1a1a1a;
+  color: var(--sl-on-signal);
 }
 
 .primary:not(:disabled):hover {

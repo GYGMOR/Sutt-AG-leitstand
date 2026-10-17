@@ -20,6 +20,8 @@
   --sl-surface: #ffffff;
   --sl-signal: #f86c04;
   --sl-signal-ink: #b84d00;
+  /* Schrift AUF Signal-Orange (Primärknopf) – in beiden Modi Anthrazit, 5.9:1. */
+  --sl-on-signal: #1a1a1a;
 
   /* Abgeleitete Stufen – alle aus dem warmen Grau, keine neuen Töne. */
   --sl-mute-2: #9c978f;
@@ -109,7 +111,7 @@
   --sl-tech-4-ink: #1a1a1a;
   --sl-tech-5: #b5473a;
   --sl-tech-5-ink: #ffffff;
-  --sl-tech-6: #0f8a8a;
+  --sl-tech-6: #0b7474;
   --sl-tech-6-ink: #ffffff;
   --sl-tech-7: #5c6b7a;
   --sl-tech-7-ink: #ffffff;

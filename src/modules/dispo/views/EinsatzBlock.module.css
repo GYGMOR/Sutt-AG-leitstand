@@ -15,7 +15,8 @@
   min-width: 0;
   padding: 3px 22px 3px 9px;
   overflow: hidden;
-  border: 1px solid transparent;
+  /* jh› Hauchdünne Kante in 30 % Kantenfarbe – hält helle Tönungen auf Weiss zusammen. */
+  border: 1px solid color-mix(in srgb, var(--sl-edge) 30%, transparent);
   border-radius: var(--sl-radius-1);
   background: var(--sl-tint);
   color: var(--sl-tint-ink);
@@ -147,8 +148,9 @@
 }
 
 .status-erledigt {
-  filter: saturate(0.25);
-  opacity: 0.8;
+  border-color: var(--sl-line-strong);
+  filter: saturate(0.4);
+  opacity: 0.88;
 }
 
 .status-erledigt .kunde {
