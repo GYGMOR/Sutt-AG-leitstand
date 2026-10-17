@@ -1,0 +1,98 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/auth/AuthLayout.module.css                    │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Geteiltes Auth-Layout                                                 │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Seite ──────────────────────────────────────────────── */
+
+.seite {
+  display: grid;
+  grid-template-columns: minmax(380px, 44%) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+/* ── §2 · Links (Anthrazit) ──────────────────────────────────── */
+
+.links {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 48px 56px;
+  overflow: hidden;
+  background: var(--sl-chrome);
+  color: var(--sl-chrome-ink);
+}
+
+.muster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--sl-chrome-line);
+  opacity: 0.55;
+}
+
+.wortmarke {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.raute {
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  background: var(--sl-signal);
+  transform: rotate(45deg);
+}
+
+.firma {
+  font-size: var(--sl-fs-20);
+  font-weight: var(--sl-fw-semibold);
+  letter-spacing: 0.08em;
+}
+
+.schraegstrich {
+  color: var(--sl-chrome-mute);
+  font-size: var(--sl-fs-20);
+}
+
+.produkt {
+  font-size: var(--sl-fs-20);
+  color: var(--sl-chrome-mute);
+}
+
+.claim {
+  position: relative;
+  margin-top: 28px;
+  font-size: var(--sl-fs-16);
+  line-height: var(--sl-lh-base);
+  color: var(--sl-chrome-mute);
+}
+
+.fuss {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sl-space-4);
+  margin-top: auto;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-chrome-mute);
+}
+
+.version {
+  font-family: var(--sl-font-mono);
+}
+
+/* ── §3 · Rechts ─────────────────────────────────────────────── */
+
+.rechts {
+  display: flex;
+  align-items: flex-start;
+  padding: 72px 64px;
+  background: var(--sl-paper);
+}
+
+/* ◆ jh · eof */

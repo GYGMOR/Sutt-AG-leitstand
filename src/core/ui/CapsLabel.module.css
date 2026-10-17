@@ -1,0 +1,31 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/CapsLabel.module.css                       │
+   │  ◆ JH · 2026.10 · rev 01                                               │
+   │  Versal-Label                                                          │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Grundform ──────────────────────────────────────────── */
+
+.caps-label {
+  display: inline-block;
+  margin: 0;
+  font-family: var(--sl-font-sans);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  line-height: var(--sl-lh-tight);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Töne ───────────────────────────────────────────────── */
+
+.ink {
+  color: var(--sl-ink);
+}
+
+.signal {
+  color: var(--sl-signal-ink);
+}
+
+/* ◆ jh · eof */

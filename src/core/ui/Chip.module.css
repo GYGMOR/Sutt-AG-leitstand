@@ -1,0 +1,81 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Chip.module.css                            │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Chip                                                                  │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Grundform ──────────────────────────────────────────── */
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  color: var(--sl-ink-2);
+  white-space: nowrap;
+}
+
+.sm {
+  height: 22px;
+  padding: 0 6px;
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+}
+
+.md {
+  height: 24px;
+  padding: 0 8px;
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+}
+
+.text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── §2 · Töne ───────────────────────────────────────────────── */
+
+/* jh› Kategorie-Chip: getönte Fläche + 2-px-Kante links, Schrift in Kategorie-Ink. */
+.tint {
+  padding-left: 9px;
+  border-color: transparent;
+  background: var(--sl-tint);
+  color: var(--sl-tint-ink);
+}
+
+.tint::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: var(--sl-mark-width);
+  background: var(--sl-edge);
+}
+
+.signal {
+  border-color: var(--sl-signal);
+  color: var(--sl-signal-ink);
+}
+
+.danger {
+  border-color: var(--sl-danger);
+  color: var(--sl-danger-ink);
+}
+
+.ok {
+  border-color: var(--sl-ok);
+  color: var(--sl-ok);
+}
+
+.mute {
+  border-style: dashed;
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

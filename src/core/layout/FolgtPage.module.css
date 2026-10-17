@@ -1,0 +1,83 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/layout/FolgtPage.module.css                   │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Folgt-Seite                                                           │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Seite ──────────────────────────────────────────────── */
+
+.seite {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sl-space-4);
+  max-width: 640px;
+  padding: var(--sl-space-8) var(--sl-space-8);
+}
+
+.kopf {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-3);
+}
+
+.icon {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  color: var(--sl-ink-2);
+}
+
+.titel {
+  font-size: var(--sl-fs-28);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+}
+
+.beschreibung {
+  font-size: var(--sl-fs-16);
+  line-height: var(--sl-lh-base);
+  color: var(--sl-ink-2);
+}
+
+.hinweis {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border-left: 2px solid var(--sl-line-strong);
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-13);
+  line-height: var(--sl-lh-base);
+}
+
+.hinweis svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--sl-mute);
+}
+
+.fakten {
+  display: grid;
+  gap: 6px;
+}
+
+.fakten div {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: var(--sl-space-3);
+  font-size: var(--sl-fs-12);
+}
+
+.fakten dt {
+  color: var(--sl-mute);
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+/* ◆ jh · eof */

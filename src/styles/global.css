@@ -1,0 +1,135 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  styles/global.css                                  │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Reset, Grundtypografie, Fokusring, Farbschema, Druckbasis             │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Reset ──────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+a {
+  color: inherit;
+}
+
+/* ── §2 · Dokument ───────────────────────────────────────────── */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+body {
+  min-width: 1024px;
+  background: var(--sl-paper);
+  color: var(--sl-ink);
+  font-family: var(--sl-font-sans);
+  font-size: var(--sl-fs-13);
+  line-height: var(--sl-lh-base);
+  /* jh› Tabellenziffern global – Zeiten und Beträge stehen immer bündig. */
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100vh;
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--sl-font-mono);
+}
+
+/* ── §3 · Fokus & Auswahl ────────────────────────────────────── */
+
+:focus {
+  outline: none;
+}
+
+/* jh› Ein Fokusring für alles: 2 px Signal, 2 px Abstand – Tastaturbedienung
+       ist bei Sutt Alltag (Telefon in der einen, Tastatur in der anderen Hand). */
+:focus-visible {
+  outline: 2px solid var(--sl-signal);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--sl-signal-wash);
+  color: var(--sl-ink);
+}
+
+/* ── §4 · Scrollleisten ──────────────────────────────────────── */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sl-line-strong) transparent;
+}
+
+/* ── §5 · Druck ──────────────────────────────────────────────── */
+
+@media print {
+  body {
+    min-width: 0;
+    background: #fff;
+    color: #1a1a1a;
+  }
+
+  #root {
+    height: auto;
+  }
+}
+
+/* ◆ jh · eof */

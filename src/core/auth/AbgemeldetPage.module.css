@@ -1,0 +1,29 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/auth/AbgemeldetPage.module.css                │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Abgemeldet-Seite                                                      │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Inhalt ─────────────────────────────────────────────── */
+
+.inhalt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sl-space-4);
+  max-width: 400px;
+}
+
+.titel {
+  font-size: var(--sl-fs-28);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+}
+
+.text {
+  font-size: var(--sl-fs-14);
+  line-height: var(--sl-lh-base);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

@@ -1,0 +1,45 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Avatar.module.css                          │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Avatar-Kreis                                                          │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Kreis ──────────────────────────────────────────────── */
+
+/* jh› Einzige Vollfläche in Technikerfarbe – klein, rund, eindeutig ein Mensch. */
+.avatar {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sl-edge);
+  color: var(--sl-avatar-ink);
+  font-family: var(--sl-font-mono);
+  font-weight: var(--sl-fw-semibold);
+  letter-spacing: 0.02em;
+}
+
+.sm {
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+}
+
+.md {
+  width: 28px;
+  height: 28px;
+  font-size: var(--sl-fs-label);
+}
+
+.lg {
+  width: 36px;
+  height: 36px;
+  font-size: var(--sl-fs-13);
+}
+
+.kuerzel {
+  line-height: 1;
+}
+
+/* ◆ jh · eof */

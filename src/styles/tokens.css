@@ -1,0 +1,223 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  styles/tokens.css                                  │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Design-Tokens (Light) – einzige Quelle für Farbe, Mass, Typo          │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* jh› Tokens benennen Rollen, nicht Farbtöne: --sl-ink ist «Vordergrund»,
+       --sl-paper ist «Arbeitsfläche». tokens.dark.css überschreibt dieselben
+       Namen unter [data-theme='dark'] – Komponenten kennen keine Rohfarben.
+       Textpaare prüft scripts/contrast.jh.ts (npm run jh:contrast). */
+
+/* ── §1 · Grundpalette ───────────────────────────────────────── */
+
+:root {
+  --sl-ink: #1a1a1a;
+  --sl-ink-2: #3a3a3a;
+  --sl-mute: #6b6b6b;
+  --sl-line: #dad7d2;
+  --sl-paper: #f4f2ee;
+  --sl-surface: #ffffff;
+  --sl-signal: #f86c04;
+  --sl-signal-ink: #b84d00;
+
+  /* Abgeleitete Stufen – alle aus dem warmen Grau, keine neuen Töne. */
+  --sl-mute-2: #9c978f;
+  --sl-line-soft: #ebe8e3;
+  --sl-line-strong: #bdb8b0;
+  --sl-hover: #efece7;
+  --sl-press: #e6e2db;
+  --sl-signal-hover: #e86200;
+  --sl-signal-wash: rgb(248 108 4 / 0.1);
+  --sl-past-wash: rgb(234 231 225 / 0.5);
+  --sl-surface-veil: rgb(255 255 255 / 0.86);
+
+  /* Meldungen */
+  --sl-danger: #b3261e;
+  --sl-danger-ink: #9a1f18;
+  --sl-danger-wash: rgb(179 38 30 / 0.1);
+  --sl-ok: #2e7d5b;
+  --sl-warn: #c08a00;
+
+  /* Rahmen (Topbar, Login links) – Anthrazit in beiden Modi */
+  --sl-chrome: #1a1a1a;
+  --sl-chrome-2: #2a2a2a;
+  --sl-chrome-line: #3a3a3a;
+  --sl-chrome-ink: #f4f2ee;
+  --sl-chrome-mute: #9c978f;
+}
+
+/* ── §2 · Statusfarben (gedämpft, nur Kante/Marke) ───────────── */
+
+:root {
+  --sl-st-geplant: #3d5a80;
+  --sl-st-unterwegs: #c08a00;
+  --sl-st-vor-ort: #2e7d5b;
+  --sl-st-wartet-teil: #8c4a9e;
+  --sl-st-erledigt: #7a7a7a;
+  --sl-st-dringend: var(--sl-signal);
+}
+
+/* ── §3 · Kategorien (Kante · Fläche · Schrift) ──────────────── */
+
+:root {
+  --sl-kat-reparatur-edge: #2f6fb2;
+  --sl-kat-reparatur-bg: #e7f0fa;
+  --sl-kat-reparatur-ink: #163a5f;
+
+  --sl-kat-montage-edge: #2e8b57;
+  --sl-kat-montage-bg: #e4f4eb;
+  --sl-kat-montage-ink: #17482d;
+
+  --sl-kat-lieferung-edge: #c98a00;
+  --sl-kat-lieferung-bg: #fbf2db;
+  --sl-kat-lieferung-ink: #5e4100;
+
+  --sl-kat-garantie-edge: #7b4fa6;
+  --sl-kat-garantie-bg: #f0e8f8;
+  --sl-kat-garantie-ink: #3f2560;
+
+  --sl-kat-mietgeraet-edge: #0f8a8a;
+  --sl-kat-mietgeraet-bg: #def3f3;
+  --sl-kat-mietgeraet-ink: #0a4646;
+
+  --sl-kat-malerarbeiten-edge: #a0522d;
+  --sl-kat-malerarbeiten-bg: #f6e9e0;
+  --sl-kat-malerarbeiten-ink: #5a2d17;
+
+  --sl-kat-offerte-edge: #5c6b7a;
+  --sl-kat-offerte-bg: #eaeef2;
+  --sl-kat-offerte-ink: #2f3943;
+
+  --sl-kat-notfall-edge: #f86c04;
+  --sl-kat-notfall-bg: #feecdd;
+  --sl-kat-notfall-ink: #8a3a00;
+}
+
+/* ── §4 · Techniker- und Regionsfarben ───────────────────────── */
+
+:root {
+  /* jh› Neun unterscheidbare, gedämpfte Töne. -ink ist die Schrift AUF der Farbe
+         (Avatar): Anthrazit auf hellen, Weiss auf dunklen Tönen. */
+  --sl-tech-1: #3d5a80;
+  --sl-tech-1-ink: #ffffff;
+  --sl-tech-2: #2e7d5b;
+  --sl-tech-2-ink: #ffffff;
+  --sl-tech-3: #8c4a9e;
+  --sl-tech-3-ink: #ffffff;
+  --sl-tech-4: #c08a00;
+  --sl-tech-4-ink: #1a1a1a;
+  --sl-tech-5: #b5473a;
+  --sl-tech-5-ink: #ffffff;
+  --sl-tech-6: #0f8a8a;
+  --sl-tech-6-ink: #ffffff;
+  --sl-tech-7: #5c6b7a;
+  --sl-tech-7-ink: #ffffff;
+  --sl-tech-8: #a0522d;
+  --sl-tech-8-ink: #ffffff;
+  --sl-tech-9: #6b8e23;
+  --sl-tech-9-ink: #1a1a1a;
+
+  --sl-region-glattal: #3d5a80;
+  --sl-region-unterland: #6b8e23;
+  --sl-region-zuerich-nord: #a0522d;
+
+  /* Smart-Slot-Bewertung (Flächen, transluzent) */
+  --sl-slot-gut: rgb(46 125 91 / 0.18);
+  --sl-slot-ok: rgb(192 138 0 / 0.18);
+  --sl-slot-schlecht: rgb(179 38 30 / 0.14);
+  --sl-slot-gut-ink: #17482d;
+  --sl-slot-ok-ink: #5e4100;
+  --sl-slot-schlecht-ink: #9a1f18;
+}
+
+/* ── §5 · Typografie ─────────────────────────────────────────── */
+
+:root {
+  /* jh! Keine Inter – Plex ist bewusst technisch-nüchtern. */
+  --sl-font-sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  --sl-font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+
+  --sl-fs-label: 11px;
+  --sl-fs-12: 12px;
+  --sl-fs-13: 13px;
+  --sl-fs-14: 14px;
+  --sl-fs-16: 16px;
+  --sl-fs-20: 20px;
+  --sl-fs-28: 28px;
+
+  --sl-fw-regular: 400;
+  --sl-fw-medium: 500;
+  --sl-fw-semibold: 600;
+
+  --sl-lh-tight: 1.2;
+  --sl-lh-base: 1.45;
+  --sl-tracking-label: 0.06em;
+}
+
+/* ── §6 · Raster, Linien, Schatten, Fokus ────────────────────── */
+
+:root {
+  --sl-space-1: 4px;
+  --sl-space-2: 8px;
+  --sl-space-3: 12px;
+  --sl-space-4: 16px;
+  --sl-space-5: 20px;
+  --sl-space-6: 24px;
+  --sl-space-8: 32px;
+  --sl-space-10: 40px;
+
+  --sl-radius-1: 2px;
+  --sl-radius-2: 3px;
+
+  --sl-hairline: 1px solid var(--sl-line);
+  --sl-mark-width: 2px;
+
+  /* jh! Einziger Schatten im System – nur Drawer/Panel, Popover, Hovercard. */
+  --sl-shadow-float: 0 16px 40px -12px rgb(26 26 26 / 0.28), 0 2px 6px rgb(26 26 26 / 0.08);
+
+  /* Fokusring: 2 px Orange, 2 px Abstand – überall gleich. */
+  --sl-focus-ring: 0 0 0 2px var(--sl-surface), 0 0 0 4px var(--sl-signal);
+}
+
+/* ── §7 · Layout-Masse der Shell ─────────────────────────────── */
+
+:root {
+  --sl-topbar-h: 56px;
+  --sl-sidebar-w: 248px;
+  --sl-sidebar-w-min: 64px;
+  --sl-panel-w: 360px;
+  --sl-panel-rail-w: 40px;
+
+  --sl-plan-tech-w: 176px;
+  --sl-plan-head-h: 36px;
+  --sl-plan-row-min: 72px;
+  --sl-plan-row-max: 120px;
+  --sl-akte-map-h: 220px;
+}
+
+/* ── §8 · Bewegung & Ebenen ──────────────────────────────────── */
+
+:root {
+  --sl-dur-fast: 120ms;
+  --sl-dur-base: 180ms;
+  --sl-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  --sl-z-plan-now: 4;
+  --sl-z-plan-drag: 5;
+  --sl-z-panel: 30;
+  --sl-z-drawer: 40;
+  --sl-z-hovercard: 45;
+  --sl-z-popover: 50;
+  --sl-z-dialog: 60;
+  --sl-z-drag-overlay: 70;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sl-dur-fast: 0ms;
+    --sl-dur-base: 0ms;
+  }
+}
+
+/* ◆ jh · eof */

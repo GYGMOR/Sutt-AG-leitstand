@@ -1,0 +1,107 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/layout/BenutzerMenu.module.css                │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Benutzermenü                                                          │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Auslöser ───────────────────────────────────────────── */
+
+.kuerzel {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--sl-chrome-mute);
+  border-radius: var(--sl-radius-1);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-semibold);
+  letter-spacing: 0.04em;
+  color: var(--sl-chrome-ink);
+}
+
+.kuerzel:hover,
+.offen {
+  background: var(--sl-chrome-2);
+  border-color: var(--sl-chrome-ink);
+}
+
+.kuerzel:focus-visible {
+  outline-color: var(--sl-chrome-ink);
+}
+
+/* ── §2 · Menü ───────────────────────────────────────────────── */
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+}
+
+.kopf {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px 10px;
+  border-bottom: var(--sl-hairline);
+}
+
+.name {
+  font-size: var(--sl-fs-14);
+  font-weight: var(--sl-fw-medium);
+}
+
+.benutzername {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.rolle {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 10px 8px;
+  border-bottom: var(--sl-hairline);
+}
+
+.rolle-label {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.eintrag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+  text-align: left;
+}
+
+.eintrag:hover {
+  background: var(--sl-hover);
+  color: var(--sl-ink);
+}
+
+.eintrag svg {
+  color: var(--sl-mute);
+}
+
+.eintrag > :last-child:not(span) {
+  margin-left: auto;
+}
+
+.abmelden {
+  margin-top: 4px;
+  border-top: var(--sl-hairline);
+  border-radius: 0;
+}
+
+/* ◆ jh · eof */

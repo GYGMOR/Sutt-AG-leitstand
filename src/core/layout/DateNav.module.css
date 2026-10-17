@@ -1,0 +1,78 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/layout/DateNav.module.css                     │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Datumsnavigation (auf Anthrazit)                                      │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Gruppe ─────────────────────────────────────────────── */
+
+.date-nav {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  color: var(--sl-chrome-ink);
+}
+
+.heute {
+  position: relative;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--sl-chrome-line);
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-chrome-ink);
+}
+
+.heute:hover {
+  background: var(--sl-chrome-2);
+}
+
+.heute:focus-visible {
+  outline-color: var(--sl-chrome-ink);
+}
+
+/* jh› Messmarke zeigt: die Anzeige enthält den heutigen Tag. */
+.heute-aktiv::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+/* ── §2 · Datum ──────────────────────────────────────────────── */
+
+.datum {
+  min-width: 184px;
+  height: 32px;
+  margin-left: var(--sl-space-2);
+  padding: 0 8px;
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-14);
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-chrome-ink);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.datum:hover {
+  background: var(--sl-chrome-2);
+}
+
+.datum:focus-visible {
+  outline-color: var(--sl-chrome-ink);
+}
+
+.kw {
+  padding: 1px 6px;
+  border: 1px solid var(--sl-chrome-line);
+  border-radius: var(--sl-radius-1);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-chrome-mute);
+  white-space: nowrap;
+}
+
+/* ◆ jh · eof */

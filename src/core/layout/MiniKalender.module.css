@@ -1,0 +1,102 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/layout/MiniKalender.module.css                │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Mini-Monatskalender                                                   │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rahmen ─────────────────────────────────────────────── */
+
+.kalender {
+  padding: 6px 10px 10px 14px;
+}
+
+.kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.monat {
+  flex: 1;
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-semibold);
+  text-align: center;
+  color: var(--sl-ink);
+}
+
+.monat:hover {
+  color: var(--sl-signal-ink);
+}
+
+/* ── §2 · Raster ─────────────────────────────────────────────── */
+
+.raster {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.raster th {
+  padding: 2px 0 4px;
+  font-size: 10px;
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  color: var(--sl-mute);
+  text-align: center;
+}
+
+.raster td {
+  padding: 0;
+  text-align: center;
+}
+
+.kw {
+  width: 26px;
+  font-family: var(--sl-font-mono);
+  font-size: 10px;
+  color: var(--sl-mute-2);
+  text-align: left !important;
+}
+
+/* ── §3 · Tage ───────────────────────────────────────────────── */
+
+.tag {
+  position: relative;
+  width: 26px;
+  height: 24px;
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink);
+}
+
+.tag:hover {
+  background: var(--sl-hover);
+}
+
+.fremd {
+  color: var(--sl-mute-2);
+}
+
+.wochenende {
+  color: var(--sl-mute);
+}
+
+/* jh› Heute: Messmarke unten statt Kreis – ruhiger als Outlooks Vollfläche. */
+.heute::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 7px;
+  right: 7px;
+  height: 2px;
+  background: var(--sl-signal);
+}
+
+.gewaehlt,
+.gewaehlt:hover {
+  background: var(--sl-ink);
+  color: var(--sl-paper);
+}
+
+/* ◆ jh · eof */

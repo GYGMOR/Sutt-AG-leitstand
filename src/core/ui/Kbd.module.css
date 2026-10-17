@@ -1,0 +1,33 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Kbd.module.css                             │
+   │  ◆ JH · 2026.10 · rev 01                                               │
+   │  Tastenhinweis                                                         │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Taste ──────────────────────────────────────────────── */
+
+.kbd-gruppe {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 1px solid var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  line-height: 1;
+  color: var(--sl-mute);
+}
+
+.chrome .kbd {
+  border-color: var(--sl-chrome-line);
+  color: var(--sl-chrome-mute);
+}
+
+/* ◆ jh · eof */

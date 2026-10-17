@@ -1,0 +1,96 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/farben.module.css                          │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Farbklassen: Kategorie, Techniker, Region, Status → --sl-edge/-tint   │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* jh› Jede Klasse setzt drei Variablen: --sl-edge (Kante), --sl-tint (Fläche),
+       --sl-tint-ink (Schrift auf der Fläche). Blöcke, Pillen und Chips lesen
+       nur diese drei – so wechselt «Farbe nach» per Klassentausch. */
+
+/* ── §1 · Kategorien ─────────────────────────────────────────── */
+
+.kat-reparatur {
+  --sl-edge: var(--sl-kat-reparatur-edge);
+  --sl-tint: var(--sl-kat-reparatur-bg);
+  --sl-tint-ink: var(--sl-kat-reparatur-ink);
+}
+
+.kat-montage {
+  --sl-edge: var(--sl-kat-montage-edge);
+  --sl-tint: var(--sl-kat-montage-bg);
+  --sl-tint-ink: var(--sl-kat-montage-ink);
+}
+
+.kat-lieferung {
+  --sl-edge: var(--sl-kat-lieferung-edge);
+  --sl-tint: var(--sl-kat-lieferung-bg);
+  --sl-tint-ink: var(--sl-kat-lieferung-ink);
+}
+
+.kat-garantie {
+  --sl-edge: var(--sl-kat-garantie-edge);
+  --sl-tint: var(--sl-kat-garantie-bg);
+  --sl-tint-ink: var(--sl-kat-garantie-ink);
+}
+
+.kat-mietgeraet {
+  --sl-edge: var(--sl-kat-mietgeraet-edge);
+  --sl-tint: var(--sl-kat-mietgeraet-bg);
+  --sl-tint-ink: var(--sl-kat-mietgeraet-ink);
+}
+
+.kat-malerarbeiten {
+  --sl-edge: var(--sl-kat-malerarbeiten-edge);
+  --sl-tint: var(--sl-kat-malerarbeiten-bg);
+  --sl-tint-ink: var(--sl-kat-malerarbeiten-ink);
+}
+
+.kat-offerte {
+  --sl-edge: var(--sl-kat-offerte-edge);
+  --sl-tint: var(--sl-kat-offerte-bg);
+  --sl-tint-ink: var(--sl-kat-offerte-ink);
+}
+
+.kat-notfall {
+  --sl-edge: var(--sl-kat-notfall-edge);
+  --sl-tint: var(--sl-kat-notfall-bg);
+  --sl-tint-ink: var(--sl-kat-notfall-ink);
+}
+
+/* ── §2 · Techniker ──────────────────────────────────────────── */
+
+.tech-1 { --sl-edge: var(--sl-tech-1); --sl-avatar-ink: var(--sl-tech-1-ink); }
+.tech-2 { --sl-edge: var(--sl-tech-2); --sl-avatar-ink: var(--sl-tech-2-ink); }
+.tech-3 { --sl-edge: var(--sl-tech-3); --sl-avatar-ink: var(--sl-tech-3-ink); }
+.tech-4 { --sl-edge: var(--sl-tech-4); --sl-avatar-ink: var(--sl-tech-4-ink); }
+.tech-5 { --sl-edge: var(--sl-tech-5); --sl-avatar-ink: var(--sl-tech-5-ink); }
+.tech-6 { --sl-edge: var(--sl-tech-6); --sl-avatar-ink: var(--sl-tech-6-ink); }
+.tech-7 { --sl-edge: var(--sl-tech-7); --sl-avatar-ink: var(--sl-tech-7-ink); }
+.tech-8 { --sl-edge: var(--sl-tech-8); --sl-avatar-ink: var(--sl-tech-8-ink); }
+.tech-9 { --sl-edge: var(--sl-tech-9); --sl-avatar-ink: var(--sl-tech-9-ink); }
+
+/* jh› Techniker, Region und Status tönen mit 14 % ihrer Kante – Schrift bleibt Ink. */
+.tech-1, .tech-2, .tech-3, .tech-4, .tech-5, .tech-6, .tech-7, .tech-8, .tech-9,
+.region-glattal, .region-unterland, .region-zuerich-nord,
+.status-geplant, .status-unterwegs, .status-vor-ort, .status-wartet-teil, .status-erledigt {
+  --sl-tint: color-mix(in srgb, var(--sl-edge) 14%, var(--sl-surface));
+  --sl-tint-ink: var(--sl-ink);
+}
+
+/* ── §3 · Regionen ───────────────────────────────────────────── */
+
+.region-glattal { --sl-edge: var(--sl-region-glattal); }
+.region-unterland { --sl-edge: var(--sl-region-unterland); }
+.region-zuerich-nord { --sl-edge: var(--sl-region-zuerich-nord); }
+
+/* ── §4 · Status (Kante + --sl-status für Swatches) ──────────── */
+
+.status-geplant { --sl-edge: var(--sl-st-geplant); --sl-status: var(--sl-st-geplant); }
+.status-unterwegs { --sl-edge: var(--sl-st-unterwegs); --sl-status: var(--sl-st-unterwegs); }
+.status-vor-ort { --sl-edge: var(--sl-st-vor-ort); --sl-status: var(--sl-st-vor-ort); }
+.status-wartet-teil { --sl-edge: var(--sl-st-wartet-teil); --sl-status: var(--sl-st-wartet-teil); }
+.status-erledigt { --sl-edge: var(--sl-st-erledigt); --sl-status: var(--sl-st-erledigt); }
+.status-dringend { --sl-status: var(--sl-st-dringend); }
+
+/* ◆ jh · eof */

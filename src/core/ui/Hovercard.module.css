@@ -1,0 +1,27 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Hovercard.module.css                       │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Hovercard-Rahmen                                                      │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rahmen ─────────────────────────────────────────────── */
+
+.hovercard {
+  position: fixed;
+  z-index: var(--sl-z-hovercard);
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2);
+  background: var(--sl-surface);
+  box-shadow: var(--sl-shadow-float);
+  color: var(--sl-ink);
+  pointer-events: none;
+  animation: einblenden var(--sl-dur-fast) var(--sl-ease);
+}
+
+@keyframes einblenden {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ◆ jh · eof */

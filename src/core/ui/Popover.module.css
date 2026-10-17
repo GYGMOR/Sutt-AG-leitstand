@@ -1,0 +1,29 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Popover.module.css                         │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Popover-Rahmen (eine der drei erlaubten Schattenstellen)              │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rahmen ─────────────────────────────────────────────── */
+
+.popover {
+  position: fixed;
+  z-index: var(--sl-z-popover);
+  min-width: 180px;
+  max-width: calc(100vw - 16px);
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2);
+  background: var(--sl-surface);
+  box-shadow: var(--sl-shadow-float);
+  color: var(--sl-ink);
+  animation: einblenden var(--sl-dur-fast) var(--sl-ease);
+}
+
+@keyframes einblenden {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+
+/* ◆ jh · eof */

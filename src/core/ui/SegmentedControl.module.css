@@ -1,0 +1,57 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/SegmentedControl.module.css                │
+   │  ◆ JH · 2026.10 · rev 01                                               │
+   │  Umschalter                                                            │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rahmen ─────────────────────────────────────────────── */
+
+.segmented {
+  display: inline-flex;
+  height: 28px;
+  border: 1px solid var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-paper);
+}
+
+/* ── §2 · Segmente ───────────────────────────────────────────── */
+
+.segment {
+  position: relative;
+  padding: 0 10px;
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-mute);
+  white-space: nowrap;
+  transition:
+    background-color var(--sl-dur-fast) var(--sl-ease),
+    color var(--sl-dur-fast) var(--sl-ease);
+}
+
+.segment + .segment {
+  border-left: 1px solid var(--sl-line);
+}
+
+.segment:hover {
+  color: var(--sl-ink);
+}
+
+/* jh› Messmarke: aktiver Zustand = 2-px-Kante links, keine Farbfläche. */
+.aktiv {
+  background: var(--sl-surface);
+  color: var(--sl-ink);
+}
+
+.aktiv::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.segment:focus-visible {
+  z-index: 1;
+}
+
+/* ◆ jh · eof */

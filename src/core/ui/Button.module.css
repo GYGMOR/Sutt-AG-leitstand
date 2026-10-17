@@ -1,0 +1,161 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Button.module.css                          │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Schaltflächen                                                         │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Grundform ──────────────────────────────────────────── */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--sl-radius-1);
+  font-weight: var(--sl-fw-medium);
+  white-space: nowrap;
+  transition:
+    background-color var(--sl-dur-fast) var(--sl-ease),
+    border-color var(--sl-dur-fast) var(--sl-ease);
+}
+
+.button:disabled {
+  opacity: 0.45;
+}
+
+.sm {
+  height: 24px;
+  padding: 0 8px;
+  font-size: var(--sl-fs-12);
+}
+
+.md {
+  height: 32px;
+  padding: 0 12px;
+  font-size: var(--sl-fs-13);
+}
+
+/* ── §2 · Varianten ──────────────────────────────────────────── */
+
+.primary {
+  background: var(--sl-signal);
+  border-color: var(--sl-signal);
+  color: #1a1a1a;
+}
+
+.primary:not(:disabled):hover {
+  background: var(--sl-signal-hover);
+  border-color: var(--sl-signal-hover);
+}
+
+.primary:not(:disabled):active {
+  background: #b84d00;
+  border-color: #b84d00;
+  color: #ffffff;
+}
+
+.secondary {
+  background: var(--sl-surface);
+  border-color: var(--sl-line-strong);
+  color: var(--sl-ink);
+}
+
+.secondary:not(:disabled):hover {
+  background: var(--sl-hover);
+}
+
+.secondary:not(:disabled):active {
+  background: var(--sl-press);
+}
+
+.ghost {
+  color: var(--sl-ink-2);
+}
+
+.ghost:not(:disabled):hover {
+  background: var(--sl-hover);
+  color: var(--sl-ink);
+}
+
+/* jh› Gefahr = Rahmen und Schrift in Rot, Fläche weiss – erst beim Drücken füllt sie sich. */
+.danger {
+  background: var(--sl-surface);
+  border-color: var(--sl-danger);
+  color: var(--sl-danger-ink);
+}
+
+.danger:not(:disabled):hover {
+  background: var(--sl-danger-wash);
+}
+
+.danger:not(:disabled):active {
+  background: var(--sl-danger);
+  color: #ffffff;
+}
+
+/* ── §3 · Icon-Button ────────────────────────────────────────── */
+
+.icon-button {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  border-radius: var(--sl-radius-1);
+  color: var(--sl-ink-2);
+  transition: background-color var(--sl-dur-fast) var(--sl-ease);
+}
+
+.icon-button.sm {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+}
+
+.icon-button.md {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.icon-button:not(:disabled):hover {
+  background: var(--sl-hover);
+  color: var(--sl-ink);
+}
+
+.icon-button:disabled {
+  opacity: 0.4;
+}
+
+.pressed {
+  background: var(--sl-press);
+  color: var(--sl-ink);
+}
+
+.pressed::before {
+  content: '';
+  position: absolute;
+  inset: 4px auto 4px 0;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.icon-button.chrome {
+  color: var(--sl-chrome-ink);
+}
+
+.icon-button.chrome:not(:disabled):hover {
+  background: var(--sl-chrome-2);
+  color: var(--sl-chrome-ink);
+}
+
+.icon-button.chrome:focus-visible {
+  outline-color: var(--sl-chrome-ink);
+}
+
+.icon-danger:not(:disabled):hover {
+  background: var(--sl-danger-wash);
+  color: var(--sl-danger-ink);
+}
+
+/* ◆ jh · eof */

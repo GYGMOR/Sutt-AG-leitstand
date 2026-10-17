@@ -1,0 +1,105 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Typenschild.module.css                     │
+   │  ◆ JH · 2026.10 · rev 01                                               │
+   │  Typenschild: feiner Rahmen, Label oben, Mono-Wert                     │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Inline-Schild ──────────────────────────────────────── */
+
+.typenschild {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  max-width: 100%;
+  padding: 3px 6px 3px;
+  border: 1px solid var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  vertical-align: top;
+}
+
+.label {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  line-height: 1;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.wert {
+  overflow: hidden;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+  color: var(--sl-ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.zusatz::before {
+  content: '·';
+  margin: 0 0.5em;
+  color: var(--sl-mute-2);
+}
+
+.md {
+  padding: 4px 8px;
+}
+
+.md .wert {
+  font-size: var(--sl-fs-14);
+  line-height: 20px;
+}
+
+/* ── §2 · Platte ─────────────────────────────────────────────── */
+
+.platte {
+  border: 1px solid var(--sl-line-strong);
+  border-radius: var(--sl-radius-2);
+  background: var(--sl-surface);
+}
+
+.platte-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--sl-line);
+}
+
+.marke {
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-semibold);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-ink);
+}
+
+.platte-zeilen {
+  display: grid;
+  padding: 6px 10px 8px;
+  row-gap: 2px;
+}
+
+.platte-zeile {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  column-gap: var(--sl-space-3);
+  align-items: baseline;
+}
+
+.platte-zeile dt {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.platte-zeile dd {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink);
+}
+
+/* ◆ jh · eof */

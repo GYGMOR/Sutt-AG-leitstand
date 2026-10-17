@@ -1,0 +1,113 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/auth/LoginPage.module.css                     │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Anmeldeformular                                                       │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Formular ───────────────────────────────────────────── */
+
+.formular {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-4);
+  width: 100%;
+  max-width: 400px;
+}
+
+.titel {
+  font-size: var(--sl-fs-28);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+  letter-spacing: -0.01em;
+}
+
+.untertitel {
+  margin-top: -8px;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+}
+
+.zeile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+}
+
+.link {
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link:hover {
+  color: var(--sl-ink);
+}
+
+.hinweis {
+  font-size: var(--sl-fs-12);
+  line-height: var(--sl-lh-base);
+  color: var(--sl-mute);
+}
+
+.absenden {
+  align-self: flex-start;
+  min-width: 160px;
+}
+
+/* ── §2 · Demo-Zugänge ───────────────────────────────────────── */
+
+.demo {
+  margin-top: var(--sl-space-6);
+  padding-top: var(--sl-space-4);
+  border-top: var(--sl-hairline);
+}
+
+.demo-titel {
+  margin-bottom: var(--sl-space-2);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.demo-liste {
+  display: flex;
+  flex-direction: column;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+}
+
+.demo-liste li + li {
+  border-top: 1px solid var(--sl-line-soft);
+}
+
+.demo-eintrag {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  gap: var(--sl-space-3);
+  align-items: center;
+  width: 100%;
+  padding: 7px 10px;
+  text-align: left;
+}
+
+.demo-eintrag:hover {
+  background: var(--sl-hover);
+}
+
+.demo-name {
+  font-size: var(--sl-fs-13);
+}
+
+.demo-rolle {
+  font-size: var(--sl-fs-label);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

@@ -1,0 +1,195 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/layout/KommandoPalette.module.css             │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Kommandopalette                                                       │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rahmen ─────────────────────────────────────────────── */
+
+.schleier {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sl-z-dialog);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 12vh;
+  background: rgb(26 26 26 / 0.28);
+}
+
+.palette {
+  display: flex;
+  flex-direction: column;
+  width: 640px;
+  max-height: 64vh;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2);
+  background: var(--sl-surface);
+  box-shadow: var(--sl-shadow-float);
+  animation: einfahren var(--sl-dur-base) var(--sl-ease);
+}
+
+@keyframes einfahren {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* ── §2 · Suchzeile ──────────────────────────────────────────── */
+
+.suchzeile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 14px;
+  border-bottom: var(--sl-hairline);
+}
+
+.lupe {
+  color: var(--sl-mute);
+}
+
+.eingabe {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  font-size: var(--sl-fs-16);
+  color: var(--sl-ink);
+}
+
+.eingabe::placeholder {
+  color: var(--sl-mute-2);
+}
+
+.eingabe:focus-visible {
+  outline: none;
+}
+
+/* ── §3 · Liste ──────────────────────────────────────────────── */
+
+.liste {
+  flex: 1;
+  min-height: 0;
+  padding: 6px 0;
+  overflow-y: auto;
+}
+
+.abschnitt + .abschnitt {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--sl-line-soft);
+}
+
+.abschnitt-titel {
+  padding: 4px 14px;
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.zeile {
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto auto;
+  gap: var(--sl-space-3);
+  align-items: center;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+
+.markiert {
+  background: var(--sl-hover);
+}
+
+.markiert::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.gesperrt {
+  color: var(--sl-mute);
+}
+
+.kennung {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+}
+
+.icon-zelle {
+  display: flex;
+  justify-content: flex-end;
+  color: var(--sl-mute);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.titel,
+.untertitel {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.titel {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+}
+
+.gesperrt .titel {
+  color: var(--sl-mute);
+}
+
+.untertitel {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.enter {
+  color: var(--sl-mute);
+}
+
+.leer {
+  padding: 16px 14px;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+}
+
+/* ── §4 · Fuss ───────────────────────────────────────────────── */
+
+.fuss {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+  padding: 7px 14px;
+  border-top: var(--sl-hairline);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.hinweis {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--sl-signal-ink);
+}
+
+.fuss-rechts {
+  letter-spacing: var(--sl-tracking-label);
+}
+
+/* ◆ jh · eof */

@@ -1,0 +1,94 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Dialog.module.css                          │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Modaler Dialog                                                        │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Schleier & Rahmen ──────────────────────────────────── */
+
+.schleier {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sl-z-dialog);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 15vh;
+  background: rgb(26 26 26 / 0.32);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2);
+  background: var(--sl-surface);
+  box-shadow: var(--sl-shadow-float);
+  animation: einfahren var(--sl-dur-base) var(--sl-ease);
+}
+
+@keyframes einfahren {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.sm {
+  width: 440px;
+}
+
+.md {
+  width: 600px;
+}
+
+.lg {
+  width: 800px;
+}
+
+/* ── §2 · Aufbau ─────────────────────────────────────────────── */
+
+.kopf {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+  padding: 14px 12px 12px var(--sl-space-5);
+  border-bottom: var(--sl-hairline);
+}
+
+.titel {
+  font-size: var(--sl-fs-16);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+}
+
+.untertitel {
+  margin-top: 4px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.inhalt {
+  flex: 1;
+  min-height: 0;
+  padding: var(--sl-space-4) var(--sl-space-5);
+  overflow-y: auto;
+}
+
+.text {
+  font-size: var(--sl-fs-14);
+  line-height: var(--sl-lh-base);
+}
+
+.fuss {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sl-space-2);
+  padding: 12px var(--sl-space-5);
+  border-top: var(--sl-hairline);
+  background: var(--sl-paper);
+}
+
+/* ◆ jh · eof */

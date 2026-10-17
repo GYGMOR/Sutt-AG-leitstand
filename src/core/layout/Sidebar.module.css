@@ -1,0 +1,294 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/layout/Sidebar.module.css                     │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Seitenleiste 248 px ↔ 64 px, Gruppen, Schlösser, Flyout, Fuss         │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Leiste ─────────────────────────────────────────────── */
+
+.sidebar {
+  grid-area: rail;
+  display: flex;
+  flex-direction: column;
+  width: var(--sl-sidebar-w);
+  min-height: 0;
+  border-right: var(--sl-hairline);
+  background: var(--sl-surface);
+  transition: width var(--sl-dur-base) ease-out;
+}
+
+.eingeklappt {
+  width: var(--sl-sidebar-w-min);
+}
+
+/* jh› Labels blenden über Opacity aus; die Breite bleibt per nowrap stabil – nichts springt. */
+.label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 1;
+  transition: opacity var(--sl-dur-fast) ease-out;
+}
+
+.eingeklappt .label {
+  width: 0;
+  opacity: 0;
+}
+
+.kopf {
+  flex: none;
+  padding: 8px 8px 4px;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--sl-radius-1);
+  color: var(--sl-mute);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+}
+
+.toggle:hover {
+  background: var(--sl-hover);
+  color: var(--sl-ink);
+}
+
+/* ── §2 · Gruppen ────────────────────────────────────────────── */
+
+.gruppen {
+  flex: 1;
+  min-height: 0;
+  padding: 0 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.gruppe + .gruppe {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--sl-line-soft);
+}
+
+.gruppen-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 28px;
+  padding: 0 14px;
+  color: var(--sl-mute);
+}
+
+.eingeklappt .gruppen-kopf {
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.gruppen-kopf:hover {
+  color: var(--sl-ink);
+}
+
+.gruppen-label {
+  overflow: hidden;
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex: none;
+  transition: transform var(--sl-dur-base) var(--sl-ease);
+}
+
+.chevron-zu {
+  transform: rotate(-90deg);
+}
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* ── §3 · Eintrag ────────────────────────────────────────────── */
+
+.eintrag {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--sl-dur-fast) var(--sl-ease);
+}
+
+.eintrag:hover {
+  background: var(--sl-hover);
+  color: var(--sl-ink);
+}
+
+.icon {
+  flex: none;
+}
+
+/* jh› Messmarke statt Farbfläche – aktiver Eintrag nur über die Kante. */
+.aktiv,
+.aktiv:hover {
+  color: var(--sl-ink);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.aktiv::before {
+  content: '';
+  position: absolute;
+  inset: 5px auto 5px -8px;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.eingeklappt .aktiv::before {
+  inset: 5px auto 5px -8px;
+}
+
+.gesperrt,
+.gesperrt:hover {
+  color: var(--sl-mute);
+  cursor: not-allowed;
+}
+
+.gesperrt:hover {
+  background: transparent;
+}
+
+/* Schloss vor dem Label (links), im eingeklappten Zustand klein am Icon */
+.schloss {
+  flex: none;
+  margin-left: -4px;
+  color: var(--sl-mute-2);
+}
+
+.eingeklappt .schloss {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  margin: 0;
+}
+
+/* ── §4 · Fuss ───────────────────────────────────────────────── */
+
+.fuss {
+  flex: none;
+  padding: 6px 8px 10px;
+  border-top: var(--sl-hairline);
+}
+
+.version {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  padding: 8px 14px 0;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+  cursor: help;
+}
+
+.version-kurz {
+  flex: none;
+}
+
+/* ── §5 · Popover-Inhalte ────────────────────────────────────── */
+
+.sperr-hinweis {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  font-size: var(--sl-fs-13);
+  line-height: var(--sl-lh-base);
+}
+
+.sperr-hinweis svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--sl-mute);
+}
+
+.sperr-beschreibung {
+  margin-top: 6px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.flyout {
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+  padding: 6px;
+}
+
+.flyout-titel {
+  padding: 6px 10px 4px;
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.flyout-eintrag {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.flyout-eintrag:hover {
+  background: var(--sl-hover);
+  color: var(--sl-ink);
+}
+
+.flyout-eintrag.aktiv::before {
+  inset: 5px auto 5px -6px;
+}
+
+.flyout-eintrag .schloss {
+  position: static;
+  margin: 0 -4px 0 -6px;
+}
+
+.version {
+  margin-left: auto;
+}
+
+.flyout-eintrag .version {
+  padding: 0;
+  font-size: 10px;
+  color: var(--sl-mute-2);
+}
+
+/* ◆ jh · eof */

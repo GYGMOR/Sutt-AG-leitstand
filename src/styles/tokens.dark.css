@@ -1,0 +1,134 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  styles/tokens.dark.css                             │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Dark-Tokens: dieselben Rollen, warmes Anthrazit statt Papier          │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* jh› Nur Werte, keine neuen Namen. Der Header (--sl-chrome) bleibt
+       Anthrazit – im Dunkeln eine Stufe tiefer als die Fläche, damit die
+       Hierarchie Topbar › Fläche erhalten bleibt. */
+
+/* ── §1 · Grundpalette ───────────────────────────────────────── */
+
+:root[data-theme='dark'] {
+  --sl-ink: #ece9e3;
+  --sl-ink-2: #c9c5be;
+  --sl-mute: #a39e96;
+  --sl-line: #3a3835;
+  --sl-paper: #1c1b1a;
+  --sl-surface: #242321;
+  --sl-signal: #f86c04;
+  --sl-signal-ink: #ffa052;
+
+  --sl-mute-2: #6e6a64;
+  --sl-line-soft: #2e2c2a;
+  --sl-line-strong: #4a4744;
+  --sl-hover: #2c2b29;
+  --sl-press: #34322f;
+  --sl-signal-hover: #ff7d1f;
+  --sl-signal-wash: rgb(248 108 4 / 0.16);
+  --sl-past-wash: rgb(0 0 0 / 0.26);
+  --sl-surface-veil: rgb(36 35 33 / 0.86);
+
+  --sl-danger: #e5534b;
+  --sl-danger-ink: #ff8a80;
+  --sl-danger-wash: rgb(229 83 75 / 0.14);
+  --sl-ok: #4fa37e;
+  --sl-warn: #d9a520;
+
+  --sl-chrome: #111111;
+  --sl-chrome-2: #1e1e1e;
+  --sl-chrome-line: #333333;
+  --sl-chrome-ink: #f4f2ee;
+  --sl-chrome-mute: #9c978f;
+
+  --sl-shadow-float: 0 16px 40px -12px rgb(0 0 0 / 0.65), 0 2px 6px rgb(0 0 0 / 0.4);
+}
+
+/* ── §2 · Status ─────────────────────────────────────────────── */
+
+:root[data-theme='dark'] {
+  --sl-st-geplant: #6e93c4;
+  --sl-st-unterwegs: #d9a520;
+  --sl-st-vor-ort: #4fa37e;
+  --sl-st-wartet-teil: #b07cc4;
+  --sl-st-erledigt: #8a8a8a;
+}
+
+/* ── §3 · Kategorien ─────────────────────────────────────────── */
+
+:root[data-theme='dark'] {
+  --sl-kat-reparatur-edge: #5a95d6;
+  --sl-kat-reparatur-bg: #1b2a3b;
+  --sl-kat-reparatur-ink: #a9cbef;
+
+  --sl-kat-montage-edge: #4fae7d;
+  --sl-kat-montage-bg: #18301f;
+  --sl-kat-montage-ink: #9ad6b2;
+
+  --sl-kat-lieferung-edge: #d9a520;
+  --sl-kat-lieferung-bg: #33290f;
+  --sl-kat-lieferung-ink: #ebc766;
+
+  --sl-kat-garantie-edge: #a07cc8;
+  --sl-kat-garantie-bg: #2a1f36;
+  --sl-kat-garantie-ink: #cdb2e6;
+
+  --sl-kat-mietgeraet-edge: #3aabab;
+  --sl-kat-mietgeraet-bg: #123131;
+  --sl-kat-mietgeraet-ink: #8cd6d6;
+
+  --sl-kat-malerarbeiten-edge: #c47a56;
+  --sl-kat-malerarbeiten-bg: #33221a;
+  --sl-kat-malerarbeiten-ink: #e3b49a;
+
+  --sl-kat-offerte-edge: #8694a3;
+  --sl-kat-offerte-bg: #232a31;
+  --sl-kat-offerte-ink: #b9c4cf;
+
+  --sl-kat-notfall-edge: #f86c04;
+  --sl-kat-notfall-bg: #3a2414;
+  --sl-kat-notfall-ink: #ffb27a;
+}
+
+/* ── §4 · Techniker, Regionen, Slots ─────────────────────────── */
+
+:root[data-theme='dark'] {
+  --sl-tech-1: #6e93c4;
+  --sl-tech-1-ink: #1a1a1a;
+  --sl-tech-2: #4fa37e;
+  --sl-tech-2-ink: #1a1a1a;
+  --sl-tech-3: #b07cc4;
+  --sl-tech-3-ink: #1a1a1a;
+  --sl-tech-4: #d9a520;
+  --sl-tech-4-ink: #1a1a1a;
+  --sl-tech-5: #d9766a;
+  --sl-tech-5-ink: #1a1a1a;
+  --sl-tech-6: #3aabab;
+  --sl-tech-6-ink: #1a1a1a;
+  --sl-tech-7: #8694a3;
+  --sl-tech-7-ink: #1a1a1a;
+  --sl-tech-8: #c47a56;
+  --sl-tech-8-ink: #1a1a1a;
+  --sl-tech-9: #8fb33a;
+  --sl-tech-9-ink: #1a1a1a;
+
+  --sl-region-glattal: #6e93c4;
+  --sl-region-unterland: #8fb33a;
+  --sl-region-zuerich-nord: #c47a56;
+
+  --sl-slot-gut: rgb(79 163 126 / 0.22);
+  --sl-slot-ok: rgb(217 165 32 / 0.2);
+  --sl-slot-schlecht: rgb(229 83 75 / 0.18);
+  --sl-slot-gut-ink: #9ad6b2;
+  --sl-slot-ok-ink: #ebc766;
+  --sl-slot-schlecht-ink: #ff8a80;
+}
+
+/* ── §5 · Fokus ──────────────────────────────────────────────── */
+
+:root[data-theme='dark'] {
+  --sl-focus-ring: 0 0 0 2px var(--sl-paper), 0 0 0 4px var(--sl-signal);
+}
+
+/* ◆ jh · eof */

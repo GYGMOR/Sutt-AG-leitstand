@@ -1,0 +1,156 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/layout/Topbar.module.css                      │
+   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  Topbar auf Anthrazit, 56 px, eine Zeile                               │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Leiste ─────────────────────────────────────────────── */
+
+.topbar {
+  grid-area: topbar;
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-4);
+  min-width: 0;
+  padding: 0 var(--sl-space-4) 0 0;
+  background: var(--sl-chrome);
+  color: var(--sl-chrome-ink);
+}
+
+/* ── §2 · Wortmarke ──────────────────────────────────────────── */
+
+/* jh› Die Raute steht auf der Mittelachse der eingeklappten Seitenleiste (64 px). */
+.wortmarke {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 0 var(--sl-space-4) 0 calc(var(--sl-sidebar-w-min) / 2 - 4.5px);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.raute {
+  width: 9px;
+  height: 9px;
+  margin-right: 4px;
+  background: var(--sl-signal);
+  transform: rotate(45deg);
+}
+
+.firma {
+  font-size: var(--sl-fs-14);
+  font-weight: var(--sl-fw-semibold);
+  letter-spacing: 0.08em;
+}
+
+.schraegstrich {
+  color: var(--sl-chrome-mute);
+  font-weight: var(--sl-fw-regular);
+}
+
+.produkt {
+  font-size: var(--sl-fs-14);
+  color: var(--sl-chrome-mute);
+}
+
+/* ── §3 · Modul ──────────────────────────────────────────────── */
+
+.modul {
+  display: flex;
+  flex: none;
+  align-items: baseline;
+  gap: var(--sl-space-2);
+  height: 100%;
+  padding: 0 var(--sl-space-4);
+  border-left: 1px solid var(--sl-chrome-line);
+  border-right: 1px solid var(--sl-chrome-line);
+  line-height: var(--sl-topbar-h);
+  white-space: nowrap;
+}
+
+.modul-name {
+  font-size: var(--sl-fs-14);
+  font-weight: var(--sl-fw-medium);
+}
+
+.modul-zusatz {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-chrome-mute);
+}
+
+@media (max-width: 1360px) {
+  .modul-zusatz {
+    display: none;
+  }
+}
+
+/* ── §4 · Suche / Palette ────────────────────────────────────── */
+
+.suche {
+  display: flex;
+  flex: 1 1 200px;
+  align-items: center;
+  gap: 10px;
+  min-width: 120px;
+  max-width: 360px;
+  height: 32px;
+  margin-left: auto;
+  padding: 0 6px 0 10px;
+  border: 1px solid var(--sl-chrome-line);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-chrome-2);
+  color: var(--sl-chrome-mute);
+  text-align: left;
+  transition: border-color var(--sl-dur-fast) var(--sl-ease);
+}
+
+.suche:hover {
+  border-color: var(--sl-chrome-mute);
+  color: var(--sl-chrome-ink);
+}
+
+.suche:focus-visible {
+  outline-color: var(--sl-chrome-ink);
+}
+
+.suche-text {
+  flex: 1;
+  overflow: hidden;
+  font-size: var(--sl-fs-13);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ── §5 · Rechts ─────────────────────────────────────────────── */
+
+.rechts {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sl-space-3);
+}
+
+.mockup {
+  padding: 2px 6px;
+  border: 1px dashed var(--sl-chrome-line);
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-chrome-mute);
+  white-space: nowrap;
+}
+
+@media (max-width: 1280px) {
+  .mockup {
+    display: none;
+  }
+}
+
+/* ◆ jh · eof */
