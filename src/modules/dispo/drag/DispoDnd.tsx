@@ -190,11 +190,22 @@ export function DispoDnd({ stammdaten, einsaetze, heute, jetztMin, tastaturSchri
     [stammdaten, einsaetze],
   );
 
+  // jh! dnd-kit liefert kein Zeigerereignis, und sein Delta enthält den Scroll der Zielspur
+  //     (Autoscroll am Rand) – Auslöser + Delta zeigte dann Stunden daneben. Darum lesen
+  //     wir die echte Zeigerposition während des Ziehens selbst mit.
+  const zeigerRef = useRef<{ x: number; y: number } | null>(null);
+  const merkeZeiger = useCallback((event: PointerEvent) => {
+    zeigerRef.current = { x: event.clientX, y: event.clientY };
+  }, []);
+
   function onDragStart(event: DragStartEvent) {
     const daten = event.active.data.current as DragPayload | undefined;
     if (!daten) return;
     slotCache.current.clear();
     payloadRef.current = daten;
+    const ausloeser = event.activatorEvent;
+    zeigerRef.current = ausloeser instanceof MouseEvent ? { x: ausloeser.clientX, y: ausloeser.clientY } : null;
+    if (zeigerRef.current) document.addEventListener('pointermove', merkeZeiger);
     setPayload(daten);
   }
 
@@ -223,9 +234,8 @@ export function DispoDnd({ stammdaten, einsaetze, heute, jetztMin, tastaturSchri
       const rect = zone.getRect();
       const skala = zone.getSkala();
       const uebersetzt = event.active.rect.current.translated;
-      // jh› Zeigerposition = Auslöse-Ereignis + Delta (dnd-kit liefert nur Deltas); bei Tastatur gibt es keinen Zeiger.
-      const ausloeser = event.activatorEvent;
-      const zeigerX = ausloeser instanceof MouseEvent ? ausloeser.clientX + event.delta.x : null;
+      // jh› Bei Tastatur gibt es keinen Zeiger – dann zählt das verschobene Rechteck.
+      const zeigerX = zeigerRef.current?.x ?? null;
       // jh› Einsatz: linke Blockkante zählt (Griffpunkt bleibt). Neue Karte: Zeit unter dem Zeiger.
       const x = aktiv.art === 'einsatz' ? (uebersetzt?.left ?? rect.left) : (zeigerX ?? uebersetzt?.left ?? rect.left);
       const roh = minOfX(skala, x - rect.left);
@@ -234,7 +244,8 @@ export function DispoDnd({ stammdaten, einsaetze, heute, jetztMin, tastaturSchri
     } else if (zone.art === 'kalender') {
       const rect = zone.getRect();
       const uebersetzt = event.active.rect.current.translated;
-      const y = uebersetzt?.top ?? rect.top;
+      const zeigerY = zeigerRef.current?.y ?? null;
+      const y = aktiv.art === 'einsatz' ? (uebersetzt?.top ?? rect.top) : (zeigerY ?? uebersetzt?.top ?? rect.top);
       startMin = clampStart(roundToRaster(zone.minOfY(y - rect.top), zone.rasterMin), aktiv.dauerMin);
     } else {
       const ignorierenId = aktiv.art === 'einsatz' ? aktiv.einsatzId : null;
@@ -256,6 +267,8 @@ export function DispoDnd({ stammdaten, einsaetze, heute, jetztMin, tastaturSchri
   }
 
   function beenden() {
+    document.removeEventListener('pointermove', merkeZeiger);
+    zeigerRef.current = null;
     payloadRef.current = null;
     vorschauRef.current = null;
     setPayload(null);
