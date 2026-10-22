@@ -36,6 +36,8 @@ Format: ein Abschnitt pro Revision, Bereiche wie im Commit-Stil (`dispo(kalender
 - **Verknüpfungen**: `Auftrag.bezugAuftragId`; Erst-/Folgetermin und Bezugsaufträge als Winkel-Linien (Plantafel, Kalender) mit Beschriftung, Pfeil-Stummel mit Datum zu anderen Tagen, Kettenglied im Block, gestrichelter Ring am Partner, Chips in der Akte, «Folgetermin … zeigen» im Wartet-Tab.
 - **Ruhe**: Fahrzeit-Puffer, Mittag und «Wartet auf Teil» ohne Schraffur; Blockstufen messen die Inhaltsbreite; Toolbar-Gruppen brechen um statt abzuschneiden.
 - **Mock**: Folgetermine `E-A01-F` (Do, MB) und `E-A25-F` (Di, NA); Mietgerät 26-04819 heute 14:00 bei LF mit Bezug auf 26-04788 (Eingang 11 statt 12); Bezüge 26-04782 → 26-04790 und 26-04820 → 26-04814.
+- **Demo-Video** (22.10.): `npm run demo:video` – Playwright-Tour mit Mauszeiger und Untertiteln, 2½ min, VP9 ≈ 8 MB; Rohaufnahmen und Kontrollbilder sind ignoriert (`docs/demo/`).
+- **Behoben** (22.10., beim Aufzeichnen gefunden): Drop-Zeit lag Stunden daneben, sobald die Plantafel beim Ziehen am Rand mitscrollte – dnd-kits Delta enthält den Scroll der Zielspur. Die Zeigerposition wird jetzt direkt mitgelesen (`DispoDnd.tsx`).
 
 ### Offen
 - `jh# 001` Mitternachtswechsel · `jh# 007` OSM-Kacheln nur fürs Mockup · `jh# 008` Routing-API statt Luftlinie · `jh# 009` virtuelle Zeilen · `jh# 010` Gerätedaten nach Schnellerfassung · `jh# 011` Verknüpfungslinien auch in Monat und Mehrtages-Plantafel.

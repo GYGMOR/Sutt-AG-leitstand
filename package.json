@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "jh:sign": "node scripts/jh-sign.mjs",
     "jh:check": "node scripts/jh-sign.mjs --check",
-    "jh:contrast": "node scripts/contrast.jh.ts"
+    "jh:contrast": "node scripts/contrast.jh.ts",
+    "demo:video": "node scripts/demo.jh.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

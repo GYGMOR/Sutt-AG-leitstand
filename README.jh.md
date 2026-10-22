@@ -18,7 +18,13 @@ npm run build        # Typecheck (tsc strict) + Produktions-Build
 npm run jh:check     # Signatur: Kopf, §-Marken, eof, jh#-Abgleich, Exporte, kein any
 npm run jh:sign      # Köpfe und §-Marken automatisch normieren
 npm run jh:contrast  # WCAG-Kontrast aller Textpaare, hell und dunkel
+npm run demo:video   # Demo-Tour aufzeichnen → docs/demo/sutt-leitstand-demo.webm (Dev-Server muss laufen)
 ```
+
+`demo:video` fährt per Playwright eine geführte Tour (Login, Plantafel, Drag & Drop, Akte, Kalender, Liste, Karte,
+Palette, Schnellerfassung, Druck, Dark Mode) mit Mauszeiger und Untertiteln ab, ca. 2½ Minuten, ohne Ton, und
+komprimiert auf rund 8 MB (VP9). Browser und ffmpeg kommen aus einer vorhandenen Playwright-Installation
+(`PLAYWRIGHT_CORE`, `PLAYWRIGHT_FFMPEG`) – nichts davon landet in `package.json`.
 
 Node ≥ 20.19 (Vite 7); `jh:contrast` braucht Node ≥ 23 (nativer TypeScript-Lauf).
 Optional `.env` nach `.env.example`: mit `VITE_GOOGLE_MAPS_API_KEY` erscheint Google Maps, ohne Schlüssel

@@ -2,5 +2,9 @@
 node_modules/
 dist/
 *.local
+# Demo-Aufnahmen (Playwright) – gross, nicht versionieren
+docs/demo/*.webm
+docs/demo/raw/
+docs/demo/frames/
 .DS_Store
 Thumbs.db
