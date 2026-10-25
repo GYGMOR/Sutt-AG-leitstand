@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/auth/LoginPage.tsx                            │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Anmeldeseite (Mock): Benutzername, Passwort, Rolle, Bleiben           │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Anmeldeseite (Mock): Benutzername, Passwort, Rolle, Rollen-Weiche     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useState } from 'react';
@@ -21,12 +21,20 @@ import styles from './LoginPage.module.css';
 // ── §1 · Komponente ──────────────────────────────────────────────
 
 const STANDARD_ZIEL = '/dispo/plantafel';
+const APP_ZIEL = '/app';
+
+// jh› Aussendienst landet auf dem Handy-Plan, Innendienst im Leitstand – ausser jemand
+//     kam von einer bestimmten Seite, dann zurück dorthin.
+function zielFuer(rolle: Rolle, von: string | undefined): string {
+  if (von && von !== STANDARD_ZIEL && von !== '/') return von;
+  return rolle === 'aussendienst' ? APP_ZIEL : STANDARD_ZIEL;
+}
 
 export function LoginPage() {
   const sitzung = useSitzung();
   const navigate = useNavigate();
   const location = useLocation();
-  const von = (location.state as LoginZustand | null)?.von ?? STANDARD_ZIEL;
+  const von = (location.state as LoginZustand | null)?.von;
 
   const [benutzername, setBenutzername] = useState('');
   const [passwort, setPasswort] = useState('');
@@ -36,7 +44,7 @@ export function LoginPage() {
   const [fehler, setFehler] = useState<string | null>(null);
   const [vergessen, setVergessen] = useState(false);
 
-  if (sitzung) return <Navigate to={von} replace />;
+  if (sitzung) return <Navigate to={zielFuer(sitzung.benutzer.rolle, von)} replace />;
 
   function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -46,7 +54,7 @@ export function LoginPage() {
       setFehler(ergebnis.fehler);
       return;
     }
-    navigate(von, { replace: true });
+    navigate(zielFuer(ergebnis.sitzung.benutzer.rolle, von), { replace: true });
   }
 
   return (

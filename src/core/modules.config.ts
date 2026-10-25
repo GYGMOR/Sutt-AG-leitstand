@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/modules.config.ts                             │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 03                                               │
    │  Modul-Register: einzige Quelle für Leiste, Palette und Routing        │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -20,6 +20,7 @@ import {
   MessageSquareText,
   Settings,
   ShieldCheck,
+  Smartphone,
   TreePalm,
   Users,
   Warehouse,
@@ -38,6 +39,7 @@ export type ModulId =
   | 'kalender'
   | 'liste'
   | 'karte'
+  | 'app'
   | 'auftraege'
   | 'kunden'
   | 'geraete'
@@ -112,6 +114,11 @@ export const MODULE: readonly Modul[] = [
     beschreibung: 'Einsätze des Tages als nummerierte Pins, Touren pro Techniker in dessen Farbe.',
   },
   {
+    id: 'app', label: 'Techniker-App', icon: Smartphone, gruppe: 'disposition', pfad: '/app',
+    freigeschaltet: true, rollen: ALLE,
+    beschreibung: 'Tagesplan, Statusknöpfe und Servicerapport fürs Handy – dieselben Daten wie die Plantafel.',
+  },
+  {
     id: 'auftraege', label: 'Aufträge', icon: ClipboardList, gruppe: 'auftraege-kunden', pfad: '/auftraege',
     freigeschaltet: false, version: 'v0.3', rollen: ALLE,
     beschreibung: 'Auftragsverwaltung von der Anfrage bis zur Verrechnung: Reparatur, Service, Montage, Garantie, Offerten.',
@@ -153,8 +160,8 @@ export const MODULE: readonly Modul[] = [
   },
   {
     id: 'rapporte', label: 'Servicerapporte', icon: FileText, gruppe: 'administration', pfad: '/rapporte',
-    freigeschaltet: false, version: 'v0.6', rollen: ALLE,
-    beschreibung: 'Digitaler Servicerapport mit Unterschrift vor Ort, Fotos und Ersatzteilen.',
+    freigeschaltet: true, rollen: ALLE,
+    beschreibung: 'Digitale Servicerapporte aus der Techniker-App: prüfen, freigeben, verrechnen, zurückgeben.',
   },
   {
     id: 'buchhaltung', label: 'Buchhaltung', icon: Banknote, gruppe: 'administration', pfad: '/buchhaltung',

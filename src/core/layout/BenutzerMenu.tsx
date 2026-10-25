@@ -1,11 +1,12 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/layout/BenutzerMenu.tsx                       │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Benutzermenü: Name, Rolle, Dark Mode, Tastaturkürzel, Abmelden        │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Benutzermenü: Name, Rolle, Moduleinträge, Dark Mode, Abmelden         │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useRef, useState } from 'react';
 import { Keyboard, LogOut, Moon, Sun } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { ROLLEN, ROLLE_LABEL } from '../auth/auth.types';
 import type { Benutzer, Rolle } from '../auth/auth.types';
 import { rolleWechseln } from '../auth/authStore';
@@ -18,13 +19,23 @@ import styles from './BenutzerMenu.module.css';
 
 // ── §1 · Komponente ──────────────────────────────────────────────
 
+/** Modulspezifischer Menüpunkt (z. B. «Demo zurücksetzen» aus der Disposition). */
+export interface MenueEintrag {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  run: () => void;
+  gefaehrlich?: boolean;
+}
+
 interface BenutzerMenuProps {
   benutzer: Benutzer;
+  eintraege?: readonly MenueEintrag[];
   onHilfe: () => void;
   onAbmelden: () => void;
 }
 
-export function BenutzerMenu({ benutzer, onHilfe, onAbmelden }: BenutzerMenuProps) {
+export function BenutzerMenu({ benutzer, eintraege = [], onHilfe, onAbmelden }: BenutzerMenuProps) {
   const [offen, setOffen] = useState(false);
   const ankerRef = useRef<HTMLButtonElement>(null);
   const { theme, toggleTheme } = useTheme();
@@ -64,6 +75,21 @@ export function BenutzerMenu({ benutzer, onHilfe, onAbmelden }: BenutzerMenuProp
             </Auswahl>
           </label>
 
+          {eintraege.map((eintrag) => (
+            <button
+              key={eintrag.id}
+              type="button"
+              role="menuitem"
+              className={cx(styles.eintrag, eintrag.gefaehrlich && styles.abmelden)}
+              onClick={() => {
+                setOffen(false);
+                eintrag.run();
+              }}
+            >
+              <eintrag.icon size={16} strokeWidth={1.5} aria-hidden />
+              <span>{eintrag.label}</span>
+            </button>
+          ))}
           <button type="button" role="menuitem" className={styles.eintrag} onClick={toggleTheme}>
             {theme === 'dark' ? <Sun size={16} strokeWidth={1.5} aria-hidden /> : <Moon size={16} strokeWidth={1.5} aria-hidden />}
             <span>{theme === 'dark' ? 'Heller Modus' : 'Dunkler Modus'}</span>

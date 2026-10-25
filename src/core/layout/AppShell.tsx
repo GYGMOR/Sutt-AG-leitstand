@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/layout/AppShell.tsx                           │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 03                                               │
    │  Layout-Shell: Topbar, Seitenleiste, Palette, Hilfe, Abmelden          │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -19,6 +19,7 @@ import type { Modul } from '../modules.config';
 import { useTheme } from '../theme';
 import { ConfirmDialog } from '../ui/Dialog';
 import { cx } from '../ui/cx';
+import type { MenueEintrag } from './BenutzerMenu';
 import { KommandoPalette } from './KommandoPalette';
 import { ShortcutHilfe } from './ShortcutHilfe';
 import { Sidebar } from './Sidebar';
@@ -32,10 +33,12 @@ interface AppShellProps {
   modul?: Modul;
   /** Modulspezifische Topbar-Elemente, z. B. die Konflikt-Badge. */
   topbarExtras?: ReactNode;
+  /** Modulspezifische Einträge im Benutzermenü, z. B. «Demo zurücksetzen». */
+  menueEintraege?: readonly MenueEintrag[];
   children: ReactNode;
 }
 
-export function AppShell({ modul, topbarExtras, children }: AppShellProps) {
+export function AppShell({ modul, topbarExtras, menueEintraege, children }: AppShellProps) {
   const navigate = useNavigate();
   const benutzer = useBenutzer();
   const offeneAenderungen = useOffeneAenderungen();
@@ -108,7 +111,7 @@ export function AppShell({ modul, topbarExtras, children }: AppShellProps) {
 
   return (
     <div className={cx(styles.shell, eingeklappt && styles.schmal)}>
-      <Topbar modul={modul} extras={topbarExtras} onOpenPalette={openPalette} onHilfe={openHilfe} onAbmelden={abmeldenAnfragen} />
+      <Topbar modul={modul} extras={topbarExtras} menueEintraege={menueEintraege} onOpenPalette={openPalette} onHilfe={openHilfe} onAbmelden={abmeldenAnfragen} />
       <Sidebar eingeklappt={eingeklappt} onToggle={toggleSidebar} onHilfe={openHilfe} onAbmelden={abmeldenAnfragen} />
       <main className={styles.flaeche} id="sl-hauptflaeche">
         {children}

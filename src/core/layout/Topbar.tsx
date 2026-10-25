@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/layout/Topbar.tsx                             │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 03                                               │
    │  Topbar 56 px: Wortmarke, Modul, Datum, Palette, Extras, Benutzer      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -13,6 +13,7 @@ import { MODUL_GRUPPEN } from '../modules.config';
 import type { Modul } from '../modules.config';
 import { Kbd } from '../ui/Kbd';
 import { BenutzerMenu } from './BenutzerMenu';
+import type { MenueEintrag } from './BenutzerMenu';
 import { DateNav } from './DateNav';
 import styles from './Topbar.module.css';
 
@@ -36,12 +37,13 @@ function Wortmarke() {
 interface TopbarProps {
   modul?: Modul;
   extras?: ReactNode;
+  menueEintraege?: readonly MenueEintrag[];
   onOpenPalette: () => void;
   onHilfe: () => void;
   onAbmelden: () => void;
 }
 
-export function Topbar({ modul, extras, onOpenPalette, onHilfe, onAbmelden }: TopbarProps) {
+export function Topbar({ modul, extras, menueEintraege, onOpenPalette, onHilfe, onAbmelden }: TopbarProps) {
   const benutzer = useBenutzer();
   const gruppe = modul ? MODUL_GRUPPEN.find((eintrag) => eintrag.id === modul.gruppe)?.label : undefined;
 
@@ -67,7 +69,7 @@ export function Topbar({ modul, extras, onOpenPalette, onHilfe, onAbmelden }: To
         <span className={styles.mockup} title="Klickbares Mockup – alle Daten sind erfunden">
           Mockup · Testdaten
         </span>
-        {benutzer && <BenutzerMenu benutzer={benutzer} onHilfe={onHilfe} onAbmelden={onAbmelden} />}
+        {benutzer && <BenutzerMenu benutzer={benutzer} eintraege={menueEintraege} onHilfe={onHilfe} onAbmelden={onAbmelden} />}
       </div>
     </header>
   );
