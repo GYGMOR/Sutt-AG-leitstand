@@ -1,0 +1,209 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/lager/LagerPage.module.css                 │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Lager: Tabellenzellen, Fahrzeugkarten, Dossiers, Journal, Formulare   │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Tabellen ───────────────────────────────────────────── */
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.zelle {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.zelle-haupt {
+  font-weight: var(--sl-fw-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zelle-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.leer-wert {
+  color: var(--sl-mute-2);
+}
+
+.journal-minus {
+  color: var(--sl-danger-ink);
+}
+
+.journal-hinweis {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Fahrzeuge ──────────────────────────────────────────── */
+
+.fahrzeuge {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  min-height: 0;
+  padding: 12px;
+  overflow-y: auto;
+  background: var(--sl-paper);
+}
+
+.fahrzeug {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.fahrzeug-kopf {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fahrzeug-titel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  font-size: var(--sl-fs-13);
+}
+
+.fahrzeug-liste {
+  display: flex;
+  flex-direction: column;
+}
+
+.fahrzeug-zeile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-top: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-13);
+}
+
+/* ── §3 · Dossiers ───────────────────────────────────────────── */
+
+.dossier {
+  display: flex;
+  flex-direction: column;
+}
+
+.leer {
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+}
+
+.hinweis {
+  margin-top: 8px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.orte {
+  display: flex;
+  flex-direction: column;
+}
+
+.ort {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr) 40px auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-13);
+}
+
+.ort-haupt .ort-label {
+  font-weight: var(--sl-fw-semibold);
+}
+
+.ort-balken {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--sl-line-soft);
+  overflow: hidden;
+}
+
+.ort-fuellung {
+  display: block;
+  height: 100%;
+  background: var(--sl-ok);
+}
+
+.ort-menge {
+  text-align: right;
+}
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.listen-zeile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: var(--sl-fs-13);
+}
+
+.journal {
+  display: flex;
+  flex-direction: column;
+}
+
+.journal-zeile {
+  display: grid;
+  grid-template-columns: 90px auto 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 2px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-12);
+}
+
+.journal-menge {
+  text-align: right;
+}
+
+.journal-text {
+  color: var(--sl-ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── §4 · Formulare ──────────────────────────────────────────── */
+
+.formular {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.zeile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ◆ jh · eof */
