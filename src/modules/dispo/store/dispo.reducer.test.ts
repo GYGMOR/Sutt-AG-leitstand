@@ -1,11 +1,13 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/dispo.reducer.test.ts          │
-   │  ◆ JH · 2026.10 · rev 03                                               │
-   │  Reducer: planen, Status mit Verlauf, Rapportfluss, Undo/Redo, Stand   │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Reducer: planen, Status, Rapport, Stammdaten, Lager, Undo, Stand      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { describe, expect, it } from 'vitest';
 import { addDays } from '../../../core/datum';
+import { LAGER_GLATTBRUGG, bestandVon, fahrzeugOrt } from '../../../core/domain/lager';
+import type { Bestellung, Lagerbewegung } from '../../../core/domain/lager';
 import { HEUTE, einsatzMitId, meta, rapportEntwurf, testState } from '../../../test/testdaten';
 import { dispoReducer, schnappschuss } from './dispo.reducer';
 
@@ -139,7 +141,132 @@ describe('Rapport-Übergänge im Büro', () => {
   });
 });
 
-// ── §4 · Undo/Redo & Stand ───────────────────────────────────────
+// ── §4 · Stammdaten ──────────────────────────────────────────────
+
+describe('Stammdaten', () => {
+  it('bearbeitet Kunden und Liegenschaften im Schnappschuss', () => {
+    const start = testState();
+    const kunde = start.stammdaten.kunden.get('K5');
+    if (!kunde) throw new Error('Kunde fehlt');
+    const state = dispoReducer(start, { kind: 'updateKunde', kunde: { ...kunde, kontakt: { ...kunde.kontakt, telefon: '079 000 00 00' } }, meta: meta('kunde') });
+    expect(state.stammdaten.kunden.get('K5')?.kontakt.telefon).toBe('079 000 00 00');
+    expect(dispoReducer(state, { kind: 'undo' }).stammdaten.kunden.get('K5')?.kontakt.telefon).toBe(kunde.kontakt.telefon);
+    expect(dispoReducer(start, { kind: 'updateKunde', kunde: { ...kunde, id: 'K-unbekannt' }, meta: meta() })).toBe(start);
+  });
+
+  it('legt neue Liegenschaften nur für bekannte Kunden an', () => {
+    const start = testState();
+    const vorlage = start.stammdaten.liegenschaften.get('L01');
+    if (!vorlage) throw new Error('Liegenschaft fehlt');
+    const neu = { ...vorlage, id: 'L-T1', bezeichnung: 'MFH Test', kundeId: 'K1' };
+    const state = dispoReducer(start, { kind: 'createLiegenschaft', liegenschaft: neu, meta: meta() });
+    expect(state.stammdaten.liegenschaften.get('L-T1')?.bezeichnung).toBe('MFH Test');
+    expect(dispoReducer(start, { kind: 'createLiegenschaft', liegenschaft: { ...neu, kundeId: 'K-nein' }, meta: meta() })).toBe(start);
+  });
+
+  it('legt pro Auftrag höchstens eine Pendenz an', () => {
+    const start = testState();
+    const einsatz = einsatzMitId(start, 'E-A02');
+    const pendenz = { id: 'P-T9', auftragId: einsatz.auftragId, anlass: 'neu' as const, dauerMin: 60, erstelltAm: meta().zeit };
+    const state = dispoReducer(start, { kind: 'createPendenz', pendenz, meta: meta() });
+    expect(state.pendenzen.some((kandidat) => kandidat.id === 'P-T9')).toBe(true);
+    expect(dispoReducer(state, { kind: 'createPendenz', pendenz: { ...pendenz, id: 'P-T10' }, meta: meta() })).toBe(state);
+  });
+});
+
+// ── §5 · Lager ───────────────────────────────────────────────────
+
+function bestellungFuer(auftragId: string | undefined, teil: Partial<Bestellung> = {}): Bestellung {
+  return {
+    id: 'B-T1',
+    nummer: 'B-26-99901',
+    artikelNummer: '11380960',
+    bezeichnung: 'Laugenpumpe',
+    menge: 2,
+    lieferant: 'Miele Ersatzteile',
+    bestelltAm: meta().zeit,
+    liefertermin: addDays(HEUTE, 3),
+    status: 'offen',
+    ...(auftragId ? { auftragId } : {}),
+    von: 'TT',
+    ...teil,
+  };
+}
+
+function wareneingangFuer(bestellung: Bestellung): Lagerbewegung {
+  return { id: 'LB-T1', zeitpunkt: meta().zeit, art: 'wareneingang', artikelNummer: bestellung.artikelNummer, menge: bestellung.menge, nach: LAGER_GLATTBRUGG, bestellungId: bestellung.id, benutzer: 'TT' };
+}
+
+describe('Lager', () => {
+  it('bestellt für einen Auftrag und spiegelt das Teil als «bestellt» an den Auftrag', () => {
+    const start = testState();
+    const einsatz = einsatzMitId(start, 'E-A02');
+    const bestellung = bestellungFuer(einsatz.auftragId);
+    const state = dispoReducer(start, { kind: 'bestellen', bestellung, meta: meta('bestellt') });
+    expect(state.bestellungen[0]).toBe(bestellung);
+    const teil = state.stammdaten.auftraege.get(einsatz.auftragId)?.ersatzteile.find((kandidat) => kandidat.artikelNummer === '11380960');
+    expect(teil).toMatchObject({ status: 'bestellt', liefertermin: bestellung.liefertermin, menge: 2 });
+    expect(teil?.preisChf).toBeGreaterThan(0);
+  });
+
+  it('bucht den Wareneingang ein, setzt das Teil auf geliefert und zieht die Pendenz auf heute', () => {
+    const start = testState();
+    const einsatz = einsatzMitId(start, 'E-A01');
+    const bestellung = bestellungFuer(einsatz.auftragId);
+    const pendenz = { id: 'P-T5', auftragId: einsatz.auftragId, anlass: 'folgetermin' as const, dauerMin: 60, erstelltAm: meta().zeit, fruehestensAm: addDays(HEUTE, 3), hinweis: 'warten' };
+    const mitPendenz = dispoReducer(start, { kind: 'createPendenz', pendenz, meta: meta() });
+    const bestellt = dispoReducer(mitPendenz, { kind: 'bestellen', bestellung, meta: meta() });
+    const vorher = bestandVon(bestellt.bestaende, '11380960', LAGER_GLATTBRUGG);
+
+    const state = dispoReducer(bestellt, { kind: 'wareneingang', bestellungId: bestellung.id, bewegung: wareneingangFuer(bestellung), meta: meta('eingang', 9 * 60) });
+    expect(state.bestellungen.find((kandidat) => kandidat.id === bestellung.id)).toMatchObject({ status: 'eingetroffen', eingetroffenAm: `${HEUTE}T09:00` });
+    expect(bestandVon(state.bestaende, '11380960', LAGER_GLATTBRUGG)).toBe(vorher + 2);
+    expect(state.bewegungen[0]?.art).toBe('wareneingang');
+    expect(state.stammdaten.auftraege.get(einsatz.auftragId)?.ersatzteile.find((teil) => teil.artikelNummer === '11380960')?.status).toBe('eingetroffen');
+    expect(state.pendenzen.find((kandidat) => kandidat.id === 'P-T5')).toMatchObject({ fruehestensAm: HEUTE, hinweis: 'Laugenpumpe eingetroffen – Folgetermin planen' });
+    expect(dispoReducer(state, { kind: 'wareneingang', bestellungId: bestellung.id, bewegung: wareneingangFuer(bestellung), meta: meta() })).toBe(state);
+  });
+
+  it('bucht Umbuchungen auf beide Orte und lehnt unbekannte Artikel ab', () => {
+    const start = testState();
+    const bewegung: Lagerbewegung = { id: 'LB-T2', zeitpunkt: meta().zeit, art: 'umbuchung', artikelNummer: '11380960', menge: 1, von: LAGER_GLATTBRUGG, nach: fahrzeugOrt('T-MB'), benutzer: 'TT' };
+    const vorherLager = bestandVon(start.bestaende, '11380960', LAGER_GLATTBRUGG);
+    const vorherAuto = bestandVon(start.bestaende, '11380960', fahrzeugOrt('T-MB'));
+    const state = dispoReducer(start, { kind: 'buchen', bewegung, meta: meta() });
+    expect(bestandVon(state.bestaende, '11380960', LAGER_GLATTBRUGG)).toBe(Math.max(0, vorherLager - 1));
+    expect(bestandVon(state.bestaende, '11380960', fahrzeugOrt('T-MB'))).toBe(vorherAuto + 1);
+    expect(dispoReducer(start, { kind: 'buchen', bewegung: { ...bewegung, artikelNummer: 'gibt-es-nicht' }, meta: meta() })).toBe(start);
+  });
+
+  it('storniert offene Bestellungen und nimmt das bestellte Teil vom Auftrag', () => {
+    const start = testState();
+    const einsatz = einsatzMitId(start, 'E-A02');
+    const bestellung = bestellungFuer(einsatz.auftragId);
+    const bestellt = dispoReducer(start, { kind: 'bestellen', bestellung, meta: meta() });
+    const state = dispoReducer(bestellt, { kind: 'stornierenBestellung', bestellungId: bestellung.id, meta: meta() });
+    expect(state.bestellungen.find((kandidat) => kandidat.id === bestellung.id)?.status).toBe('storniert');
+    expect(state.stammdaten.auftraege.get(einsatz.auftragId)?.ersatzteile.some((teil) => teil.artikelNummer === '11380960')).toBe(false);
+  });
+
+  it('verbucht beim Rapport-Abschluss Verbrauch ab Fahrzeug und neue Bestellungen', () => {
+    const start = testState();
+    const einsatz = einsatzMitId(start, 'E-A01-F');
+    const auftrag = start.stammdaten.auftraege.get(einsatz.auftragId);
+    if (!auftrag) throw new Error('Auftrag fehlt');
+    const rapport = rapportEntwurf(einsatz, { teile: [{ artikelNummer: '10780350', bezeichnung: 'Türverriegelung', menge: 1, verwendung: 'fahrzeuglager' }] });
+    const verbrauch: Lagerbewegung = { id: 'LB-T3', zeitpunkt: meta().zeit, art: 'verbrauch', artikelNummer: '10780350', menge: 1, von: fahrzeugOrt(einsatz.technikerId), auftragId: auftrag.id, benutzer: 'MB' };
+    const vorher = bestandVon(start.bestaende, '10780350', fahrzeugOrt(einsatz.technikerId));
+    const bestellung = bestellungFuer(auftrag.id, { id: 'B-T7', artikelNummer: '11380960' });
+
+    const state = dispoReducer(start, { kind: 'abschliessenRapport', rapport, auftrag, bestellungen: [bestellung], bewegungen: [verbrauch], meta: meta() });
+    expect(bestandVon(state.bestaende, '10780350', fahrzeugOrt(einsatz.technikerId))).toBe(Math.max(0, vorher - 1));
+    expect(state.bewegungen[0]).toBe(verbrauch);
+    expect(state.bestellungen.some((kandidat) => kandidat.id === 'B-T7')).toBe(true);
+    expect(schnappschuss(dispoReducer(state, { kind: 'undo' }))).toEqual(schnappschuss(start));
+  });
+});
+
+// ── §6 · Undo/Redo & Stand ───────────────────────────────────────
 
 describe('undo / redo', () => {
   it('stellt den Schnappschuss vor der Planung her und wieder zurück', () => {

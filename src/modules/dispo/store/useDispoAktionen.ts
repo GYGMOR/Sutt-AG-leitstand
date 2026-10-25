@@ -1,22 +1,24 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/useDispoAktionen.ts            │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Aktionen mit Protokolltext, IDs, Zeitstempel – Klebstoff zum Store    │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useMemo } from 'react';
 import { useBenutzer } from '../../../core/auth/authStore';
-import { addDays, nowZeitpunkt, splitZeitpunkt } from '../../../core/datum';
+import { nowZeitpunkt, splitZeitpunkt } from '../../../core/datum';
 import type { IsoDatum } from '../../../core/datum';
 import { isTeilOffen } from '../../../core/domain/auftrag';
 import type { Auftrag, Ersatzteil } from '../../../core/domain/auftrag';
 import { STATUS_LABEL } from '../../../core/domain/einsatz';
 import type { Einsatz, EinsatzStatus, Pendenz, StatusQuelle } from '../../../core/domain/einsatz';
+import { LAGER_GLATTBRUGG, bestandVon, fahrzeugOrt, liefertermin, nextBestellNummer, technikerIdVon } from '../../../core/domain/lager';
+import type { Artikel, Bestellung, LagerOrt, Lagerbewegung } from '../../../core/domain/lager';
 import { NACHRICHT_KANAL, NACHRICHT_LABEL } from '../../../core/domain/nachricht';
 import type { Nachricht, NachrichtArt } from '../../../core/domain/nachricht';
 import { ABSCHLUSS_LABEL, nextRapportNummer } from '../../../core/domain/rapport';
 import type { Rapport, Unterschrift } from '../../../core/domain/rapport';
-import type { Geraet } from '../../../core/domain/stammdaten';
+import type { Geraet, Kunde, Liegenschaft } from '../../../core/domain/stammdaten';
 import { formatDatumKurz, formatWochentag, formatZeit } from '../../../core/format';
 import type { DispoAuswahl, PlanZiel } from '../dispo.types';
 import type { AktionsMeta, EinsatzAenderung } from './dispo.reducer';
@@ -50,9 +52,6 @@ function describeZiel(ziel: PlanZiel, kuerzel: string): string {
   return `${kuerzel} · ${formatWochentag(ziel.datum, 'kurz')} ${formatDatumKurz(ziel.datum)} ${formatZeit(ziel.startMin)}`;
 }
 
-// jh? Lieferfrist beim Hersteller: drei Arbeitstage angenommen – mit Sutt je Marke klären.
-const LIEFERFRIST_TAGE = 3;
-
 /** Entwurf eines Rapports aus dem Formular – ID und Nummer vergibt die Aktion. */
 export type RapportEntwurf = Omit<Rapport, 'id' | 'nummer' | 'status' | 'erstelltAm' | 'geaendertAm'> & { id?: string; nummer?: string };
 
@@ -76,6 +75,10 @@ export function useDispoAktionen() {
     const meta = (text: string): AktionsMeta => ({ text, zeit: nowZeitpunkt(), benutzer: kuerzel });
     const nummerOf = (auftragId: string) => store.getState().stammdaten.auftraege.get(auftragId)?.nummer ?? auftragId;
     const kuerzelOf = (technikerId: string) => technikerOf(store.getState().stammdaten, technikerId).kuerzel;
+    const ortLabel = (ort: LagerOrt) => {
+      const technikerId = technikerIdVon(ort);
+      return technikerId ? `Fahrzeug ${kuerzelOf(technikerId)}` : 'Glattbrugg';
+    };
 
     // jh› Rapport aus dem Entwurf vervollständigen: bestehende ID/Nummer behalten, sonst neu.
     const vollstaendig = (entwurf: RapportEntwurf, status: Rapport['status']): Rapport => {
@@ -121,7 +124,7 @@ export function useDispoAktionen() {
         if (!einsatz) return null;
         const { auftrag } = resolveAuftrag(state.stammdaten, einsatz.auftragId);
         const offeneTeile = auftrag.ersatzteile.filter(isTeilOffen);
-        const liefertermin = offeneTeile.map((teil) => teil.liefertermin).filter((termin): termin is IsoDatum => termin !== undefined).sort().pop();
+        const spaetester = offeneTeile.map((teil) => teil.liefertermin).filter((termin): termin is IsoDatum => termin !== undefined).sort().pop();
         const ersterTeil = offeneTeile[0];
         const pendenz: Pendenz = {
           id: nextId('P'),
@@ -129,7 +132,7 @@ export function useDispoAktionen() {
           anlass: 'folgetermin',
           dauerMin: Math.min(einsatz.dauerMin, 60),
           erstelltAm: nowZeitpunkt(),
-          ...(liefertermin ? { fruehestensAm: liefertermin } : {}),
+          ...(spaetester ? { fruehestensAm: spaetester } : {}),
           hinweis: ersterTeil ? `${ersterTeil.bezeichnung} – Liefertermin abwarten` : 'Folgetermin aus Einsatz',
         };
         store.dispatch({ kind: 'requestFolgetermin', einsatzId, pendenz, meta: meta(`${auftrag.nummer} · Folgetermin im Eingang`) });
@@ -212,17 +215,51 @@ export function useDispoAktionen() {
         const auftrag = state.stammdaten.auftraege.get(rapport.auftragId);
         if (!einsatz || !auftrag) throw new Error(`Rapport ${rapport.nummer}: Einsatz oder Auftrag fehlt`);
         const heute = splitZeitpunkt(nowZeitpunkt()).datum;
+        const termin = liefertermin(heute);
 
-        // Bestellte Teile landen als «bestellt» mit Liefertermin am Auftrag.
+        // Bestellte Teile landen als «bestellt» mit Liefertermin am Auftrag – und als Bestellung im Lager (ADR-004).
         const bestellen = rapport.teile.filter((teil) => teil.verwendung === 'bestellen');
-        const liefertermin = addDays(heute, LIEFERFRIST_TAGE);
         const ersatzteile: Ersatzteil[] = auftrag.ersatzteile.map((teil) =>
-          bestellen.some((bestellt) => bestellt.artikelNummer === teil.artikelNummer) ? { ...teil, status: 'bestellt' as const, liefertermin } : teil,
+          bestellen.some((bestellt) => bestellt.artikelNummer === teil.artikelNummer) ? { ...teil, status: 'bestellt' as const, liefertermin: termin } : teil,
         );
+        const bestellungen: Bestellung[] = [];
         for (const teil of bestellen) {
-          if (ersatzteile.some((vorhanden) => vorhanden.artikelNummer === teil.artikelNummer)) continue;
-          ersatzteile.push({ artikelNummer: teil.artikelNummer, bezeichnung: teil.bezeichnung, menge: teil.menge, preisChf: 0, status: 'bestellt', lieferant: 'Hersteller', liefertermin });
+          const artikel = state.stammdaten.artikel.get(teil.artikelNummer);
+          const lieferant = artikel?.lieferant ?? 'Hersteller';
+          if (!ersatzteile.some((vorhanden) => vorhanden.artikelNummer === teil.artikelNummer)) {
+            ersatzteile.push({ artikelNummer: teil.artikelNummer, bezeichnung: teil.bezeichnung, menge: teil.menge, preisChf: artikel?.preisChf ?? 0, status: 'bestellt', lieferant, liefertermin: termin });
+          }
+          const offen = state.bestellungen.some((bestellung) => bestellung.status === 'offen' && bestellung.auftragId === auftrag.id && bestellung.artikelNummer === teil.artikelNummer);
+          if (offen) continue;
+          bestellungen.push({
+            id: nextId('B'),
+            nummer: nextBestellNummer([...state.bestellungen, ...bestellungen]),
+            artikelNummer: teil.artikelNummer,
+            bezeichnung: teil.bezeichnung,
+            menge: teil.menge,
+            lieferant,
+            bestelltAm: nowZeitpunkt(),
+            liefertermin: termin,
+            status: 'offen',
+            auftragId: auftrag.id,
+            von: kuerzel,
+          });
         }
+
+        // Teile ab Fahrzeug und eingebaute Teile sind Verbrauch – nur für Artikel, die das Lager kennt.
+        const bewegungen: Lagerbewegung[] = rapport.teile
+          .filter((teil) => teil.verwendung !== 'bestellen' && state.stammdaten.artikel.has(teil.artikelNummer))
+          .map((teil) => ({
+            id: nextId('LB'),
+            zeitpunkt: nowZeitpunkt(),
+            art: 'verbrauch' as const,
+            artikelNummer: teil.artikelNummer,
+            menge: teil.menge,
+            von: teil.verwendung === 'fahrzeuglager' ? fahrzeugOrt(rapport.technikerId) : LAGER_GLATTBRUGG,
+            auftragId: auftrag.id,
+            text: `Rapport ${rapport.nummer}`,
+            benutzer: kuerzel,
+          }));
 
         // jh› Pro Auftrag höchstens eine offene Pendenz – wer einen Rapport erneut abschliesst, legt keine zweite an.
         const pendenzOffen = state.pendenzen.some((kandidat) => kandidat.auftragId === auftrag.id);
@@ -231,7 +268,7 @@ export function useDispoAktionen() {
           pendenz = undefined;
         } else if (rapport.abschluss === 'teil-bestellt') {
           const erstes = bestellen[0];
-          pendenz = { id: nextId('P'), auftragId: auftrag.id, anlass: 'folgetermin', dauerMin: Math.min(einsatz.dauerMin, 60), erstelltAm: nowZeitpunkt(), fruehestensAm: liefertermin, hinweis: erstes ? `${erstes.bezeichnung} – Liefertermin abwarten` : 'Teil bestellt – Liefertermin abwarten' };
+          pendenz = { id: nextId('P'), auftragId: auftrag.id, anlass: 'folgetermin', dauerMin: Math.min(einsatz.dauerMin, 60), erstelltAm: nowZeitpunkt(), fruehestensAm: termin, hinweis: erstes ? `${erstes.bezeichnung} – Liefertermin abwarten` : 'Teil bestellt – Liefertermin abwarten' };
         } else if (rapport.abschluss === 'folgetermin') {
           pendenz = { id: nextId('P'), auftragId: auftrag.id, anlass: 'folgetermin', dauerMin: einsatz.dauerMin, erstelltAm: nowZeitpunkt(), hinweis: rapport.abschlussGrund || 'Folgetermin aus Rapport' };
         } else if (rapport.abschluss === 'nicht-angetroffen') {
@@ -243,6 +280,8 @@ export function useDispoAktionen() {
           rapport,
           auftrag: { ...auftrag, ersatzteile },
           ...(pendenz ? { pendenz } : {}),
+          bestellungen,
+          bewegungen,
           meta: meta(`${auftrag.nummer} · Rapport ${rapport.nummer} abgeschlossen: ${ABSCHLUSS_LABEL[rapport.abschluss]} (App)`),
         });
         return { rapport, pendenzId: pendenz?.id ?? null };
@@ -273,6 +312,90 @@ export function useDispoAktionen() {
         const nachricht: Nachricht = { ...entwurf, id: nextId('M'), kanal: NACHRICHT_KANAL[entwurf.art], zeitpunkt: nowZeitpunkt(), von: kuerzel };
         store.dispatch({ kind: 'sendeNachricht', nachricht, meta: meta(`${nummerOf(entwurf.auftragId)} · ${NACHRICHT_LABEL[entwurf.art]} an ${entwurf.empfaenger}`) });
         return nachricht;
+      },
+
+      // ·· Stammdaten (Module Kunden, Geräte, Lager)
+      updateKunde(kunde: Kunde) {
+        store.dispatch({ kind: 'updateKunde', kunde, meta: meta(`${kunde.nummer} · ${kunde.name} bearbeitet`) });
+      },
+      updateLiegenschaft(liegenschaft: Liegenschaft) {
+        store.dispatch({ kind: 'updateLiegenschaft', liegenschaft, meta: meta(`Liegenschaft ${liegenschaft.bezeichnung} bearbeitet`) });
+      },
+      createLiegenschaft(entwurf: Omit<Liegenschaft, 'id'>): Liegenschaft {
+        const liegenschaft: Liegenschaft = { ...entwurf, id: nextId('L') };
+        store.dispatch({ kind: 'createLiegenschaft', liegenschaft, meta: meta(`Liegenschaft ${liegenschaft.bezeichnung} angelegt`) });
+        return liegenschaft;
+      },
+      updateArtikel(artikel: Artikel) {
+        store.dispatch({ kind: 'updateArtikel', artikel, meta: meta(`Artikel ${artikel.artikelNummer} · ${artikel.bezeichnung} bearbeitet`) });
+      },
+      /** Auftrag ohne Termin zurück in den Eingang; gibt die Pendenz-ID zurück. */
+      pendenzAnlegen(auftragId: string): string | null {
+        const auftrag = store.getState().stammdaten.auftraege.get(auftragId);
+        if (!auftrag) return null;
+        const pendenz: Pendenz = { id: nextId('P'), auftragId, anlass: 'neu', dauerMin: auftrag.dauerMin, erstelltAm: nowZeitpunkt(), hinweis: 'Aus dem Modul Aufträge in den Eingang gelegt' };
+        store.dispatch({ kind: 'createPendenz', pendenz, meta: meta(`${auftrag.nummer} → Eingang`) });
+        return pendenz.id;
+      },
+
+      // ·· Lager (ADR-004)
+      bestellen(angaben: { artikelNummer: string; menge: number; auftragId?: string; liefertermin?: IsoDatum }): Bestellung | null {
+        const state = store.getState();
+        const artikel = state.stammdaten.artikel.get(angaben.artikelNummer);
+        if (!artikel || angaben.menge <= 0) return null;
+        const jetzt = nowZeitpunkt();
+        const bestellung: Bestellung = {
+          id: nextId('B'),
+          nummer: nextBestellNummer(state.bestellungen),
+          artikelNummer: artikel.artikelNummer,
+          bezeichnung: artikel.bezeichnung,
+          menge: angaben.menge,
+          lieferant: artikel.lieferant,
+          bestelltAm: jetzt,
+          liefertermin: angaben.liefertermin ?? liefertermin(splitZeitpunkt(jetzt).datum),
+          status: 'offen',
+          ...(angaben.auftragId ? { auftragId: angaben.auftragId } : {}),
+          von: kuerzel,
+        };
+        const zweck = angaben.auftragId ? ` für ${nummerOf(angaben.auftragId)}` : ' (Lager auffüllen)';
+        store.dispatch({ kind: 'bestellen', bestellung, meta: meta(`${bestellung.nummer} · ${angaben.menge}× ${artikel.bezeichnung} bestellt${zweck}`) });
+        return bestellung;
+      },
+      wareneingang(bestellungId: string) {
+        const bestellung = store.getState().bestellungen.find((kandidat) => kandidat.id === bestellungId);
+        if (!bestellung || bestellung.status !== 'offen') return;
+        const bewegung: Lagerbewegung = {
+          id: nextId('LB'),
+          zeitpunkt: nowZeitpunkt(),
+          art: 'wareneingang',
+          artikelNummer: bestellung.artikelNummer,
+          menge: bestellung.menge,
+          nach: LAGER_GLATTBRUGG,
+          bestellungId: bestellung.id,
+          ...(bestellung.auftragId ? { auftragId: bestellung.auftragId } : {}),
+          benutzer: kuerzel,
+        };
+        store.dispatch({ kind: 'wareneingang', bestellungId, bewegung, meta: meta(`${bestellung.nummer} · ${bestellung.menge}× ${bestellung.bezeichnung} eingetroffen`) });
+      },
+      umbuchen(artikelNummer: string, von: LagerOrt, nach: LagerOrt, menge: number, text?: string) {
+        const artikel = store.getState().stammdaten.artikel.get(artikelNummer);
+        if (!artikel || menge <= 0 || von === nach) return;
+        const bewegung: Lagerbewegung = { id: nextId('LB'), zeitpunkt: nowZeitpunkt(), art: 'umbuchung', artikelNummer, menge, von, nach, ...(text ? { text } : {}), benutzer: kuerzel };
+        store.dispatch({ kind: 'buchen', bewegung, meta: meta(`${menge}× ${artikel.bezeichnung} · ${ortLabel(von)} → ${ortLabel(nach)}`) });
+      },
+      bestandKorrigieren(artikelNummer: string, ort: LagerOrt, neueMenge: number, grund: string) {
+        const state = store.getState();
+        const artikel = state.stammdaten.artikel.get(artikelNummer);
+        if (!artikel) return;
+        const delta = Math.max(0, Math.round(neueMenge)) - bestandVon(state.bestaende, artikelNummer, ort);
+        if (delta === 0) return;
+        const bewegung: Lagerbewegung = { id: nextId('LB'), zeitpunkt: nowZeitpunkt(), art: 'korrektur', artikelNummer, menge: delta, nach: ort, text: grund, benutzer: kuerzel };
+        store.dispatch({ kind: 'buchen', bewegung, meta: meta(`${artikel.bezeichnung} · ${ortLabel(ort)} korrigiert auf ${Math.max(0, Math.round(neueMenge))}`) });
+      },
+      bestellungStornieren(bestellungId: string) {
+        const bestellung = store.getState().bestellungen.find((kandidat) => kandidat.id === bestellungId);
+        if (!bestellung || bestellung.status !== 'offen') return;
+        store.dispatch({ kind: 'stornierenBestellung', bestellungId, meta: meta(`${bestellung.nummer} · ${bestellung.bezeichnung} storniert`) });
       },
 
       select(auswahl: DispoAuswahl) {

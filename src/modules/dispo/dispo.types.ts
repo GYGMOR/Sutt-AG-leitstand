@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/dispo.types.ts                       │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Dispo-Typen: Ansicht, Farbe-nach, Zoom, Filter, Auswahl, Bestand      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -8,6 +8,7 @@ import type { IsoDatum, Minuten } from '../../core/datum';
 import type { Auftrag } from '../../core/domain/auftrag';
 import type { Einsatz, EinsatzStatus, Pendenz } from '../../core/domain/einsatz';
 import type { Kategorie } from '../../core/domain/kategorie';
+import type { Artikel, Bestellung, Lagerbestand, Lagerbewegung } from '../../core/domain/lager';
 import type { Nachricht } from '../../core/domain/nachricht';
 import type { Rapport } from '../../core/domain/rapport';
 import type { Absenz, Geraet, Kunde, Liegenschaft, Region, Techniker } from '../../core/domain/stammdaten';
@@ -53,6 +54,7 @@ export interface DispoStammdaten {
   kunden: ReadonlyMap<string, Kunde>;
   liegenschaften: ReadonlyMap<string, Liegenschaft>;
   geraete: ReadonlyMap<string, Geraet>;
+  artikel: ReadonlyMap<string, Artikel>;
   absenzen: readonly Absenz[];
 }
 
@@ -61,6 +63,9 @@ export interface DispoBestand {
   pendenzen: readonly Pendenz[];
   rapporte: readonly Rapport[];
   nachrichten: readonly Nachricht[];
+  bestaende: readonly Lagerbestand[];
+  bestellungen: readonly Bestellung[];
+  bewegungen: readonly Lagerbewegung[];
 }
 
 // ── §3 · Filter, Auswahl, Ziel ───────────────────────────────────

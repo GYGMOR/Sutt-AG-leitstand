@@ -1,28 +1,39 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/dispo.reducer.ts               │
-   │  ◆ JH · 2026.10 · rev 03                                               │
-   │  Dispo-State: planen, Status, Rapport, Nachrichten, Undo/Redo, Stand   │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Betriebs-State: Plan, Status, Rapport, Stammdaten, Lager, Undo        │
    └────────────────────────────────────────────────────────────────────────┘ */
 
+import { splitZeitpunkt } from '../../../core/datum';
 import type { IsoDatum, IsoZeitpunkt, Minuten } from '../../../core/datum';
-import type { Auftrag } from '../../../core/domain/auftrag';
+import type { Auftrag, Ersatzteil } from '../../../core/domain/auftrag';
 import { mitStatuswechsel } from '../../../core/domain/einsatz';
 import type { Einsatz, EinsatzStatus, Pendenz, StatusQuelle } from '../../../core/domain/einsatz';
+import { wendeBewegungAn } from '../../../core/domain/lager';
+import type { Artikel, Bestellung, Lagerbestand, Lagerbewegung } from '../../../core/domain/lager';
 import type { Nachricht } from '../../../core/domain/nachricht';
 import { istSchreibgeschuetzt, statusNachAbschluss } from '../../../core/domain/rapport';
 import type { Rapport, Unterschrift } from '../../../core/domain/rapport';
-import type { Geraet } from '../../../core/domain/stammdaten';
+import type { Geraet, Kunde, Liegenschaft } from '../../../core/domain/stammdaten';
 import type { DispoAuswahl, DispoBestand, DispoStammdaten, PlanZiel } from '../dispo.types';
 
 // ── §1 · State ───────────────────────────────────────────────────
 
+// jh› Alles, was ein Modul bearbeitet, liegt im Schnappschuss (ADR-003): Undo, Protokoll und
+//     Fenster-Spiegelung gelten damit für Kunden und Lager genauso wie für den Plan.
 export interface Schnappschuss {
   einsaetze: readonly Einsatz[];
   pendenzen: readonly Pendenz[];
   rapporte: readonly Rapport[];
   nachrichten: readonly Nachricht[];
+  bestaende: readonly Lagerbestand[];
+  bestellungen: readonly Bestellung[];
+  bewegungen: readonly Lagerbewegung[];
   auftraege: ReadonlyMap<string, Auftrag>;
   geraete: ReadonlyMap<string, Geraet>;
+  kunden: ReadonlyMap<string, Kunde>;
+  liegenschaften: ReadonlyMap<string, Liegenschaft>;
+  artikel: ReadonlyMap<string, Artikel>;
 }
 
 /** Herkunft einer Änderung – kommt fertig in der Aktion (Reducer bleibt rein). */
@@ -44,6 +55,9 @@ export interface DispoState {
   pendenzen: readonly Pendenz[];
   rapporte: readonly Rapport[];
   nachrichten: readonly Nachricht[];
+  bestaende: readonly Lagerbestand[];
+  bestellungen: readonly Bestellung[];
+  bewegungen: readonly Lagerbewegung[];
   auswahl: DispoAuswahl;
   /** Mehrfachauswahl in der Liste (Einsatz-IDs). */
   mehrfach: readonly string[];
@@ -64,6 +78,9 @@ export function createDispoState(stammdaten: DispoStammdaten, bestand: DispoBest
     pendenzen: bestand.pendenzen,
     rapporte: bestand.rapporte,
     nachrichten: bestand.nachrichten,
+    bestaende: bestand.bestaende,
+    bestellungen: bestand.bestellungen,
+    bewegungen: bestand.bewegungen,
     auswahl: null,
     mehrfach: [],
     protokoll: [],
@@ -98,12 +115,21 @@ export type DispoAction =
   | { kind: 'assignTechniker'; einsatzIds: readonly string[]; technikerId: string; meta: AktionsMeta }
   | { kind: 'shiftEinsaetze'; einsatzIds: readonly string[]; datum: IsoDatum; meta: AktionsMeta }
   | { kind: 'saveRapport'; rapport: Rapport; meta: AktionsMeta }
-  | { kind: 'abschliessenRapport'; rapport: Rapport; auftrag: Auftrag; pendenz?: Pendenz; meta: AktionsMeta }
+  | { kind: 'abschliessenRapport'; rapport: Rapport; auftrag: Auftrag; pendenz?: Pendenz; bestellungen?: readonly Bestellung[]; bewegungen?: readonly Lagerbewegung[]; meta: AktionsMeta }
   | { kind: 'signRapport'; rapportId: string; unterschrift: Unterschrift; meta: AktionsMeta }
   | { kind: 'freigebenRapport'; rapportId: string; meta: AktionsMeta }
   | { kind: 'verrechnenRapport'; rapportId: string; meta: AktionsMeta }
   | { kind: 'zurueckAnTechniker'; rapportId: string; bemerkung: string; meta: AktionsMeta }
   | { kind: 'sendeNachricht'; nachricht: Nachricht; meta: AktionsMeta }
+  | { kind: 'updateKunde'; kunde: Kunde; meta: AktionsMeta }
+  | { kind: 'updateLiegenschaft'; liegenschaft: Liegenschaft; meta: AktionsMeta }
+  | { kind: 'createLiegenschaft'; liegenschaft: Liegenschaft; meta: AktionsMeta }
+  | { kind: 'updateArtikel'; artikel: Artikel; meta: AktionsMeta }
+  | { kind: 'createPendenz'; pendenz: Pendenz; meta: AktionsMeta }
+  | { kind: 'bestellen'; bestellung: Bestellung; meta: AktionsMeta }
+  | { kind: 'wareneingang'; bestellungId: string; bewegung: Lagerbewegung; meta: AktionsMeta }
+  | { kind: 'buchen'; bewegung: Lagerbewegung; meta: AktionsMeta }
+  | { kind: 'stornierenBestellung'; bestellungId: string; meta: AktionsMeta }
   | { kind: 'select'; auswahl: DispoAuswahl }
   | { kind: 'toggleMehrfach'; einsatzId: string }
   | { kind: 'setMehrfach'; einsatzIds: readonly string[] }
@@ -120,8 +146,14 @@ export function schnappschuss(state: DispoState): Schnappschuss {
     pendenzen: state.pendenzen,
     rapporte: state.rapporte,
     nachrichten: state.nachrichten,
+    bestaende: state.bestaende,
+    bestellungen: state.bestellungen,
+    bewegungen: state.bewegungen,
     auftraege: state.stammdaten.auftraege,
     geraete: state.stammdaten.geraete,
+    kunden: state.stammdaten.kunden,
+    liegenschaften: state.stammdaten.liegenschaften,
+    artikel: state.stammdaten.artikel,
   };
 }
 
@@ -132,8 +164,36 @@ function anwenden(state: DispoState, schnapp: Schnappschuss): DispoState {
     pendenzen: schnapp.pendenzen,
     rapporte: schnapp.rapporte,
     nachrichten: schnapp.nachrichten,
-    stammdaten: { ...state.stammdaten, auftraege: schnapp.auftraege, geraete: schnapp.geraete },
+    bestaende: schnapp.bestaende,
+    bestellungen: schnapp.bestellungen,
+    bewegungen: schnapp.bewegungen,
+    stammdaten: {
+      ...state.stammdaten,
+      auftraege: schnapp.auftraege,
+      geraete: schnapp.geraete,
+      kunden: schnapp.kunden,
+      liegenschaften: schnapp.liegenschaften,
+      artikel: schnapp.artikel,
+    },
   };
+}
+
+/** Gleiche Referenzen in allen Feldern – nichts Persistentes hat sich geändert. */
+export function gleicherSchnappschuss(a: Schnappschuss, b: Schnappschuss): boolean {
+  return (
+    a.einsaetze === b.einsaetze &&
+    a.pendenzen === b.pendenzen &&
+    a.rapporte === b.rapporte &&
+    a.nachrichten === b.nachrichten &&
+    a.bestaende === b.bestaende &&
+    a.bestellungen === b.bestellungen &&
+    a.bewegungen === b.bewegungen &&
+    a.auftraege === b.auftraege &&
+    a.geraete === b.geraete &&
+    a.kunden === b.kunden &&
+    a.liegenschaften === b.liegenschaften &&
+    a.artikel === b.artikel
+  );
 }
 
 function auswahlExists(auswahl: DispoAuswahl, schnapp: Schnappschuss): boolean {
@@ -358,7 +418,17 @@ function abschliessenRapport(state: DispoState, action: Extract<DispoAction, { k
     fotos: rapport.fotos.length > 0 ? rapport.fotos : action.auftrag.fotos,
   });
   const pendenzen = action.pendenz ? [...state.pendenzen, action.pendenz] : state.pendenzen;
-  return commit(state, action.meta, { einsaetze, rapporte: ersetzeRapport(state.rapporte, rapport), auftraege, pendenzen }, { markiertId: rapport.einsatzId });
+  // jh› Lager-Kopplung (ADR-004): Teile ab Fahrzeug/Lager sind Verbrauch, zu bestellende Teile werden Bestellungen.
+  const neueBewegungen = action.bewegungen ?? [];
+  const bestaende = neueBewegungen.reduce<readonly Lagerbestand[]>((stand, bewegung) => wendeBewegungAn(stand, bewegung), state.bestaende);
+  const bekannt = new Set(state.bestellungen.map((bestellung) => bestellung.id));
+  const bestellungen = [...state.bestellungen, ...(action.bestellungen ?? []).filter((bestellung) => !bekannt.has(bestellung.id))];
+  return commit(
+    state,
+    action.meta,
+    { einsaetze, rapporte: ersetzeRapport(state.rapporte, rapport), auftraege, pendenzen, bestaende, bestellungen, bewegungen: [...neueBewegungen, ...state.bewegungen] },
+    { markiertId: rapport.einsatzId },
+  );
 }
 
 function signRapport(state: DispoState, action: Extract<DispoAction, { kind: 'signRapport' }>): DispoState {
@@ -400,7 +470,92 @@ function sendeNachricht(state: DispoState, action: Extract<DispoAction, { kind: 
   return commit(state, action.meta, { nachrichten: [...state.nachrichten, action.nachricht] });
 }
 
-// ── §7 · Undo/Redo & Stand ───────────────────────────────────────
+// ── §7 · Stammdaten ──────────────────────────────────────────────
+
+function updateKunde(state: DispoState, action: Extract<DispoAction, { kind: 'updateKunde' }>): DispoState {
+  if (!state.stammdaten.kunden.has(action.kunde.id)) return state;
+  return commit(state, action.meta, { kunden: withMap(state.stammdaten.kunden, action.kunde.id, action.kunde) });
+}
+
+function updateLiegenschaft(state: DispoState, action: Extract<DispoAction, { kind: 'updateLiegenschaft' }>): DispoState {
+  if (!state.stammdaten.liegenschaften.has(action.liegenschaft.id)) return state;
+  return commit(state, action.meta, { liegenschaften: withMap(state.stammdaten.liegenschaften, action.liegenschaft.id, action.liegenschaft) });
+}
+
+function createLiegenschaft(state: DispoState, action: Extract<DispoAction, { kind: 'createLiegenschaft' }>): DispoState {
+  if (state.stammdaten.liegenschaften.has(action.liegenschaft.id) || !state.stammdaten.kunden.has(action.liegenschaft.kundeId)) return state;
+  return commit(state, action.meta, { liegenschaften: withMap(state.stammdaten.liegenschaften, action.liegenschaft.id, action.liegenschaft) }, { markiertId: action.liegenschaft.id });
+}
+
+function updateArtikel(state: DispoState, action: Extract<DispoAction, { kind: 'updateArtikel' }>): DispoState {
+  if (!state.stammdaten.artikel.has(action.artikel.artikelNummer)) return state;
+  return commit(state, action.meta, { artikel: withMap(state.stammdaten.artikel, action.artikel.artikelNummer, action.artikel) });
+}
+
+// jh› Ein Auftrag ohne Termin und ohne Pendenz (z. B. nach «Löschen» + Redo) kommt so zurück in den Eingang.
+function createPendenz(state: DispoState, action: Extract<DispoAction, { kind: 'createPendenz' }>): DispoState {
+  const { pendenz } = action;
+  if (!state.stammdaten.auftraege.has(pendenz.auftragId)) return state;
+  if (state.pendenzen.some((kandidat) => kandidat.auftragId === pendenz.auftragId)) return state;
+  return commit(state, action.meta, { pendenzen: [...state.pendenzen, pendenz] }, { markiertId: pendenz.id });
+}
+
+// ── §8 · Lager ───────────────────────────────────────────────────
+
+function mitErsatzteil(auftrag: Auftrag, bestellung: Bestellung, artikel: Artikel | undefined): Auftrag {
+  const vorhanden = auftrag.ersatzteile.some((teil) => teil.artikelNummer === bestellung.artikelNummer);
+  const ersatzteile: Ersatzteil[] = vorhanden
+    ? auftrag.ersatzteile.map((teil) => (teil.artikelNummer === bestellung.artikelNummer ? { ...teil, status: 'bestellt' as const, liefertermin: bestellung.liefertermin, lieferant: bestellung.lieferant } : teil))
+    : [...auftrag.ersatzteile, { artikelNummer: bestellung.artikelNummer, bezeichnung: bestellung.bezeichnung, menge: bestellung.menge, preisChf: artikel?.preisChf ?? 0, status: 'bestellt', lieferant: bestellung.lieferant, liefertermin: bestellung.liefertermin }];
+  return { ...auftrag, ersatzteile };
+}
+
+function bestellen(state: DispoState, action: Extract<DispoAction, { kind: 'bestellen' }>): DispoState {
+  const { bestellung } = action;
+  if (state.bestellungen.some((kandidat) => kandidat.id === bestellung.id)) return state;
+  const auftrag = bestellung.auftragId ? state.stammdaten.auftraege.get(bestellung.auftragId) : undefined;
+  const auftraege = auftrag ? withMap(state.stammdaten.auftraege, auftrag.id, mitErsatzteil(auftrag, bestellung, state.stammdaten.artikel.get(bestellung.artikelNummer))) : state.stammdaten.auftraege;
+  return commit(state, action.meta, { bestellungen: [bestellung, ...state.bestellungen], auftraege }, { markiertId: bestellung.id });
+}
+
+// jh› Wareneingang spiegelt an die Dispo: Teil «geliefert» am Auftrag, Folgetermin-Pendenz ab heute mit Hinweis «Teil da».
+function wareneingang(state: DispoState, action: Extract<DispoAction, { kind: 'wareneingang' }>): DispoState {
+  const bestellung = state.bestellungen.find((kandidat) => kandidat.id === action.bestellungId);
+  if (!bestellung || bestellung.status !== 'offen') return state;
+  const heute = splitZeitpunkt(action.meta.zeit).datum;
+  const bestellungen = state.bestellungen.map((kandidat) => (kandidat.id === bestellung.id ? { ...kandidat, status: 'eingetroffen' as const, eingetroffenAm: action.meta.zeit } : kandidat));
+  const bestaende = wendeBewegungAn(state.bestaende, action.bewegung);
+
+  let auftraege = state.stammdaten.auftraege;
+  let pendenzen = state.pendenzen;
+  const auftrag = bestellung.auftragId ? state.stammdaten.auftraege.get(bestellung.auftragId) : undefined;
+  if (auftrag) {
+    const ersatzteile = auftrag.ersatzteile.map((teil) => (teil.artikelNummer === bestellung.artikelNummer ? { ...teil, status: 'eingetroffen' as const } : teil));
+    auftraege = withMap(auftraege, auftrag.id, { ...auftrag, ersatzteile });
+    pendenzen = pendenzen.map((pendenz) =>
+      pendenz.auftragId === auftrag.id && pendenz.anlass === 'folgetermin' ? { ...pendenz, fruehestensAm: heute, hinweis: `${bestellung.bezeichnung} eingetroffen – Folgetermin planen` } : pendenz,
+    );
+  }
+  return commit(state, action.meta, { bestellungen, bestaende, bewegungen: [action.bewegung, ...state.bewegungen], auftraege, pendenzen }, { markiertId: bestellung.id });
+}
+
+function buchen(state: DispoState, action: Extract<DispoAction, { kind: 'buchen' }>): DispoState {
+  if (!state.stammdaten.artikel.has(action.bewegung.artikelNummer)) return state;
+  return commit(state, action.meta, { bestaende: wendeBewegungAn(state.bestaende, action.bewegung), bewegungen: [action.bewegung, ...state.bewegungen] });
+}
+
+function stornierenBestellung(state: DispoState, action: Extract<DispoAction, { kind: 'stornierenBestellung' }>): DispoState {
+  const bestellung = state.bestellungen.find((kandidat) => kandidat.id === action.bestellungId);
+  if (!bestellung || bestellung.status !== 'offen') return state;
+  const bestellungen = state.bestellungen.map((kandidat) => (kandidat.id === bestellung.id ? { ...kandidat, status: 'storniert' as const } : kandidat));
+  const auftrag = bestellung.auftragId ? state.stammdaten.auftraege.get(bestellung.auftragId) : undefined;
+  const auftraege = auftrag
+    ? withMap(state.stammdaten.auftraege, auftrag.id, { ...auftrag, ersatzteile: auftrag.ersatzteile.filter((teil) => !(teil.artikelNummer === bestellung.artikelNummer && teil.status === 'bestellt')) })
+    : state.stammdaten.auftraege;
+  return commit(state, action.meta, { bestellungen, auftraege });
+}
+
+// ── §9 · Undo/Redo & Stand ───────────────────────────────────────
 
 function undo(state: DispoState): DispoState {
   const [letzter, ...rest] = state.protokoll;
@@ -435,7 +590,7 @@ function replaceStand(state: DispoState, action: Extract<DispoAction, { kind: 'r
   return { ...basis, protokoll: [], zukunft: [], auswahl: auswahlExists(state.auswahl, action.stand) ? state.auswahl : null, markiertId: null };
 }
 
-// ── §8 · Reducer ─────────────────────────────────────────────────
+// ── §10 · Reducer ────────────────────────────────────────────────
 
 export function dispoReducer(state: DispoState, action: DispoAction): DispoState {
   switch (action.kind) {
@@ -477,6 +632,24 @@ export function dispoReducer(state: DispoState, action: DispoAction): DispoState
       return zurueckAnTechniker(state, action);
     case 'sendeNachricht':
       return sendeNachricht(state, action);
+    case 'updateKunde':
+      return updateKunde(state, action);
+    case 'updateLiegenschaft':
+      return updateLiegenschaft(state, action);
+    case 'createLiegenschaft':
+      return createLiegenschaft(state, action);
+    case 'updateArtikel':
+      return updateArtikel(state, action);
+    case 'createPendenz':
+      return createPendenz(state, action);
+    case 'bestellen':
+      return bestellen(state, action);
+    case 'wareneingang':
+      return wareneingang(state, action);
+    case 'buchen':
+      return buchen(state, action);
+    case 'stornierenBestellung':
+      return stornierenBestellung(state, action);
     case 'select':
       return { ...state, auswahl: action.auswahl };
     case 'toggleMehrfach':

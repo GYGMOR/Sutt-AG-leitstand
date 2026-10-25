@@ -1,10 +1,10 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  mock/generator.ts                                  │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Deterministischer Füller: drei Wochen, neun Techniker, Kategorien     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
-import { addDays, isSunday, startOfWeek, toZeitpunkt } from '../core/datum';
+import { addDays, isSunday, startOfWeek, toIsoDate, toZeitpunkt } from '../core/datum';
 import type { IsoDatum, Minuten } from '../core/datum';
 import type { Auftrag, Auftragsart, Dringlichkeit, Ersatzteil, KontaktVorOrt, Rechnungsempfaenger } from '../core/domain/auftrag';
 import type { Einsatz, EinsatzStatus } from '../core/domain/einsatz';
@@ -147,6 +147,14 @@ function geraetKeyFor(zufall: Zufall, techniker: Techniker, art: Auftragsart): K
   return zufall() < 0.7 && passend.length > 0 ? pick(zufall, passend) : pick(zufall, REPARATUR_KEYS);
 }
 
+// jh› Garantie (2 Jahre ab Kauf) ist ab Baujahr 2023 immer hinterlegt, bei älteren Geräten nur zu einem
+//     Viertel – so hat die Kartei laufende, abgelaufene und unbekannte Garantien.
+function garantieFor(zufall: Zufall, baujahr: number): { garantieBis?: IsoDatum } {
+  const hinterlegt = baujahr >= 2023 || zufall() < 0.25;
+  if (!hinterlegt) return {};
+  return { garantieBis: toIsoDate(new Date(baujahr + 2, between(zufall, 0, 11), between(zufall, 1, 28))) };
+}
+
 // ── §3 · Tagesfüllung ────────────────────────────────────────────
 
 interface GeneratorKontext {
@@ -200,8 +208,18 @@ interface Rohplan {
   art: Auftragsart;
 }
 
+interface Bekannt {
+  geraet: Geraet;
+  wohnung?: Wohnung;
+}
+
+// jh› Geräte haben ein Leben: Reparatur, Service und Garantie treffen mit 40 % ein Gerät,
+//     das an dieser Liegenschaft schon einmal Besuch hatte – so entsteht eine echte Kartei.
+const WIEDERSEHEN = 0.4;
+
 export function generateFill(kontext: GeneratorKontext): GeneratorErgebnis {
   const ergebnis: GeneratorErgebnis = { auftraege: [], geraete: [], einsaetze: [] };
+  const bekannt = new Map<string, Bekannt[]>();
   const erster = addDays(startOfWeek(kontext.heute), -7);
   let laufnummer = 4200;
 
@@ -242,24 +260,33 @@ export function generateFill(kontext: GeneratorKontext): GeneratorErgebnis {
 
         laufnummer += 1;
         const id = `GX-${datum}-${techniker.kuerzel}-${plan.slotIndex}`;
-        const key = geraetKeyFor(zufall, techniker, plan.art);
         const dringlichkeit = dringlichkeitFor(zufall);
         const vergangen = datum < kontext.heute;
         const status: EinsatzStatus = istHeute ? (statusHeute[index] ?? 'geplant') : vergangen ? (zufall() < 0.05 ? 'wartet-teil' : 'erledigt') : 'geplant';
         const neugeraet = plan.art === 'Montage' || plan.art === 'Lieferung' || plan.art === 'Mietgerät';
-        const geraet = buildGeraet(key, {
-          id: `G-${id}`,
-          seriennummer: `${between(zufall, 1000, 9999)}-${between(zufall, 1000, 9999)}`,
-          baujahr: neugeraet ? 2026 : between(zufall, 2012, 2025),
-          ...(neugeraet ? { garantieBis: addDays(datum, 730) } : {}),
-        });
+        const schonDa = bekannt.get(liegenschaft.id) ?? [];
+        const wiedersehen = !neugeraet && schonDa.length > 0 && zufall() < WIEDERSEHEN ? pick(zufall, schonDa) : null;
+        const key = wiedersehen ? (KATALOG_KEYS.find((kandidat) => KATALOG[kandidat].modell === wiedersehen.geraet.modell) ?? geraetKeyFor(zufall, techniker, plan.art)) : geraetKeyFor(zufall, techniker, plan.art);
+        const baujahr = neugeraet ? 2026 : between(zufall, 2012, 2025);
+        const geraet =
+          wiedersehen?.geraet ??
+          buildGeraet(key, {
+            id: `G-${id}`,
+            seriennummer: `${between(zufall, 1000, 9999)}-${between(zufall, 1000, 9999)}`,
+            baujahr,
+            ...(neugeraet ? { garantieBis: addDays(datum, 730) } : garantieFor(zufall, baujahr)),
+          });
+        const wohnung = wiedersehen ? wiedersehen.wohnung : kunde.art === 'verwaltung' ? wohnungFor(zufall) : undefined;
+        if (!wiedersehen) {
+          ergebnis.geraete.push(geraet);
+          bekannt.set(liegenschaft.id, [...schonDa, { geraet, ...(wohnung ? { wohnung } : {}) }]);
+        }
 
         // jh› Eingang immer vor dem Einsatz und nie in der Zukunft.
         const vorlauf = between(zufall, 1, 4);
         const angefragtTag = vergangen ? addDays(datum, -vorlauf) : addDays(kontext.heute, -Math.min(vorlauf, 3));
         const angefragtMin = between(zufall, 15, 34) * 30;
 
-        ergebnis.geraete.push(geraet);
         ergebnis.auftraege.push({
           id,
           nummer: `26-0${laufnummer}`,
@@ -272,7 +299,7 @@ export function generateFill(kontext: GeneratorKontext): GeneratorErgebnis {
           bestelltAm: toZeitpunkt(angefragtTag, angefragtMin + between(zufall, 10, 90)),
           kundeId: kunde.id,
           liegenschaftId: liegenschaft.id,
-          ...(kunde.art === 'verwaltung' ? { wohnung: wohnungFor(zufall) } : {}),
+          ...(wohnung ? { wohnung } : {}),
           kontaktVorOrt: kontaktFor(zufall, kunde),
           rechnung: rechnungFor(plan.art, liegenschaft, geraet, zufall),
           geraetId: geraet.id,

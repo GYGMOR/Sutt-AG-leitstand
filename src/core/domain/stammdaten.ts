@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/domain/stammdaten.ts                          │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Stammdaten: Kunde, Liegenschaft, Gerät, Techniker, Absenz, Region     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -31,6 +31,26 @@ const REGION_VON_ORT: Readonly<Record<Ort, Region>> = {
 };
 
 export const REGIONEN: readonly Region[] = ['glattal', 'unterland', 'zuerich-nord'];
+
+export interface OrtInfo {
+  ort: Ort;
+  plz: string;
+  /** Ortsmitte als Näherung für neu erfasste Liegenschaften (jh! nicht geokodiert). */
+  mitte: Koordinaten;
+}
+
+export const ORTE: readonly OrtInfo[] = [
+  { ort: 'Glattbrugg', plz: '8152', mitte: { lat: 47.4306, lng: 8.5667 } },
+  { ort: 'Opfikon', plz: '8152', mitte: { lat: 47.43, lng: 8.576 } },
+  { ort: 'Kloten', plz: '8302', mitte: { lat: 47.4515, lng: 8.585 } },
+  { ort: 'Wallisellen', plz: '8304', mitte: { lat: 47.414, lng: 8.593 } },
+  { ort: 'Dübendorf', plz: '8600', mitte: { lat: 47.397, lng: 8.618 } },
+  { ort: 'Zürich-Seebach', plz: '8052', mitte: { lat: 47.422, lng: 8.538 } },
+];
+
+export function ortInfo(ort: Ort): OrtInfo {
+  return ORTE.find((info) => info.ort === ort) ?? { ort, plz: '', mitte: { lat: 47.4306, lng: 8.5667 } };
+}
 
 export const REGION_LABEL: Readonly<Record<Region, string>> = {
   glattal: 'Glattal',
@@ -72,6 +92,17 @@ export const KUNDENART_LABEL: Readonly<Record<Kundenart, string>> = {
 };
 
 export type HinweisArt = 'rechnung-offen' | 'stammkunde' | 'schluessel-verwaltung' | 'hund' | 'vorsicht' | 'parkplatz';
+
+export const HINWEIS_ARTEN: readonly HinweisArt[] = ['stammkunde', 'schluessel-verwaltung', 'hund', 'vorsicht', 'parkplatz', 'rechnung-offen'];
+
+export const HINWEIS_LABEL: Readonly<Record<HinweisArt, string>> = {
+  'rechnung-offen': 'Rechnung offen',
+  stammkunde: 'Stammkunde',
+  'schluessel-verwaltung': 'Schlüssel bei Verwaltung',
+  hund: 'Hund im Haus',
+  vorsicht: 'Vorsicht',
+  parkplatz: 'Parkieren',
+};
 
 // jh› Kleine Hinweise, die der Techniker vor Ort braucht – als Chips, nie als Fliesstext.
 export interface KundenHinweis {
@@ -139,6 +170,8 @@ export type Geraeteart =
   | 'Kochfeld'
   | 'Kühlschrank'
   | 'Gefrierschrank';
+
+export const GERAETEARTEN: readonly Geraeteart[] = ['Waschmaschine', 'Wärmepumpentrockner', 'Geschirrspüler', 'Backofen', 'Steamer', 'Kochfeld', 'Kühlschrank', 'Gefrierschrank'];
 
 export interface GeraetEreignis {
   datum: IsoDatum;

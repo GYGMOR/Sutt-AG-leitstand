@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/dispoStore.ts                  │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Dispo-Store (Singleton je Fenster), Persistenz, Ansichts-Einstellung  │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -9,7 +9,7 @@ import { createStore, readPersisted, useStore, writePersisted } from '../../../c
 import type { Store } from '../../../core/store';
 import type { DispoBestand, DispoStammdaten, FarbeNach, PanelTab, Zoom } from '../dispo.types';
 import { isZoom } from '../zeitraster';
-import { createDispoState, dispoReducer, schnappschuss } from './dispo.reducer';
+import { createDispoState, dispoReducer, gleicherSchnappschuss, schnappschuss } from './dispo.reducer';
 import type { DispoAction, DispoState, Schnappschuss } from './dispo.reducer';
 import { beobachteFremdeFenster, ladeStand, loescheStand, schnappschussAus, schreibeStand, serialisiere, standAus } from './persistenz';
 
@@ -23,10 +23,6 @@ let zuletztGeschrieben: string | null = null;
 let zuletztStand: Schnappschuss | null = null;
 
 const SCHREIB_VERZOEGERUNG_MS = 300;
-
-function gleicherStand(a: Schnappschuss, b: Schnappschuss): boolean {
-  return a.einsaetze === b.einsaetze && a.pendenzen === b.pendenzen && a.rapporte === b.rapporte && a.nachrichten === b.nachrichten && a.auftraege === b.auftraege && a.geraete === b.geraete;
-}
 
 // jh› Die Modulwurzel hängt den Bestand ein (Mock heute, API morgen); der Store
 //     selbst kennt keine Mockdaten. Ein gespeicherter Stand von heute hat Vorrang.
@@ -53,7 +49,7 @@ export function initDispoStore(stammdaten: DispoStammdaten, bestand: DispoBestan
     timer = window.setTimeout(() => {
       timer = null;
       const aktuell = schnappschuss(neu.getState());
-      if (zuletztStand && gleicherStand(zuletztStand, aktuell)) return;
+      if (zuletztStand && gleicherSchnappschuss(zuletztStand, aktuell)) return;
       const stand = standAus(neu.getState(), heute);
       const roh = serialisiere(stand);
       if (roh !== zuletztGeschrieben && !schreibeStand(stand, roh)) return;

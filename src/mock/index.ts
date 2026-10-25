@@ -1,12 +1,13 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  mock/index.ts                                      │
-   │  ◆ JH · 2026.10 · rev 03                                               │
-   │  Mock-Bestand zusammenstellen, veredeln (Verlauf, Rapport) und prüfen  │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Mock-Bestand zusammenstellen, veredeln (Verlauf, Rapport, Lager)      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { addDays } from '../core/datum';
 import type { Auftrag, RechnungStatus } from '../core/domain/auftrag';
 import type { Einsatz, Pendenz } from '../core/domain/einsatz';
+import type { Artikel, Bestellung, Lagerbestand, Lagerbewegung } from '../core/domain/lager';
 import type { Nachricht } from '../core/domain/nachricht';
 import type { Rapport } from '../core/domain/rapport';
 import type { Absenz, Geraet, GeraetEreignis, Kunde, Liegenschaft, Techniker } from '../core/domain/stammdaten';
@@ -16,6 +17,7 @@ import { HAND_EINSAETZE, HAND_PENDENZEN, HAND_TECHNIKER_HEUTE } from './einsaetz
 import { between, generateFill, mulberry32, pick, seedFrom } from './generator';
 import { MOCK_HEUTE, MOCK_REFERENZ_MIN } from './heute';
 import { KUNDEN, LIEGENSCHAFTEN } from './kunden';
+import { buildLager } from './lager';
 import { buildRapporte } from './rapporte';
 import { TECHNIKER } from './techniker';
 
@@ -27,6 +29,7 @@ export interface Stammdaten {
   kunden: ReadonlyMap<string, Kunde>;
   liegenschaften: ReadonlyMap<string, Liegenschaft>;
   geraete: ReadonlyMap<string, Geraet>;
+  artikel: ReadonlyMap<string, Artikel>;
   absenzen: readonly Absenz[];
 }
 
@@ -35,6 +38,9 @@ export interface Bestand {
   pendenzen: readonly Pendenz[];
   rapporte: readonly Rapport[];
   nachrichten: readonly Nachricht[];
+  bestaende: readonly Lagerbestand[];
+  bestellungen: readonly Bestellung[];
+  bewegungen: readonly Lagerbewegung[];
 }
 
 /** Telefonbuch für die Schnellerfassung: normalisierte Nummer → wer ruft an. */
@@ -128,7 +134,13 @@ const geraete: readonly Geraet[] = rohGeraete.map((geraet) => ({
   historie: historieFor(geraet, TECHNIKER),
 }));
 
-// ── §4 · Export ──────────────────────────────────────────────────
+// ── §4 · Lager ───────────────────────────────────────────────────
+
+// jh› Lager aus den fertigen Aufträgen: Bestellungen für bestellte Teile, Verbrauch aus
+//     erledigten Einsätzen – Lagerzahlen passen damit zur Plantafel (ADR-004).
+const lager = buildLager({ heute: MOCK_HEUTE, techniker: TECHNIKER, auftraege, einsaetze: alleEinsaetze });
+
+// ── §5 · Export ──────────────────────────────────────────────────
 
 export const mockStammdaten: Stammdaten = {
   techniker: TECHNIKER,
@@ -136,6 +148,7 @@ export const mockStammdaten: Stammdaten = {
   kunden,
   liegenschaften: byId(LIEGENSCHAFTEN),
   geraete: byId(geraete),
+  artikel: new Map(lager.artikel.map((artikel) => [artikel.artikelNummer, artikel])),
   absenzen: ABSENZEN,
 };
 
@@ -144,6 +157,9 @@ export const mockBestand: Bestand = {
   pendenzen: HAND_PENDENZEN,
   rapporte,
   nachrichten: [],
+  bestaende: lager.bestaende,
+  bestellungen: lager.bestellungen,
+  bewegungen: lager.bewegungen,
 };
 
 export { MOCK_HEUTE };
@@ -178,7 +194,7 @@ export const mockTelefonbuch: readonly TelefonEintrag[] = (() => {
   return [...eintraege.values()];
 })();
 
-// ── §5 · Konsistenz ──────────────────────────────────────────────
+// ── §6 · Konsistenz ──────────────────────────────────────────────
 
 // jh! Fehlende Referenzen im Mock sind Programmierfehler – lieber laut beim
 //     Start als still mit leeren Feldern in der Akte.
@@ -204,6 +220,16 @@ function assertConsistent(stammdaten: Stammdaten, bestand: Bestand): void {
   }
   for (const absenz of stammdaten.absenzen) {
     if (!technikerIds.has(absenz.technikerId)) fehler.push(`${absenz.id}: Techniker ${absenz.technikerId}`);
+  }
+  for (const bestellung of bestand.bestellungen) {
+    if (!stammdaten.artikel.has(bestellung.artikelNummer)) fehler.push(`${bestellung.id}: Artikel ${bestellung.artikelNummer}`);
+    if (bestellung.auftragId && !stammdaten.auftraege.has(bestellung.auftragId)) fehler.push(`${bestellung.id}: Auftrag ${bestellung.auftragId}`);
+  }
+  for (const eintrag of bestand.bestaende) {
+    if (!stammdaten.artikel.has(eintrag.artikelNummer)) fehler.push(`Bestand ${eintrag.ort}: Artikel ${eintrag.artikelNummer}`);
+  }
+  for (const bewegung of bestand.bewegungen) {
+    if (!stammdaten.artikel.has(bewegung.artikelNummer)) fehler.push(`${bewegung.id}: Artikel ${bewegung.artikelNummer}`);
   }
   if (fehler.length > 0) throw new Error(`Mock inkonsistent:\n${fehler.join('\n')}`);
 }
