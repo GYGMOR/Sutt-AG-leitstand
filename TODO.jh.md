@@ -15,6 +15,8 @@ Erledigt → `- [x]` setzen und die Marke im Code entfernen. `npm run jh:check` 
 - [ ] **jh# 013** · `modules/app/AppLayout.tsx` – Offline ist nur ein Hinweis; echte Warteschlange (Service Worker, Wiederholung) für Statusmeldungen und Rapporte.
 - [ ] **jh# 014** · `modules/rapport/rapport.model.ts` – Typenschild-Vorschlag ist Mock-OCR (deterministisch pro Gerät); echte Erkennung über Kamera-API oder Modul Geräte.
 - [ ] **jh# 015** · `modules/dispo/store/persistenz.ts` – «Letzter Schreiber gewinnt» zwischen Fenstern; mit echter API Versionsnummer/ETag gegen verlorene Änderungen (ADR-001).
+- [ ] **jh# 016** · `modules/kunden/LiegenschaftDialog.tsx` – Neue Liegenschaften bekommen die Ortsmitte als Koordinaten; Geokodierung der Adresse folgt mit der API (Karte, Fahrzeit, Smart-Slot).
+- [ ] **jh# 017** · `modules/app/LagerSeite.tsx` – Fahrzeuglager in der Techniker-App nur lesend; «Auffüllen anfordern» und «Verbrauch melden» ausserhalb des Rapports fehlen.
 
 ## Erledigt
 

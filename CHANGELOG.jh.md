@@ -2,6 +2,32 @@
 
 Format: ein Abschnitt pro Revision, Bereiche wie im Commit-Stil (`dispo(kalender): … ◆`).
 
+## rev 04 · 2026.10 · v0.4.0 – Betrieb: Dashboard, Aufträge, Kunden, Geräte, Bilder, Lager
+
+### Neu
+- **Dashboard** `/dashboard` (Startseite für Büro und Administration): Kennzahlen als Sprungmarken – Einsätze heute, Eingang mit dringend, Konflikte, Rapporte zu prüfen und fehlend, zu verrechnen in CHF, Lieferungen überfällig/heute, Abwesende; «Im Feld jetzt» je Techniker mit Live-Puls und nächstem Einsatz, Kapazitätsband, Eingang (dringend zuerst), fällige Rapporte, Lieferungen, Abwesenheiten. Jede Zahl kommt aus dem Selektor des Moduls, das sie zeigt.
+- **Aufträge** `/auftraege`: abgeleitete **Phase** (Im Eingang · Disponiert · In Arbeit · Wartet auf Teil · Rapport prüfen · Zu verrechnen · Rechnung offen · Bezahlt · Ohne Termin) als Kacheln, Filter nach Kategorie, Techniker, Region, Suche (`?suche=` aus anderen Modulen), sortierbare Tabelle, Dossier mit Einsätzen («Im Plan»), Pendenz («Planen»), Servicerapport (Freigeben · Zurück · Verrechnen), Parteien und Rechnung mit Betrag (Arbeit · Anfahrt · Teile), Gerät, Fotos, Ersatzteilen und Bestellungen («Teil bestellen»), Verlauf, Nachrichten; Bearbeiten, Kopieren, Löschen, «In den Eingang», Neuer Auftrag (Schnellerfassung).
+- **Kunden & Liegenschaften** `/kunden` (Innendienst): Kacheln Alle · Verwaltungen · Private · Gewerbe · Rechnung offen, Suche über Liegenschaften und Hauswarte, Dossier mit Kontakt, Liegenschaftskarten (Hauswart, Zugang, Hinweise, Geräte je Wohnung, Aufträge), Aufträgen, offenen Rechnungen, Nachrichten; Kunde bearbeiten, Liegenschaft anlegen/bearbeiten, Hinweise pflegen, neuer Auftrag mit Vorbelegung.
+- **Geräte** `/geraete`: Kartei mit Kacheln Alle · Garantie läuft · abgelaufen · Typenschild fehlt, Filter Marke/Art, Dossier mit Typenschild, Standort (Liegenschaft, Wohnung, Kunde), Einsätzen, Ersatzteil-Historie (Auftrag + Rapport), Fotos, Ereignissen; Typenschild-Vorschlag übernehmen, Gerät bearbeiten, neuer Auftrag für dieses Gerät.
+- **Bilder** `/bilder`: alle Fotos aus Feld und Akte nach Tag, Kacheln Heute · Woche · Garantiefälle · Typenschilder, Filter Motiv/Techniker/Marke/Kategorie/Zeitraum, Lightbox mit Pfeiltasten und Verweisen auf Auftrag, Kunde, Gerät, Rapport.
+- **Lager & Ersatzteile** `/lager` (Innendienst, ADR-004): Artikel aus dem Katalog mit Bestand Glattbrugg, Fahrzeugen, Mindestbestand und Stufe (am Lager · knapp · nicht am Lager), Bestellungen mit Liefertermin (offen · überfällig · heute · eingetroffen), **Wareneingang** (bucht ein, setzt das Teil am Auftrag auf «geliefert», zieht den Folgetermin auf heute), Stornieren, Umbuchen Glattbrugg ↔ Fahrzeug, Bestand korrigieren, Artikel bearbeiten, Fahrzeuglager je Techniker, Journal aller Bewegungen. Rapport-Abschluss bucht Verbrauch (ab Fahrzeug, eingebaut) und legt Bestellungen an.
+- **Techniker-App**: Tab «Fahrzeug» mit Bestand an Bord, knappen Teilen und Lieferungen für die eigenen Aufträge; Rapport bietet Teile «im Fahrzeug» mit einem Tipp als «ab Fahrzeug» an.
+- **Verweise**: Jede Nummer ist ein Sprung – Auftrag, Kunde, Gerät, Rapport, Artikel, Bestellung – aus Akte, Dossiers, Dashboard und Lightbox; Kommandopalette findet Aufträge, Kunden und Geräte von jeder Seite.
+- **Verrechnung**: Rapportbetrag aus Arbeitszeit × Stundensatz, Anfahrtspauschale und eingebauten Teilen (5-Rappen-Rundung) – im Auftrag, bei Rechnungen und auf dem Dashboard (jh? Sätze).
+- **Bausteine** in `core/ui`: `ModulSeite` (Liste + Dossier, schmal umschaltend), `Kacheln`, `Tabelle` (sortierbar, Tastatur, Container-Query), `Suchfeld`, `Leer`, `Verweis`, `FotoLightbox`; `ModulRoute` prüft die Rolle je Route.
+- **Skills** für die Weiterarbeit: `.claude/skills/sutt-modul` (Modul anlegen) und `sutt-pruefung` (Abnahme).
+- **Tests**: 114 vitest-Tests, neu für Lager-Domäne, Verrechnung, Reducer (Stammdaten, Lager), Modelle Aufträge, Kunden, Geräte, Bilder, Lager, Dashboard.
+
+### Geändert
+- Stand-Format **v2** (ADR-003): Kunden, Liegenschaften, Artikel, Bestände, Bestellungen, Bewegungen im Schnappschuss – Undo und Fenster-Spiegelung gelten auch für sie; ältere Stände werden verworfen.
+- Mock: Lager aus dem Katalog (40 Artikel, Bestände, Bestellungen aus allen bestellten Teilen, Journal), Geräte werden an derselben Liegenschaft wiedergesehen (40 %), Ortsliste mit PLZ und Ortsmitte.
+- Login-Weiche: Büro und Administration starten im Dashboard, Disposition in der Plantafel, Aussendienst in der App; `/` → `/dashboard`.
+- Akte: Auftrag, Kunde und Gerät als Verweise; `KundenChips` auch ohne Liegenschaft; Schnellerfassung mit Vorbelegung aus Dossiers.
+- `AkteFotos` nutzt die geteilte `FotoLightbox`.
+
+### Offen
+- `jh# 016` Geokodierung neuer Liegenschaften · `jh# 017` Fahrzeuglager in der App nur lesend · Fragen 18–24 in README §9.
+
 ## rev 03 · 2026.10 · v0.3.0 – Aussendienst: Techniker-App und Servicerapport
 
 ### Neu

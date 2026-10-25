@@ -3,7 +3,7 @@
 Branchensoftware der **Sutt AG** (Haushalt-Apparate, Industriestrasse 24, 8152 Glattbrugg/Opfikon) –
 Service, Reparatur und Verkauf von Haushalts-Grossgeräten.
 
-**Stand:** rev 03 · v0.3.0 · Aussendienst (Techniker-App, Servicerapport) auf Disposition v2 · klickbares Mockup mit Testdaten, ohne Backend.
+**Stand:** rev 04 · v0.4.0 · Betrieb (Dashboard, Aufträge, Kunden, Geräte, Bilder, Lager) auf Aussendienst v0.3 und Disposition v2 · klickbares Mockup mit Testdaten, ohne Backend.
 Diese Datei ist der Bauplan: **jedes folgende Modul** (Kunden, Geräte, Lager, Mietgeräte, Zeit …)
 wird exakt nach diesen Regeln aufgebaut. Änderungen je Revision stehen in `CHANGELOG.jh.md`.
 
@@ -31,6 +31,10 @@ komprimiert auf rund 8 MB (VP9). Browser und ffmpeg kommen aus einer vorhandenen
 Telefonrahmen. Statusknöpfe, Rapporte und Freigaben erscheinen sofort drüben: der Stand liegt in `localStorage` und
 spiegelt sich über das `storage`-Ereignis (ADR-001). «Demo zurücksetzen» im Benutzermenü stellt den Ausgangsbestand her.
 Aussendienst-Konten (`mb`, `sk`) landen nach dem Login direkt in der App; Büro-Konten können dort jeden Techniker ansehen.
+
+**Start je Rolle (rev 04):** `rw` (Büro) und `admin` starten im Dashboard, `jh` (Disposition) in der Plantafel, `mb`/`sk` in der
+App. Kunden und Lager sind Innendienst-Module: Aussendienst sieht dort die Folgt-Seite mit Rollenhinweis.
+Eigene Skills für die Weiterarbeit liegen in `.claude/skills/` (`sutt-modul`, `sutt-pruefung`).
 
 Node ≥ 20.19 (Vite 7); `jh:contrast` braucht Node ≥ 23 (nativer TypeScript-Lauf).
 Optional `.env` nach `.env.example`: mit `VITE_GOOGLE_MAPS_API_KEY` erscheint Google Maps, ohne Schlüssel
@@ -75,12 +79,14 @@ src/
 │  ├─ modules.config.ts         einzige Quelle für Leiste, Palette, Routing, Rollen, Freischaltung
 │  ├─ aenderungen.ts            Zähler ungespeicherter Änderungen (Abmelden-Rückfrage)
 │  ├─ auth/                     Typen, authStore (Mock), RequireAuth, LoginPage, AbgemeldetPage
-│  ├─ domain/                   Stammdaten, Auftrag, Einsatz/Pendenz (Statusverlauf), Rapport, Nachricht, Kategorie
+│  ├─ domain/                   Stammdaten (Orte, Hinweise), Auftrag, Einsatz/Pendenz, Rapport, Nachricht, Kategorie,
+│  │                            Lager (Orte, Artikel, Bestand, Bestellung, Bewegung), Verrechnung (Betrag)
 │  ├─ hooks/                    useNow · useHotkey · useDismiss · useElementSize · useHoverIntent · useMediaQuery · useQrSvg
 │  ├─ layout/                   AppShell · Topbar · Sidebar · MiniKalender · DateNav · BenutzerMenu ·
-│  │                            KommandoPalette · ShortcutHilfe · FolgtPage
-│  └─ ui/                       Button · Chip · Avatar · Typenschild · DetailZeile · Popover · Dialog ·
-│                               Hovercard · Form · SegmentedControl · CapsLabel · Kbd · FotoKachel · farben · cx
+│  │                            KommandoPalette · ShortcutHilfe · FolgtPage · ModulRoute (Rolle je Route)
+│  └─ ui/                       Button · Chip · Avatar · Typenschild · DetailZeile · Popover · Dialog · Hovercard · Form ·
+│                               SegmentedControl · CapsLabel · Kbd · FotoKachel · FotoLightbox · ModulSeite (Liste + Dossier) ·
+│                               Kacheln · Tabelle · Suchfeld · Leer · Verweis · farben · cx
 ├─ modules/dispo/               ← ein Ordner pro Modul
 │  ├─ DispoPage.tsx             Modulwurzel: hängt Mock ein, Befehle, Hotkeys, Komposition
 │  ├─ DispoToolbar.tsx          Ansicht, Zeitraum, Zoom, Farbe nach, Filter, Undo/Redo, Neu
@@ -101,16 +107,26 @@ src/
 ├─ modules/rapport/             Servicerapport, geteilt von App und Büro: RapportFormular · UnterschriftFeld · NachrichtDialog ·
 │                               ZurueckDialog · RapportDruck (A4, QR) · rapport.model · rapportStatus
 ├─ modules/rapporte/            Büro-Modul «Servicerapporte»: RapportePage (Kacheln als Filter, Liste, Prüfung, Freigabe)
-├─ mock/                        Testdaten – nur von Modulwurzeln und App.tsx importiert (rapporte.ts: Statusverläufe, Rapporte)
+├─ modules/dashboard/           Tagesüberblick (rev 04): DashboardPage · dashboard.model (Tagesbild aus den Modul-Selektoren)
+├─ modules/auftraege/           Aufträge: AuftraegePage · AuftragDossier · auftraege.model (Phase, Sichten, Suche)
+├─ modules/kunden/              Kunden & Liegenschaften: KundenPage · KundeDossier · KundeDialog · LiegenschaftDialog ·
+│                               HinweisFelder · kunden.model
+├─ modules/geraete/             Gerätekartei: GeraetePage · GeraetDossier · GeraetDialog · geraete.model
+├─ modules/bilder/              Bilder: BilderPage · bilder.model (Fotos mit Kontext, Filter, Tage)
+├─ modules/lager/               Lager & Ersatzteile: LagerPage · ArtikelDossier · BestellungDossier · BestellDialog ·
+│                               LagerDialoge (Umbuchen, Korrektur, Artikel) · lager.model
+├─ modules/suche/               globaleSuche – Suchquellen Aufträge/Kunden/Geräte für die Palette auf jeder Seite
+├─ mock/                        Testdaten – nur von Modulwurzeln und App.tsx importiert (rapporte.ts, lager.ts: Verläufe, Rapporte, Lager)
 └─ test/testdaten.ts            Testhelfer auf dem echten Mock (deterministisch, relativ zu heute)
 scripts/jh-sign.mjs · scripts/contrast.jh.ts · scripts/demo.jh.mjs
-docs/adr · docs/design · docs/tests · docs/prompts
+docs/adr (001–004) · docs/design · docs/tests · docs/prompts · .claude/skills (sutt-modul, sutt-pruefung)
 TODO.jh.md · CHANGELOG.jh.md
 ```
 
 **Abhängigkeitsrichtung:** `modules/*` → `core/*`. `core` kennt keine Module und keine Mockdaten
-(Mock-Auth bekommt sein Benutzerverzeichnis in `main.tsx` injiziert). `modules/app` und `modules/rapporte` sind
-weitere Sichten auf den Dispo-Store (ADR-002); `modules/rapport` ist der geteilte Rapport-Baustein ohne eigenen Store.
+(Mock-Auth bekommt sein Benutzerverzeichnis in `main.tsx` injiziert). Alle Module sind Sichten auf **einen** Stand
+(ADR-003): Dashboard, Aufträge, Kunden, Geräte, Bilder, Lager, App und Rapporte lesen und schreiben denselben Store;
+`modules/rapport` ist der geteilte Rapport-Baustein ohne eigenen Store.
 
 **Muster pro Modul:** `*.types.ts` → `store/*.reducer.ts` (rein) → `store/*.selectors.ts` (rein) →
 `store/use*Aktionen.ts` (Protokolltext, IDs, Zeitstempel) → Komponenten (dumm, explizite Props).
@@ -299,12 +315,37 @@ Seitenleiste zeigt `v0.2.0 · ◆ JH`; der Tooltip trägt Build-Datum und Commit
 - **Persistenz & Demo**: Stand in `localStorage`, zwischen Fenstern gespiegelt; «Demo zurücksetzen» (Benutzermenü, Palette)
   lädt den Ausgangsbestand – in allen Fenstern.
 
+### Betrieb v0.4 – Dashboard, Aufträge, Kunden, Geräte, Bilder, Lager
+- **Dashboard** `/dashboard`: Kennzahlen als Sprungmarken (Einsätze heute, Eingang/dringend, Konflikte, Rapporte zu prüfen und
+  fehlend, zu verrechnen in CHF, Lieferungen, Abwesende), «Im Feld jetzt» je Techniker mit Live-Puls, Kapazitätsband, Eingang
+  dringend zuerst, fällige Rapporte, Lieferungen, Abwesenheiten. Jede Zahl stammt aus dem Selektor des Moduls, das sie zeigt.
+- **Aufträge** `/auftraege/:id?`: Phase abgeleitet aus Rechnung › Rapport › Einsätzen › Pendenz (Im Eingang · Disponiert ·
+  In Arbeit · Wartet auf Teil · Rapport prüfen · Zu verrechnen · Rechnung offen · Bezahlt · Ohne Termin); Kacheln, Filter,
+  sortierbare Tabelle, Dossier mit Einsätzen («Im Plan»), Pendenz («Planen»), Servicerapport, Parteien und Rechnung mit Betrag,
+  Gerät, Fotos, Teilen und Bestellungen, Verlauf, Nachrichten; Bearbeiten, Kopieren, Löschen, «In den Eingang», Neuer Auftrag.
+- **Kunden & Liegenschaften** `/kunden/:id?` (Innendienst): Verwaltungen, Private, Gewerbe, Rechnung offen; Liegenschaftskarten
+  mit Hauswart, Zugang, Hinweisen, Geräten je Wohnung und Aufträgen; Kunde und Liegenschaft bearbeiten, Liegenschaft anlegen,
+  Hinweise pflegen (gelten sofort in Akte und App), neuer Auftrag mit Vorbelegung.
+- **Geräte** `/geraete/:id?`: Kartei mit Garantie-Sichten und «Typenschild fehlt», Standort aus dem jüngsten Auftrag,
+  Einsätze, Ersatzteil-Historie aus Auftrag und Rapport, Fotos, Ereignisse; Vorschlag übernehmen, Gerät bearbeiten,
+  neuer Auftrag für dieses Gerät.
+- **Bilder** `/bilder`: alle Fotos nach Tag, Kacheln Heute · Woche · Garantiefälle · Typenschilder, Filter nach Motiv,
+  Techniker, Marke, Kategorie, Zeitraum; Lightbox (Pfeiltasten) mit Verweisen auf Auftrag, Kunde, Gerät, Rapport.
+- **Lager & Ersatzteile** `/lager/:bereich?` (Innendienst, ADR-004): Artikel (Bestand Glattbrugg, Fahrzeuge, Mindestbestand,
+  Stufe), Bestellungen (offen, überfällig, heute, eingetroffen) mit **Wareneingang** – bucht ein, setzt das Teil am Auftrag auf
+  «geliefert», zieht den Folgetermin auf heute –, Stornieren, Umbuchen Glattbrugg ↔ Fahrzeug, Bestand korrigieren, Artikel
+  bearbeiten, Fahrzeuglager je Techniker, Journal. Der Rapport-Abschluss bucht Verbrauch und legt Bestellungen an.
+- **Querverweise**: Jede Nummer (Auftrag, Kunde, Gerät, Rapport, Artikel, Bestellung) ist ein Sprung ins Modul; `Strg+K`
+  findet Aufträge, Kunden und Geräte auf jeder Seite. Techniker-App: Tab «Fahrzeug» und Teile «im Fahrzeug» im Rapport.
+
 ### Mockdaten
 Alles hängt am echten Datum (`MOCK_HEUTE`). Heute (6 Techniker) und der Eingang sind handverlesen, die
 übrigen Tage und Techniker füllt ein deterministischer Generator (Saat = Datum + Techniker); Absenzen liegen
 relativ zu heute. Koordinaten sind Näherungen auf Strassenniveau, Fahrzeit = Luftlinie × 1.35 bei 28 km/h + 4 min.
 Erledigte Einsätze tragen Statusverläufe (Abfahrt, Ankunft, Fertig) und Rapporte aus der Saat; fehlende Rapporte gibt es
-nur aus den letzten drei Tagen. Alle Firmen, Personen, Nummern und E-Mails (`.example`) sind **erfunden**.
+nur aus den letzten drei Tagen. Geräte werden an derselben Liegenschaft zu 40 % wiedergesehen (Kartei mit Geschichte); das
+Lager entsteht aus dem Gerätekatalog (40 Artikel) mit Beständen, Bestellungen aus allen bestellten Teilen und einem Journal
+aus den erledigten Einsätzen. Alle Firmen, Personen, Nummern und E-Mails (`.example`) sind **erfunden**.
 
 ---
 
@@ -354,6 +395,19 @@ nur aus den letzten drei Tagen. Alle Firmen, Personen, Nummern und E-Mails (`.ex
 18. **Typenschild-Vorschlag** – Fotografiert der Techniker das Typenschild eines «noch nicht erfassten» Geräts, schlägt der
     Rapport Modell, Typ und Seriennummer vor; «Übernehmen» schreibt sie an das Gerät. *Warum:* Gerätedaten aus der
     Telefon-Schnellerfassung würden sonst nie nachgetragen (`jh# 010`, `jh# 014`).
+19. **Phase statt Status** (rev 04) – Ein Auftrag hat kein Statusfeld, das jemand pflegen müsste: Die Phase ergibt sich aus
+    Rechnung, Rapport, Einsätzen und Pendenz. *Warum:* Ein gepflegter Status lügt nach zwei Wochen; ein abgeleiteter nie.
+20. **Zahl = Filter = Sprung** – Kacheln in jedem Modul sind Zähler und Filter zugleich, auf dem Dashboard Sprungmarken ins
+    Modul mit passender Sicht. *Warum:* Wer «13 fehlend» liest, will die 13 sehen – nicht erst ein Dropdown suchen.
+21. **Lager-Kopplung** – «Teil bestellen» im Rapport wird zur Bestellung, der Wareneingang setzt das Teil am Auftrag auf
+    «geliefert» und legt den Folgetermin in den Eingang; Teile ab Fahrzeug buchen vom Fahrzeuglager ab. *Warum:* Der häufigste
+    Bruch im Service («Ist das Teil da?») verschwindet – Lager, Dispo und Techniker lesen denselben Datensatz.
+22. **Ein Datensatz, viele Türen** – Auftrag, Kunde, Gerät, Rapport, Artikel, Bestellung: Jede Nummer ist ein Verweis, aus Akte,
+    Dossier, Dashboard, Lightbox und Palette. *Warum:* Der Disponent denkt in Zusammenhängen, nicht in Modulen.
+23. **Gerätekartei aus Aufträgen** – Standort, Wohnung, Einsätze, Teile und Fotos eines Geräts entstehen aus seinen Aufträgen;
+    Umzüge und Ersatz ergeben sich von selbst. *Warum:* Eine separat gepflegte Gerätedatei veraltet – die Auftragsgeschichte nicht.
+24. **Betrag auf Knopfdruck** – Arbeitszeit × Stundensatz, Anfahrtspauschale, eingebaute Teile – im Auftrag, bei offenen
+    Rechnungen und als Summe «zu verrechnen» auf dem Dashboard. *Warum:* Das Büro sieht das Geld, bevor die Buchhaltung kommt.
 
 ---
 
@@ -376,15 +430,25 @@ nur aus den letzten drei Tagen. Alle Firmen, Personen, Nummern und E-Mails (`.ex
 15. Büronummer und Absendername für SMS und Mail? – `core/domain/nachricht.ts`
 16. Fristen für «Rapport fehlt» (1 Tag) und «Unterschrift fehlt» (2 Tage) im Konflikt-Wächter? – `modules/dispo/konflikte.ts`
 17. Genügt die Unterschrift auf dem Telefon (Name, Zeit, Pfad) der Buchhaltung, oder braucht es den Mail-Beleg? – `modules/rapport/UnterschriftFeld.tsx`
+18. Stundensatz, Anfahrtspauschale und Rundung (heute CHF 128 / CHF 48, 5 Rappen)? – `core/domain/verrechnung.ts`
+19. Mindestbestände je Artikel und wer sie pflegt? – `core/domain/lager.ts`
+20. Nummernkreis der Bestellungen (`B-26-00123`), Lieferanten je Marke? – `core/domain/lager.ts`
+21. Wird das Fahrzeuglager gezählt oder geschätzt; bucht der Techniker Verbrauch selbst? – `modules/app/LagerSeite.tsx`
+22. Wer bucht den Wareneingang – Büro oder Lager, mit Lieferschein-Scan? – `modules/lager/BestellungDossier.tsx`
+23. Kundenarten vollständig (Verwaltung, Privat, Gewerbe) oder auch Eigentümergemeinschaften? – `core/domain/stammdaten.ts`
+24. Regionen-Zuordnung neuer Liegenschaften nach Ort oder Tourenplan (Ortsliste mit PLZ)? – `core/domain/stammdaten.ts`
 
 ---
 
-## 10 · Bewusst nicht in v0.3
+## 10 · Bewusst nicht in v0.4
 
 Kein Backend, keine Auth-Prüfung, keine echten Daten. Persistenz nur als `localStorage`-Stand desselben Tages (Reload hält
 ihn, «Demo zurücksetzen» verwirft ihn, ein neuer Tag beginnt frisch). Kein echter SMS/Mail-Versand (Vorschau + Protokoll),
 kein echtes OCR (`jh# 014`), Kamerafotos nur im Fenster (`jh# 012`), keine Offline-Warteschlange (`jh# 013`),
-kein Routing-Dienst (Fahrzeit ist Luftlinie × Faktor), OSM-Kacheln nur fürs Mockup (`jh# 007`).
+kein Routing-Dienst (Fahrzeit ist Luftlinie × Faktor), OSM-Kacheln nur fürs Mockup (`jh# 007`), keine Geokodierung neuer
+Liegenschaften (`jh# 016`), Fahrzeuglager in der App nur lesend (`jh# 017`), keine Rechnungsstellung/Mahnwesen (Buchhaltung
+v0.7), Techniker und Absenzen noch feste Stammdaten (Personal v0.5), keine Lieferanten-Anbindung (Bestellung ist ein Datensatz,
+kein Versand).
 
 ---
 
@@ -399,7 +463,8 @@ Die grosse Karte zeigt auf den Bildern die Schemakarte: der eingebettete Prüf-B
 MapLibre meldet kein `load`, nach 10 s greift der Fallback. Im normalen Browser erscheinen die OSM-Kacheln – wie im
 Kartenkopf der Akte zu sehen.
 
-rev 03 (Techniker-App im Telefonrahmen, Rapport-Erfassung, Modul Servicerapporte, Akte mit Rapport-Abschnitt) ist noch
-nicht abgelichtet – die Bilder entstehen mit der zweiten Demo-Tour (`npm run demo:video`).
+rev 03 (Techniker-App im Telefonrahmen, Rapport-Erfassung, Modul Servicerapporte, Akte mit Rapport-Abschnitt) und rev 04
+(Dashboard, Aufträge, Kunden, Geräte, Bilder, Lager) sind noch nicht abgelichtet – die Bilder entstehen mit der zweiten
+Demo-Tour (`npm run demo:video`).
 
 /* ◆ jh · eof */
