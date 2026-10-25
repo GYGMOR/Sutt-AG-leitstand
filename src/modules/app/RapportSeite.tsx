@@ -1,12 +1,14 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/app/RapportSeite.tsx                       │
-   │  ◆ JH · 2026.10 · rev 03                                               │
-   │  Rapport erfassen: Entwurf, Speichern, Abschliessen, SMS, Mail         │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Rapport erfassen: Entwurf, Fahrzeugteile, Abschliessen, SMS, Mail     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useMemo, useState } from 'react';
 import { ArrowLeft, Check, MessageSquareText, Save } from 'lucide-react';
 import { Navigate, useNavigate, useParams } from 'react-router';
+import { fahrzeugOrt } from '../../core/domain/lager';
+import type { Artikel } from '../../core/domain/lager';
 import type { NachrichtArt } from '../../core/domain/nachricht';
 import { ABSCHLUSS_LABEL, istSchreibgeschuetzt } from '../../core/domain/rapport';
 import { Button } from '../../core/ui/Button';
@@ -15,6 +17,7 @@ import type { RapportEntwurf } from '../dispo/store/useDispoAktionen';
 import { NachrichtDialog } from '../rapport/NachrichtDialog';
 import { entwurfAus, neuerRapportEntwurf } from '../rapport/rapport.model';
 import { RapportFormular } from '../rapport/RapportFormular';
+import type { FahrzeugTeil } from '../rapport/RapportFormular';
 import { useApp } from './AppKontext';
 import styles from './Seiten.module.css';
 
@@ -29,6 +32,19 @@ export function RapportSeite() {
   const vorhanden = einsatzId ? rapportFuerEinsatz(state.rapporte, einsatzId) : undefined;
   const kontext = useMemo(() => (einsatz && state.stammdaten.auftraege.has(einsatz.auftragId) ? resolveAuftrag(state.stammdaten, einsatz.auftragId) : null), [einsatz, state.stammdaten]);
   const techniker = einsatz ? technikerOf(state.stammdaten, einsatz.technikerId) : null;
+
+  // jh› Was im Fahrzeug liegt, steht im Rapport zum Antippen bereit – Marke des Geräts zuerst.
+  const fahrzeugTeile = useMemo<FahrzeugTeil[]>(() => {
+    if (!einsatz) return [];
+    const ort = fahrzeugOrt(einsatz.technikerId);
+    const marke = kontext?.geraet.marke;
+    return state.bestaende
+      .filter((bestand) => bestand.ort === ort && bestand.menge > 0)
+      .map((bestand) => ({ artikel: state.stammdaten.artikel.get(bestand.artikelNummer), menge: bestand.menge }))
+      .filter((eintrag): eintrag is { artikel: Artikel; menge: number } => eintrag.artikel !== undefined)
+      .sort((a, b) => Number(b.artikel.marke === marke) - Number(a.artikel.marke === marke) || a.artikel.bezeichnung.localeCompare(b.artikel.bezeichnung, 'de-CH'))
+      .map((eintrag) => ({ artikelNummer: eintrag.artikel.artikelNummer, bezeichnung: eintrag.artikel.bezeichnung, menge: eintrag.menge }));
+  }, [einsatz, kontext, state.bestaende, state.stammdaten.artikel]);
 
   const [entwurf, setEntwurf] = useState<RapportEntwurf | null>(() => {
     if (!einsatz || !kontext || !techniker) return null;
@@ -74,6 +90,7 @@ export function RapportSeite() {
         rueckmeldung={vorhanden?.rueckmeldung}
         onGeraetUebernehmen={(vorschlag) => aktionen.updateGeraet({ ...kontext.geraet, ...vorschlag }, 'Typenschild erkannt (App)')}
         onMailSenden={() => setNachricht('rapport-mail')}
+        fahrzeugTeile={fahrzeugTeile}
       />
 
       {!lesend && (

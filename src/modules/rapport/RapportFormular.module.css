@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/rapport/RapportFormular.module.css         │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Rapport-Karten: Kopf, Zeiten, Checkliste, Teile, Fotos, Abschluss     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -239,6 +239,32 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+/* jh› Teile aus dem Fahrzeug als Chips: ein Tipp statt Suchen und Tippen. */
+.fahrzeug-teile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.fahrzeug-teil {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px dashed var(--sl-line-strong);
+  border-radius: 16px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink);
+}
+
+.fahrzeug-teil:hover {
+  border-style: solid;
+  background: var(--sl-hover);
 }
 
 /* ── §5 · Fotos ──────────────────────────────────────────────── */

@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/app/Seiten.module.css                      │
-   │  ◆ JH · 2026.10 · rev 03                                               │
-   │  Seiten der App: Tagesleiste, Banner, Listen, Woche, Rapport-Fuss      │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Seiten der App: Tagesleiste, Banner, Listen, Woche, Rapport, Lager    │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 /* ── §1 · Grundraster ────────────────────────────────────────── */
@@ -300,6 +300,55 @@
 .fuss-knoepfe > * {
   min-height: 48px;
   justify-content: center;
+}
+
+/* ── §6 · Fahrzeuglager ──────────────────────────────────────── */
+
+.bord {
+  display: flex;
+  flex-direction: column;
+}
+
+.bord-zeile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-13);
+}
+
+.bord-zeile:last-child {
+  border-bottom: 0;
+}
+
+.bord-icon {
+  color: var(--sl-mute);
+}
+
+.bord-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bord-text > span:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bord-menge {
+  min-width: 28px;
+  font-size: 15px;
+  font-weight: var(--sl-fw-semibold);
+  text-align: right;
+}
+
+.bord-knapp {
+  color: var(--sl-signal-ink);
 }
 
 /* ◆ jh · eof */

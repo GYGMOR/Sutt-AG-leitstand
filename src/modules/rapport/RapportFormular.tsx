@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/rapport/RapportFormular.tsx                │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Servicerapport: Zeiten, Arbeiten, Teile, Fotos, Abschluss, Signatur   │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -87,10 +87,18 @@ export interface RapportFormularProps {
   onGeraetUebernehmen?: (vorschlag: GeraeteVorschlag) => void;
   /** «Rapport per Mail» – öffnet den Nachrichtendialog in der Seite. */
   onMailSenden?: () => void;
+  /** Teile im Fahrzeug des Technikers – ein Tipp, und das Teil steht als «ab Fahrzeug» im Rapport. */
+  fahrzeugTeile?: readonly FahrzeugTeil[];
+}
+
+export interface FahrzeugTeil {
+  artikelNummer: string;
+  bezeichnung: string;
+  menge: number;
 }
 
 export function RapportFormular(props: RapportFormularProps) {
-  const { entwurf, onChange, status, auftrag, kunde, liegenschaft, geraet, einsatz, techniker, kuerzel, lesend = false, rueckmeldung, onGeraetUebernehmen, onMailSenden } = props;
+  const { entwurf, onChange, status, auftrag, kunde, liegenschaft, geraet, einsatz, techniker, kuerzel, lesend = false, rueckmeldung, onGeraetUebernehmen, onMailSenden, fahrzeugTeile = [] } = props;
   const dateiRef = useRef<HTMLInputElement>(null);
   const [quellen, setQuellen] = useState<Record<string, string>>({});
   const [neuerSchritt, setNeuerSchritt] = useState('');
@@ -126,6 +134,9 @@ export function RapportFormular(props: RapportFormularProps) {
     setNeuesTeil({ bezeichnung: '', artikelNummer: '' });
   };
   const bestellt = entwurf.teile.filter((teil) => teil.verwendung === 'bestellen');
+  // jh› Vorschlag aus dem Fahrzeug: passend zur Marke zuerst, schon verwendete Teile ausgeblendet.
+  const abFahrzeug = fahrzeugTeile.filter((teil) => !entwurf.teile.some((vorhanden) => vorhanden.artikelNummer === teil.artikelNummer));
+  const abFahrzeugNehmen = (teil: FahrzeugTeil) => setze({ teile: [...entwurf.teile, { artikelNummer: teil.artikelNummer, bezeichnung: teil.bezeichnung, menge: 1, verwendung: 'fahrzeuglager' }] });
 
   // ·· Fotos
   const fotoHinzufuegen = (motiv: FotoMotiv, quelle?: string) => {
@@ -262,6 +273,16 @@ export function RapportFormular(props: RapportFormularProps) {
             </li>
           ))}
         </ul>
+        {!lesend && abFahrzeug.length > 0 && (
+          <div className={styles.fahrzeugTeile}>
+            <span className={styles.hinweis}>Im Fahrzeug:</span>
+            {abFahrzeug.slice(0, 6).map((teil) => (
+              <button key={teil.artikelNummer} type="button" className={styles.fahrzeugTeil} onClick={() => abFahrzeugNehmen(teil)} title={`${teil.bezeichnung} · ${teil.menge} an Bord`}>
+                <Plus size={14} strokeWidth={1.5} aria-hidden /> {teil.bezeichnung} <span className={styles.mono}>×{teil.menge}</span>
+              </button>
+            ))}
+          </div>
+        )}
         {!lesend && (
           <div className={styles.zeile}>
             <Eingabe value={neuesTeil.bezeichnung} placeholder="Teil ohne Nummer, z. B. Türgummi" onChange={(event) => setNeuesTeil({ ...neuesTeil, bezeichnung: event.target.value })} aria-label="Bezeichnung" />

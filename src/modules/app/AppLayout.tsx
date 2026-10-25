@@ -1,12 +1,12 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/app/AppLayout.tsx                          │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Handy-Layout: Telefonrahmen am Desktop, Kopf, Offline, Tableiste      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { CalendarCheck, CalendarRange, LogOut, Menu, Monitor, Moon, Sun, WifiOff } from 'lucide-react';
+import { CalendarCheck, CalendarRange, LogOut, Menu, Monitor, Moon, Package, Sun, WifiOff } from 'lucide-react';
 import { NavLink, useNavigate, useSearchParams } from 'react-router';
 import { abmelden, useBenutzer } from '../../core/auth/authStore';
 import { fullName } from '../../core/domain/stammdaten';
@@ -107,6 +107,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <NavLink to={pfad('/app/woche')} className={({ isActive }) => cx(styles.tab, isActive && styles.tabAktiv)}>
           <CalendarRange size={20} strokeWidth={1.5} aria-hidden />
           Woche
+        </NavLink>
+        <NavLink to={pfad('/app/lager')} className={({ isActive }) => cx(styles.tab, isActive && styles.tabAktiv)}>
+          <Package size={20} strokeWidth={1.5} aria-hidden />
+          Fahrzeug
         </NavLink>
       </nav>
 

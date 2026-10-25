@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/app/AppPage.tsx                            │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Modulwurzel Techniker-App: Techniker bestimmen, Routen, Kontext       │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -19,6 +19,7 @@ import type { AppKontextWert } from './AppKontext';
 import { AppLayout, KeinTechniker } from './AppLayout';
 import { EinsatzSeite } from './EinsatzSeite';
 import { HeuteSeite } from './HeuteSeite';
+import { LagerSeite } from './LagerSeite';
 import { RapportSeite } from './RapportSeite';
 import { WocheSeite } from './WocheSeite';
 
@@ -52,6 +53,7 @@ export function AppPage() {
         <Routes>
           <Route index element={<HeuteSeite />} />
           <Route path="woche" element={<WocheSeite />} />
+          <Route path="lager" element={<LagerSeite />} />
           <Route path="einsatz/:einsatzId" element={<EinsatzSeite />} />
           <Route path="rapport/:einsatzId" element={<RapportSeite />} />
           <Route path="*" element={<Navigate to={pfad('/app')} replace />} />
