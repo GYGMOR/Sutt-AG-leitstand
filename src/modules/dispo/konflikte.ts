@@ -1,13 +1,15 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/konflikte.ts                         │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Konflikt-Wächter: Überschneidung, Arbeitszeit, Teil, Fahrt, Absenz    │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Konflikt-Wächter: Überschneidung, Arbeitszeit, Teil, Fahrt, Rapport   │
    └────────────────────────────────────────────────────────────────────────┘ */
 
+import { addDays } from '../../core/datum';
 import type { IsoDatum } from '../../core/datum';
 import { isTeilOffen } from '../../core/domain/auftrag';
 import { einsatzEnde } from '../../core/domain/einsatz';
 import type { Einsatz } from '../../core/domain/einsatz';
+import type { Rapport } from '../../core/domain/rapport';
 import { ABSENZ_LABEL, isAbwesend } from '../../core/domain/stammdaten';
 import { formatDatumKurz, formatZeit } from '../../core/format';
 import { SUTT_HQ, fahrzeitMin } from '../../core/geo';
@@ -17,7 +19,14 @@ import { ARBEIT_ENDE, ARBEIT_START, overlaps } from './zeitraster';
 
 // ── §1 · Typen ───────────────────────────────────────────────────
 
-export type KonfliktArt = 'ueberschneidung' | 'ausserhalb-arbeitszeit' | 'teil-nicht-geliefert' | 'fahrzeit-knapp' | 'absenz';
+export type KonfliktArt =
+  | 'ueberschneidung'
+  | 'ausserhalb-arbeitszeit'
+  | 'teil-nicht-geliefert'
+  | 'fahrzeit-knapp'
+  | 'absenz'
+  | 'rapport-fehlt'
+  | 'unterschrift-fehlt';
 
 export const KONFLIKT_LABEL: Readonly<Record<KonfliktArt, string>> = {
   ueberschneidung: 'Überschneidung',
@@ -25,6 +34,8 @@ export const KONFLIKT_LABEL: Readonly<Record<KonfliktArt, string>> = {
   'teil-nicht-geliefert': 'Teil noch nicht geliefert',
   'fahrzeit-knapp': 'Fahrzeit zu knapp',
   absenz: 'Techniker abwesend',
+  'rapport-fehlt': 'Rapport fehlt',
+  'unterschrift-fehlt': 'Unterschrift fehlt',
 };
 
 export interface Konflikt {
@@ -36,11 +47,16 @@ export interface Konflikt {
   text: string;
 }
 
+/** Erledigt ohne Rapport wird ab dem Folgetag gemahnt, fehlende Unterschrift nach zwei Tagen. */
+const RAPPORT_FRIST_TAGE = 1;
+const UNTERSCHRIFT_FRIST_TAGE = 2;
+const RUECKBLICK_TAGE = 14;
+
 // ── §2 · Prüfung ─────────────────────────────────────────────────
 
 // jh› Nur zukünftige/laufende Einsätze – erledigte Überschneidungen von letzter
 //     Woche sind Geschichte, nicht Arbeit. Fahrzeit nur innerhalb eines Tages.
-export function findKonflikte(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[], heute: IsoDatum): Konflikt[] {
+export function findKonflikte(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[], heute: IsoDatum, rapporte: readonly Rapport[] = []): Konflikt[] {
   const konflikte: Konflikt[] = [];
   const relevante = einsaetze.filter((einsatz) => einsatz.datum >= heute && einsatz.status !== 'erledigt' && einsatz.status !== 'wartet-teil');
   const gesehen = new Set<string>();
@@ -100,7 +116,32 @@ export function findKonflikte(stammdaten: DispoStammdaten, einsaetze: readonly E
     }
   }
 
+  konflikte.push(...findRapportKonflikte(stammdaten, einsaetze, heute, rapporte));
   return konflikte.sort((a, b) => a.datum.localeCompare(b.datum) || a.einsatzId.localeCompare(b.einsatzId));
+}
+
+// jh› Rückwärts statt vorwärts: erledigt, aber kein Rapport – das Büro kann nicht verrechnen.
+//     Begrenzt auf zwei Wochen, damit alte Mockdaten den Zähler nicht fluten.
+export function findRapportKonflikte(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[], heute: IsoDatum, rapporte: readonly Rapport[]): Konflikt[] {
+  const konflikte: Konflikt[] = [];
+  const rapportFrist = addDays(heute, -RAPPORT_FRIST_TAGE);
+  const unterschriftFrist = addDays(heute, -UNTERSCHRIFT_FRIST_TAGE);
+  const rueckblick = addDays(heute, -RUECKBLICK_TAGE);
+  const proEinsatz = new Map(rapporte.map((rapport) => [rapport.einsatzId, rapport]));
+
+  for (const einsatz of einsaetze) {
+    if (einsatz.status !== 'erledigt' || einsatz.datum < rueckblick) continue;
+    if (!stammdaten.auftraege.has(einsatz.auftragId)) continue;
+    const rapport = proEinsatz.get(einsatz.id);
+    const nummer = resolveAuftrag(stammdaten, einsatz.auftragId).auftrag.nummer;
+    const basis = `${nummer} · ${formatDatumKurz(einsatz.datum)} ${formatZeit(einsatz.startMin)}`;
+    if (!rapport && einsatz.datum <= rapportFrist) {
+      konflikte.push({ id: `K-rp-${einsatz.id}`, art: 'rapport-fehlt', einsatzId: einsatz.id, technikerId: einsatz.technikerId, datum: einsatz.datum, text: `${basis}: erledigt, aber kein Rapport` });
+    } else if (rapport && rapport.status === 'erstellt' && einsatz.datum <= unterschriftFrist) {
+      konflikte.push({ id: `K-us-${einsatz.id}`, art: 'unterschrift-fehlt', einsatzId: einsatz.id, technikerId: einsatz.technikerId, datum: einsatz.datum, text: `${basis}: Rapport ${rapport.nummer} ohne Unterschrift` });
+    }
+  }
+  return konflikte;
 }
 
 /* ◆ jh · eof */

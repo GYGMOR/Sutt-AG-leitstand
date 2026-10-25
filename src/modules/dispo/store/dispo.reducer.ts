@@ -1,20 +1,26 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/dispo.reducer.ts               │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Dispo-State: planen, verschieben, bearbeiten, löschen, Undo/Redo      │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Dispo-State: planen, Status, Rapport, Nachrichten, Undo/Redo, Stand   │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import type { IsoDatum, IsoZeitpunkt, Minuten } from '../../../core/datum';
 import type { Auftrag } from '../../../core/domain/auftrag';
-import type { Einsatz, EinsatzStatus, Pendenz } from '../../../core/domain/einsatz';
+import { mitStatuswechsel } from '../../../core/domain/einsatz';
+import type { Einsatz, EinsatzStatus, Pendenz, StatusQuelle } from '../../../core/domain/einsatz';
+import type { Nachricht } from '../../../core/domain/nachricht';
+import { istSchreibgeschuetzt, statusNachAbschluss } from '../../../core/domain/rapport';
+import type { Rapport, Unterschrift } from '../../../core/domain/rapport';
 import type { Geraet } from '../../../core/domain/stammdaten';
 import type { DispoAuswahl, DispoBestand, DispoStammdaten, PlanZiel } from '../dispo.types';
 
 // ── §1 · State ───────────────────────────────────────────────────
 
-interface Schnappschuss {
+export interface Schnappschuss {
   einsaetze: readonly Einsatz[];
   pendenzen: readonly Pendenz[];
+  rapporte: readonly Rapport[];
+  nachrichten: readonly Nachricht[];
   auftraege: ReadonlyMap<string, Auftrag>;
   geraete: ReadonlyMap<string, Geraet>;
 }
@@ -36,6 +42,8 @@ export interface DispoState {
   stammdaten: DispoStammdaten;
   einsaetze: readonly Einsatz[];
   pendenzen: readonly Pendenz[];
+  rapporte: readonly Rapport[];
+  nachrichten: readonly Nachricht[];
   auswahl: DispoAuswahl;
   /** Mehrfachauswahl in der Liste (Einsatz-IDs). */
   mehrfach: readonly string[];
@@ -54,6 +62,8 @@ export function createDispoState(stammdaten: DispoStammdaten, bestand: DispoBest
     stammdaten,
     einsaetze: bestand.einsaetze,
     pendenzen: bestand.pendenzen,
+    rapporte: bestand.rapporte,
+    nachrichten: bestand.nachrichten,
     auswahl: null,
     mehrfach: [],
     protokoll: [],
@@ -78,24 +88,41 @@ export type DispoAction =
   | { kind: 'planPendenz'; pendenzId: string; einsatzId: string; ziel: PlanZiel; meta: AktionsMeta }
   | { kind: 'moveEinsatz'; einsatzId: string; ziel: PlanZiel; meta: AktionsMeta }
   | { kind: 'unplanEinsatz'; einsatzId: string; pendenzId: string; meta: AktionsMeta }
-  | { kind: 'setStatus'; einsatzId: string; status: EinsatzStatus; meta: AktionsMeta }
+  | { kind: 'setStatus'; einsatzId: string; status: EinsatzStatus; quelle: StatusQuelle; meta: AktionsMeta }
   | { kind: 'requestFolgetermin'; einsatzId: string; pendenz: Pendenz; meta: AktionsMeta }
   | { kind: 'createAuftrag'; auftrag: Auftrag; geraet?: Geraet; pendenz?: Pendenz; einsatz?: Einsatz; meta: AktionsMeta }
   | { kind: 'updateAuftrag'; auftrag: Auftrag; einsatz?: EinsatzAenderung; meta: AktionsMeta }
+  | { kind: 'updateGeraet'; geraet: Geraet; meta: AktionsMeta }
   | { kind: 'copyAuftrag'; auftrag: Auftrag; pendenz: Pendenz; meta: AktionsMeta }
   | { kind: 'deleteAuftrag'; auftragId: string; meta: AktionsMeta }
   | { kind: 'assignTechniker'; einsatzIds: readonly string[]; technikerId: string; meta: AktionsMeta }
   | { kind: 'shiftEinsaetze'; einsatzIds: readonly string[]; datum: IsoDatum; meta: AktionsMeta }
+  | { kind: 'saveRapport'; rapport: Rapport; meta: AktionsMeta }
+  | { kind: 'abschliessenRapport'; rapport: Rapport; auftrag: Auftrag; pendenz?: Pendenz; meta: AktionsMeta }
+  | { kind: 'signRapport'; rapportId: string; unterschrift: Unterschrift; meta: AktionsMeta }
+  | { kind: 'freigebenRapport'; rapportId: string; meta: AktionsMeta }
+  | { kind: 'verrechnenRapport'; rapportId: string; meta: AktionsMeta }
+  | { kind: 'zurueckAnTechniker'; rapportId: string; bemerkung: string; meta: AktionsMeta }
+  | { kind: 'sendeNachricht'; nachricht: Nachricht; meta: AktionsMeta }
   | { kind: 'select'; auswahl: DispoAuswahl }
   | { kind: 'toggleMehrfach'; einsatzId: string }
   | { kind: 'setMehrfach'; einsatzIds: readonly string[] }
   | { kind: 'undo' }
-  | { kind: 'redo' };
+  | { kind: 'redo' }
+  | { kind: 'replaceStand'; stand: Schnappschuss }
+  | { kind: 'resetDemo'; stammdaten: DispoStammdaten; bestand: DispoBestand };
 
 // ── §3 · Hilfen ──────────────────────────────────────────────────
 
-function schnappschuss(state: DispoState): Schnappschuss {
-  return { einsaetze: state.einsaetze, pendenzen: state.pendenzen, auftraege: state.stammdaten.auftraege, geraete: state.stammdaten.geraete };
+export function schnappschuss(state: DispoState): Schnappschuss {
+  return {
+    einsaetze: state.einsaetze,
+    pendenzen: state.pendenzen,
+    rapporte: state.rapporte,
+    nachrichten: state.nachrichten,
+    auftraege: state.stammdaten.auftraege,
+    geraete: state.stammdaten.geraete,
+  };
 }
 
 function anwenden(state: DispoState, schnapp: Schnappschuss): DispoState {
@@ -103,6 +130,8 @@ function anwenden(state: DispoState, schnapp: Schnappschuss): DispoState {
     ...state,
     einsaetze: schnapp.einsaetze,
     pendenzen: schnapp.pendenzen,
+    rapporte: schnapp.rapporte,
+    nachrichten: schnapp.nachrichten,
     stammdaten: { ...state.stammdaten, auftraege: schnapp.auftraege, geraete: schnapp.geraete },
   };
 }
@@ -136,7 +165,26 @@ function withMap<T>(map: ReadonlyMap<string, T>, key: string, wert: T): Readonly
   return kopie;
 }
 
-// ── §4 · Einzelne Aktionen ───────────────────────────────────────
+function ersetzeRapport(rapporte: readonly Rapport[], rapport: Rapport): Rapport[] {
+  const vorhanden = rapporte.some((kandidat) => kandidat.id === rapport.id);
+  return vorhanden ? rapporte.map((kandidat) => (kandidat.id === rapport.id ? rapport : kandidat)) : [...rapporte, rapport];
+}
+
+// jh› Der Auftrag spiegelt den Rapport (Status, Fotos), damit Listen, Chips und
+//     die Akte ohne Rapport-Zugriff weiterhin stimmen.
+function spiegleRapport(auftraege: ReadonlyMap<string, Auftrag>, rapport: Rapport, rechnungStatus?: Auftrag['rechnungStatus']): ReadonlyMap<string, Auftrag> {
+  const auftrag = auftraege.get(rapport.auftragId);
+  if (!auftrag) return auftraege;
+  return withMap(auftraege, auftrag.id, {
+    ...auftrag,
+    rapport: rapport.status,
+    rapportId: rapport.id,
+    fotos: rapport.fotos.length > 0 ? rapport.fotos : auftrag.fotos,
+    ...(rechnungStatus ? { rechnungStatus } : {}),
+  });
+}
+
+// ── §4 · Planen & Status ─────────────────────────────────────────
 
 function planPendenz(state: DispoState, action: Extract<DispoAction, { kind: 'planPendenz' }>): DispoState {
   const pendenz = state.pendenzen.find((kandidat) => kandidat.id === action.pendenzId);
@@ -188,9 +236,7 @@ function setStatus(state: DispoState, action: Extract<DispoAction, { kind: 'setS
   const einsatz = state.einsaetze.find((kandidat) => kandidat.id === action.einsatzId);
   if (!einsatz || einsatz.status === action.status) return state;
   const einsaetze = state.einsaetze.map((kandidat) =>
-    kandidat.id === action.einsatzId
-      ? { ...kandidat, status: action.status, ...(action.status === 'vor-ort' ? { statusSeit: action.meta.zeit } : {}) }
-      : kandidat,
+    kandidat.id === action.einsatzId ? mitStatuswechsel(kandidat, action.status, action.meta.zeit, action.quelle) : kandidat,
   );
   return commit(state, action.meta, { einsaetze });
 }
@@ -198,10 +244,12 @@ function setStatus(state: DispoState, action: Extract<DispoAction, { kind: 'setS
 function requestFolgetermin(state: DispoState, action: Extract<DispoAction, { kind: 'requestFolgetermin' }>): DispoState {
   const einsaetze = state.einsaetze.map((einsatz) => {
     if (einsatz.id !== action.einsatzId || einsatz.status !== 'vor-ort') return einsatz;
-    return { ...einsatz, status: 'wartet-teil' as const };
+    return mitStatuswechsel(einsatz, 'wartet-teil', action.meta.zeit, 'buero');
   });
   return commit(state, action.meta, { einsaetze, pendenzen: [...state.pendenzen, action.pendenz] }, { markiertId: action.pendenz.id });
 }
+
+// ── §5 · Aufträge ────────────────────────────────────────────────
 
 function createAuftrag(state: DispoState, action: Extract<DispoAction, { kind: 'createAuftrag' }>): DispoState {
   const auftraege = withMap(state.stammdaten.auftraege, action.auftrag.id, action.auftrag);
@@ -235,6 +283,11 @@ function updateAuftrag(state: DispoState, action: Extract<DispoAction, { kind: '
   return commit(state, action.meta, { auftraege, einsaetze }, { markiertId: aenderung?.einsatzId ?? null });
 }
 
+function updateGeraet(state: DispoState, action: Extract<DispoAction, { kind: 'updateGeraet' }>): DispoState {
+  if (!state.stammdaten.geraete.has(action.geraet.id)) return state;
+  return commit(state, action.meta, { geraete: withMap(state.stammdaten.geraete, action.geraet.id, action.geraet) });
+}
+
 function copyAuftrag(state: DispoState, action: Extract<DispoAction, { kind: 'copyAuftrag' }>): DispoState {
   const auftraege = withMap(state.stammdaten.auftraege, action.auftrag.id, action.auftrag);
   return commit(
@@ -250,8 +303,11 @@ function copyAuftrag(state: DispoState, action: Extract<DispoAction, { kind: 'co
 function deleteAuftrag(state: DispoState, action: Extract<DispoAction, { kind: 'deleteAuftrag' }>): DispoState {
   const einsaetze = state.einsaetze.filter((einsatz) => einsatz.auftragId !== action.auftragId);
   const pendenzen = state.pendenzen.filter((pendenz) => pendenz.auftragId !== action.auftragId);
-  if (einsaetze.length === state.einsaetze.length && pendenzen.length === state.pendenzen.length) return state;
-  return commit(state, action.meta, { einsaetze, pendenzen }, { auswahl: null, mehrfach: state.mehrfach.filter((id) => einsaetze.some((e) => e.id === id)) });
+  // jh› Rapporte und Nachrichten hängen am Auftrag – ohne ihn wären sie Waisen im Modul Rapporte.
+  const rapporte = state.rapporte.filter((rapport) => rapport.auftragId !== action.auftragId);
+  const nachrichten = state.nachrichten.filter((nachricht) => nachricht.auftragId !== action.auftragId);
+  if (einsaetze.length === state.einsaetze.length && pendenzen.length === state.pendenzen.length && rapporte.length === state.rapporte.length) return state;
+  return commit(state, action.meta, { einsaetze, pendenzen, rapporte, nachrichten }, { auswahl: null, mehrfach: state.mehrfach.filter((id) => einsaetze.some((e) => e.id === id)) });
 }
 
 function assignTechniker(state: DispoState, action: Extract<DispoAction, { kind: 'assignTechniker' }>): DispoState {
@@ -269,6 +325,82 @@ function shiftEinsaetze(state: DispoState, action: Extract<DispoAction, { kind: 
   );
   return commit(state, action.meta, { einsaetze });
 }
+
+// ── §6 · Rapport & Nachrichten ───────────────────────────────────
+
+// jh› Freigegeben oder verrechnet hat das Büro das letzte Wort – ein verspätetes «Speichern»
+//     aus der App (zweites Fenster) ändert daran nichts mehr.
+function istGesperrt(state: DispoState, rapportId: string): boolean {
+  const vorhanden = state.rapporte.find((kandidat) => kandidat.id === rapportId);
+  return vorhanden !== undefined && istSchreibgeschuetzt(vorhanden);
+}
+
+function saveRapport(state: DispoState, action: Extract<DispoAction, { kind: 'saveRapport' }>): DispoState {
+  if (istGesperrt(state, action.rapport.id)) return state;
+  const rapporte = ersetzeRapport(state.rapporte, action.rapport);
+  return commit(state, action.meta, { rapporte, auftraege: spiegleRapport(state.stammdaten.auftraege, action.rapport) }, { markiertId: action.rapport.einsatzId });
+}
+
+// jh› Abschluss setzt in einem Schritt: Rapport, Einsatzstatus (mit Verlauf), Auftrag
+//     (Teile, Fotos) und – bei Teil/Folgetermin/nicht angetroffen – die Pendenz im Eingang.
+function abschliessenRapport(state: DispoState, action: Extract<DispoAction, { kind: 'abschliessenRapport' }>): DispoState {
+  const { rapport } = action;
+  if (istGesperrt(state, rapport.id)) return state;
+  const zielStatus = statusNachAbschluss(rapport.abschluss);
+  const einsaetze = state.einsaetze.map((einsatz) => {
+    if (einsatz.id !== rapport.einsatzId) return einsatz;
+    return einsatz.status === zielStatus ? einsatz : mitStatuswechsel(einsatz, zielStatus, action.meta.zeit, 'app');
+  });
+  const auftraege = withMap(state.stammdaten.auftraege, action.auftrag.id, {
+    ...action.auftrag,
+    rapport: rapport.status,
+    rapportId: rapport.id,
+    fotos: rapport.fotos.length > 0 ? rapport.fotos : action.auftrag.fotos,
+  });
+  const pendenzen = action.pendenz ? [...state.pendenzen, action.pendenz] : state.pendenzen;
+  return commit(state, action.meta, { einsaetze, rapporte: ersetzeRapport(state.rapporte, rapport), auftraege, pendenzen }, { markiertId: rapport.einsatzId });
+}
+
+function signRapport(state: DispoState, action: Extract<DispoAction, { kind: 'signRapport' }>): DispoState {
+  const rapport = state.rapporte.find((kandidat) => kandidat.id === action.rapportId);
+  if (!rapport || rapport.status !== 'erstellt') return state;
+  const neu: Rapport = { ...rapport, status: 'unterschrieben', unterschrift: action.unterschrift, geaendertAm: action.meta.zeit };
+  return commit(state, action.meta, { rapporte: ersetzeRapport(state.rapporte, neu), auftraege: spiegleRapport(state.stammdaten.auftraege, neu) });
+}
+
+function freigebenRapport(state: DispoState, action: Extract<DispoAction, { kind: 'freigebenRapport' }>): DispoState {
+  const rapport = state.rapporte.find((kandidat) => kandidat.id === action.rapportId);
+  if (!rapport || (rapport.status !== 'erstellt' && rapport.status !== 'unterschrieben')) return state;
+  const neu: Rapport = { ...rapport, status: 'freigegeben', freigegebenAm: action.meta.zeit, geaendertAm: action.meta.zeit };
+  return commit(state, action.meta, { rapporte: ersetzeRapport(state.rapporte, neu), auftraege: spiegleRapport(state.stammdaten.auftraege, neu) });
+}
+
+function verrechnenRapport(state: DispoState, action: Extract<DispoAction, { kind: 'verrechnenRapport' }>): DispoState {
+  const rapport = state.rapporte.find((kandidat) => kandidat.id === action.rapportId);
+  if (!rapport || rapport.status !== 'freigegeben') return state;
+  const neu: Rapport = { ...rapport, status: 'verrechnet', verrechnetAm: action.meta.zeit, geaendertAm: action.meta.zeit };
+  return commit(state, action.meta, { rapporte: ersetzeRapport(state.rapporte, neu), auftraege: spiegleRapport(state.stammdaten.auftraege, neu, 'gestellt') });
+}
+
+// jh› Zurück an den Techniker löscht die Unterschrift: Der Mieter hat etwas anderes unterschrieben.
+function zurueckAnTechniker(state: DispoState, action: Extract<DispoAction, { kind: 'zurueckAnTechniker' }>): DispoState {
+  const rapport = state.rapporte.find((kandidat) => kandidat.id === action.rapportId);
+  if (!rapport || rapport.status === 'verrechnet' || rapport.status === 'offen') return state;
+  const { unterschrift: _entfernt, ...ohneUnterschrift } = rapport;
+  const neu: Rapport = {
+    ...ohneUnterschrift,
+    status: 'erstellt',
+    geaendertAm: action.meta.zeit,
+    rueckmeldung: { bemerkung: action.bemerkung, zeitpunkt: action.meta.zeit, von: action.meta.benutzer },
+  };
+  return commit(state, action.meta, { rapporte: ersetzeRapport(state.rapporte, neu), auftraege: spiegleRapport(state.stammdaten.auftraege, neu) });
+}
+
+function sendeNachricht(state: DispoState, action: Extract<DispoAction, { kind: 'sendeNachricht' }>): DispoState {
+  return commit(state, action.meta, { nachrichten: [...state.nachrichten, action.nachricht] });
+}
+
+// ── §7 · Undo/Redo & Stand ───────────────────────────────────────
 
 function undo(state: DispoState): DispoState {
   const [letzter, ...rest] = state.protokoll;
@@ -296,7 +428,14 @@ function redo(state: DispoState): DispoState {
   };
 }
 
-// ── §5 · Reducer ─────────────────────────────────────────────────
+// jh› Stand aus einem anderen Fenster: ohne Protokoll, denn das Undo dort gehört
+//     zu einer anderen Geschichte als unseres.
+function replaceStand(state: DispoState, action: Extract<DispoAction, { kind: 'replaceStand' }>): DispoState {
+  const basis = anwenden(state, action.stand);
+  return { ...basis, protokoll: [], zukunft: [], auswahl: auswahlExists(state.auswahl, action.stand) ? state.auswahl : null, markiertId: null };
+}
+
+// ── §8 · Reducer ─────────────────────────────────────────────────
 
 export function dispoReducer(state: DispoState, action: DispoAction): DispoState {
   switch (action.kind) {
@@ -314,6 +453,8 @@ export function dispoReducer(state: DispoState, action: DispoAction): DispoState
       return createAuftrag(state, action);
     case 'updateAuftrag':
       return updateAuftrag(state, action);
+    case 'updateGeraet':
+      return updateGeraet(state, action);
     case 'copyAuftrag':
       return copyAuftrag(state, action);
     case 'deleteAuftrag':
@@ -322,6 +463,20 @@ export function dispoReducer(state: DispoState, action: DispoAction): DispoState
       return assignTechniker(state, action);
     case 'shiftEinsaetze':
       return shiftEinsaetze(state, action);
+    case 'saveRapport':
+      return saveRapport(state, action);
+    case 'abschliessenRapport':
+      return abschliessenRapport(state, action);
+    case 'signRapport':
+      return signRapport(state, action);
+    case 'freigebenRapport':
+      return freigebenRapport(state, action);
+    case 'verrechnenRapport':
+      return verrechnenRapport(state, action);
+    case 'zurueckAnTechniker':
+      return zurueckAnTechniker(state, action);
+    case 'sendeNachricht':
+      return sendeNachricht(state, action);
     case 'select':
       return { ...state, auswahl: action.auswahl };
     case 'toggleMehrfach':
@@ -337,6 +492,10 @@ export function dispoReducer(state: DispoState, action: DispoAction): DispoState
       return undo(state);
     case 'redo':
       return redo(state);
+    case 'replaceStand':
+      return replaceStand(state, action);
+    case 'resetDemo':
+      return createDispoState(action.stammdaten, action.bestand);
   }
 }
 

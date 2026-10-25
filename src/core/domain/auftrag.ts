@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/domain/auftrag.ts                             │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 03                                               │
    │  Auftrag: Kategorie, Dringlichkeit, Parteien, Teile, Fotos, Rapport    │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -103,12 +103,17 @@ export interface Foto {
   technikerKuerzel: string;
 }
 
-export type RapportStatus = 'offen' | 'erstellt' | 'unterschrieben';
+// jh› Fünf Stufen: der Techniker erstellt und lässt unterschreiben, das Büro gibt frei und verrechnet.
+export type RapportStatus = 'offen' | 'erstellt' | 'unterschrieben' | 'freigegeben' | 'verrechnet';
+
+export const RAPPORT_STATUS: readonly RapportStatus[] = ['offen', 'erstellt', 'unterschrieben', 'freigegeben', 'verrechnet'];
 
 export const RAPPORT_LABEL: Readonly<Record<RapportStatus, string>> = {
   offen: 'Rapport offen',
   erstellt: 'Rapport erstellt',
   unterschrieben: 'Rapport unterschrieben',
+  freigegeben: 'Rapport freigegeben',
+  verrechnet: 'Rapport verrechnet',
 };
 
 export type RechnungStatus = 'offen' | 'gestellt' | 'bezahlt';
@@ -140,7 +145,9 @@ export interface Auftrag {
   geraetId: string;
   ersatzteile: readonly Ersatzteil[];
   fotos: readonly Foto[];
+  /** Status des jüngsten Servicerapports – Spiegel für Listen und Chips. */
   rapport: RapportStatus;
+  rapportId?: string;
   rechnungStatus: RechnungStatus;
   /** Geschätzte Einsatzdauer vor Ort. */
   dauerMin: Minuten;

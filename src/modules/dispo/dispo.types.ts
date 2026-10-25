@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/dispo.types.ts                       │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 03                                               │
    │  Dispo-Typen: Ansicht, Farbe-nach, Zoom, Filter, Auswahl, Bestand      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -8,6 +8,8 @@ import type { IsoDatum, Minuten } from '../../core/datum';
 import type { Auftrag } from '../../core/domain/auftrag';
 import type { Einsatz, EinsatzStatus, Pendenz } from '../../core/domain/einsatz';
 import type { Kategorie } from '../../core/domain/kategorie';
+import type { Nachricht } from '../../core/domain/nachricht';
+import type { Rapport } from '../../core/domain/rapport';
 import type { Absenz, Geraet, Kunde, Liegenschaft, Region, Techniker } from '../../core/domain/stammdaten';
 
 export type { Einsatz, EinsatzStatus, Pendenz };
@@ -57,6 +59,8 @@ export interface DispoStammdaten {
 export interface DispoBestand {
   einsaetze: readonly Einsatz[];
   pendenzen: readonly Pendenz[];
+  rapporte: readonly Rapport[];
+  nachrichten: readonly Nachricht[];
 }
 
 // ── §3 · Filter, Auswahl, Ziel ───────────────────────────────────

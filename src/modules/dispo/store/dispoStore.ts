@@ -1,32 +1,90 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/dispoStore.ts                  │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Dispo-Store (Singleton je Sitzung) und Ansichts-Einstellungen         │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Dispo-Store (Singleton je Fenster), Persistenz, Ansichts-Einstellung  │
    └────────────────────────────────────────────────────────────────────────┘ */
 
+import type { IsoDatum } from '../../../core/datum';
 import { createStore, readPersisted, useStore, writePersisted } from '../../../core/store';
 import type { Store } from '../../../core/store';
 import type { DispoBestand, DispoStammdaten, FarbeNach, PanelTab, Zoom } from '../dispo.types';
 import { isZoom } from '../zeitraster';
-import { createDispoState, dispoReducer } from './dispo.reducer';
-import type { DispoAction, DispoState } from './dispo.reducer';
+import { createDispoState, dispoReducer, schnappschuss } from './dispo.reducer';
+import type { DispoAction, DispoState, Schnappschuss } from './dispo.reducer';
+import { beobachteFremdeFenster, ladeStand, loescheStand, schnappschussAus, schreibeStand, serialisiere, standAus } from './persistenz';
 
 // ── §1 · Dispo-Store ─────────────────────────────────────────────
 
 export type DispoStore = Store<DispoState, DispoAction>;
 
 let store: DispoStore | null = null;
+let ausgang: { stammdaten: DispoStammdaten; bestand: DispoBestand; heute: IsoDatum } | null = null;
+let zuletztGeschrieben: string | null = null;
+let zuletztStand: Schnappschuss | null = null;
 
-// jh› Die Modulwurzel hängt den Bestand ein (Mock heute, API morgen); der
-//     Store selbst kennt keine Mockdaten.
-export function initDispoStore(stammdaten: DispoStammdaten, bestand: DispoBestand): DispoStore {
-  if (!store) store = createStore(dispoReducer, createDispoState(stammdaten, bestand));
-  return store;
+const SCHREIB_VERZOEGERUNG_MS = 300;
+
+function gleicherStand(a: Schnappschuss, b: Schnappschuss): boolean {
+  return a.einsaetze === b.einsaetze && a.pendenzen === b.pendenzen && a.rapporte === b.rapporte && a.nachrichten === b.nachrichten && a.auftraege === b.auftraege && a.geraete === b.geraete;
+}
+
+// jh› Die Modulwurzel hängt den Bestand ein (Mock heute, API morgen); der Store
+//     selbst kennt keine Mockdaten. Ein gespeicherter Stand von heute hat Vorrang.
+export function initDispoStore(stammdaten: DispoStammdaten, bestand: DispoBestand, heute: IsoDatum): DispoStore {
+  if (store) return store;
+  ausgang = { stammdaten, bestand, heute };
+
+  const gespeichert = ladeStand(heute);
+  const initial = createDispoState(stammdaten, bestand);
+  const neu = createStore(dispoReducer, initial);
+  if (gespeichert) {
+    zuletztGeschrieben = gespeichert.roh;
+    zuletztStand = schnappschussAus(gespeichert.stand);
+    neu.dispatch({ kind: 'replaceStand', stand: zuletztStand });
+  }
+
+  // jh› Entprellt schreiben: beim Ziehen entstehen viele Aktionen, der Stand braucht nur den letzten.
+  //     Geschrieben wird nur, wenn sich der Stand selbst geändert hat – eine Auswahl oder ein eben
+  //     empfangener fremder Stand lösen keinen Schreibzyklus aus (sonst überschriebe das Echo eines
+  //     Fensters die jüngere Änderung des anderen).
+  let timer: number | null = null;
+  neu.subscribe(() => {
+    if (timer !== null) window.clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      timer = null;
+      const aktuell = schnappschuss(neu.getState());
+      if (zuletztStand && gleicherStand(zuletztStand, aktuell)) return;
+      const stand = standAus(neu.getState(), heute);
+      const roh = serialisiere(stand);
+      if (roh !== zuletztGeschrieben && !schreibeStand(stand, roh)) return;
+      zuletztGeschrieben = roh;
+      zuletztStand = aktuell;
+    }, SCHREIB_VERZOEGERUNG_MS);
+  });
+
+  beobachteFremdeFenster(heute, (stand, roh) => {
+    if (roh === zuletztGeschrieben) return;
+    zuletztGeschrieben = roh;
+    zuletztStand = schnappschussAus(stand);
+    neu.dispatch({ kind: 'replaceStand', stand: zuletztStand });
+  });
+
+  store = neu;
+  return neu;
 }
 
 export function getDispoStore(): DispoStore {
   if (!store) throw new Error('Dispo-Store nicht initialisiert – initDispoStore() in der Modulwurzel aufrufen');
   return store;
+}
+
+/** Stellt den Ausgangsbestand her und löscht den gespeicherten Stand. */
+export function resetDispoStore(): void {
+  if (!store || !ausgang) return;
+  loescheStand();
+  zuletztGeschrieben = null;
+  zuletztStand = null;
+  store.dispatch({ kind: 'resetDemo', stammdaten: ausgang.stammdaten, bestand: ausgang.bestand });
 }
 
 export function useDispoState(): DispoState {

@@ -1,16 +1,17 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/dispo.selectors.ts             │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Ansichtsmodelle: Zeilen, Puffer, Kalender, Liste, Karte, Puls, Akte   │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Ansichtsmodelle: Zeilen, Puffer, Kalender, Liste, Rapporte, Puls      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import type { IsoDatum, Minuten } from '../../../core/datum';
 import { splitZeitpunkt, toZeitpunkt } from '../../../core/datum';
 import { DRINGLICHKEIT_RANG, isDringend, isTeilOffen } from '../../../core/domain/auftrag';
 import type { Auftrag } from '../../../core/domain/auftrag';
-import { einsatzEnde } from '../../../core/domain/einsatz';
+import { einsatzEnde, zeitpunktVon } from '../../../core/domain/einsatz';
 import type { Einsatz, Pendenz } from '../../../core/domain/einsatz';
 import { KATEGORIE_LABEL } from '../../../core/domain/kategorie';
+import type { Rapport } from '../../../core/domain/rapport';
 import { formatStrasse, fullName, isAbwesend, regionOf } from '../../../core/domain/stammdaten';
 import type { Absenz, Geraet, Kunde, Liegenschaft, Region, Techniker } from '../../../core/domain/stammdaten';
 import { formatDatum, formatDatumKurz, formatWochentag, formatZeit, formatZeitpunkt, formatZeitspanne } from '../../../core/format';
@@ -449,17 +450,90 @@ export function buildWartetViews(stammdaten: DispoStammdaten, einsaetze: readonl
 export interface ErledigtView extends AuftragKontext {
   einsatz: Einsatz;
   techniker: Techniker;
+  rapport: Rapport | undefined;
 }
 
-export function buildErledigtViews(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[], tage: readonly IsoDatum[]): ErledigtView[] {
+export function buildErledigtViews(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[], tage: readonly IsoDatum[], rapporte: readonly Rapport[] = []): ErledigtView[] {
   const tageSet = new Set(tage);
   return einsaetze
     .filter((einsatz) => einsatz.status === 'erledigt' && tageSet.has(einsatz.datum))
-    .map((einsatz) => ({ ...resolveAuftrag(stammdaten, einsatz.auftragId), einsatz, techniker: technikerOf(stammdaten, einsatz.technikerId) }))
+    .map((einsatz) => ({
+      ...resolveAuftrag(stammdaten, einsatz.auftragId),
+      einsatz,
+      techniker: technikerOf(stammdaten, einsatz.technikerId),
+      rapport: rapportFuerEinsatz(rapporte, einsatz.id),
+    }))
     .sort((a, b) => b.einsatz.datum.localeCompare(a.einsatz.datum) || b.einsatz.startMin - a.einsatz.startMin);
 }
 
-// ── §6 · Live-Puls & Kapazität ───────────────────────────────────
+// ── §6 · Rapporte ────────────────────────────────────────────────
+
+export interface RapportView extends AuftragKontext {
+  rapport: Rapport;
+  einsatz: Einsatz | undefined;
+  techniker: Techniker;
+}
+
+export function rapportFuerEinsatz(rapporte: readonly Rapport[], einsatzId: string): Rapport | undefined {
+  return rapporte.find((rapport) => rapport.einsatzId === einsatzId);
+}
+
+/** Alle Rapporte, neueste zuerst – Grundlage für das Modul «Servicerapporte». */
+export function buildRapportViews(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[], rapporte: readonly Rapport[]): RapportView[] {
+  return rapporte
+    .filter((rapport) => stammdaten.auftraege.has(rapport.auftragId))
+    .map((rapport) => ({
+      ...resolveAuftrag(stammdaten, rapport.auftragId),
+      rapport,
+      einsatz: einsaetze.find((einsatz) => einsatz.id === rapport.einsatzId),
+      techniker: technikerOf(stammdaten, rapport.technikerId),
+    }))
+    .sort((a, b) => b.rapport.geaendertAm.localeCompare(a.rapport.geaendertAm));
+}
+
+/** Erledigte Einsätze ohne Rapport, älteste zuerst – die Mahnliste des Büros. */
+export function buildFehlendeRapporte(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[], rapporte: readonly Rapport[]): ErledigtView[] {
+  const mitRapport = new Set(rapporte.map((rapport) => rapport.einsatzId));
+  return einsaetze
+    .filter((einsatz) => einsatz.status === 'erledigt' && !mitRapport.has(einsatz.id) && stammdaten.auftraege.has(einsatz.auftragId))
+    .map((einsatz) => ({
+      ...resolveAuftrag(stammdaten, einsatz.auftragId),
+      einsatz,
+      techniker: technikerOf(stammdaten, einsatz.technikerId),
+      rapport: undefined,
+    }))
+    .sort((a, b) => a.einsatz.datum.localeCompare(b.einsatz.datum) || a.einsatz.startMin - b.einsatz.startMin);
+}
+
+export interface RapportZaehler {
+  /** Erledigte Einsätze ohne Rapport. */
+  fehlend: number;
+  erstellt: number;
+  unterschrieben: number;
+  freigegeben: number;
+  verrechnet: number;
+  /** Freigegeben, aber noch nicht verrechnet – fällige Rechnungen. */
+  faelligeRechnungen: number;
+}
+
+// jh› Zähler für Dashboard-Kacheln (v0.4) und Panel – heute für Rapporte-Modul und Konflikte.
+export function zaehleRapporte(einsaetze: readonly Einsatz[], rapporte: readonly Rapport[]): RapportZaehler {
+  const mitRapport = new Set(rapporte.map((rapport) => rapport.einsatzId));
+  const zaehler: RapportZaehler = { fehlend: 0, erstellt: 0, unterschrieben: 0, freigegeben: 0, verrechnet: 0, faelligeRechnungen: 0 };
+  for (const einsatz of einsaetze) {
+    if (einsatz.status === 'erledigt' && !mitRapport.has(einsatz.id)) zaehler.fehlend += 1;
+  }
+  for (const rapport of rapporte) {
+    if (rapport.status === 'erstellt') zaehler.erstellt += 1;
+    if (rapport.status === 'unterschrieben') zaehler.unterschrieben += 1;
+    if (rapport.status === 'freigegeben') zaehler.freigegeben += 1;
+    if (rapport.status === 'verrechnet') zaehler.verrechnet += 1;
+  }
+  zaehler.faelligeRechnungen = zaehler.freigegeben;
+  return zaehler;
+}
+
+// ── §7 · Live-Puls & Kapazität ───────────────────────────────────
 
 export function pulsFor(einsaetzeHeute: readonly Einsatz[], jetztMin: Minuten, absenz: Absenz | undefined): Puls {
   if (absenz) return { art: 'abwesend', text: 'abwesend' };
@@ -491,7 +565,7 @@ export function kapazitaetFor(zeile: TagesZeile): Kapazitaet {
   };
 }
 
-// ── §7 · Status-Verlauf ──────────────────────────────────────────
+// ── §8 · Status-Verlauf ──────────────────────────────────────────
 
 const ANFAHRT_MIN = 45;
 
@@ -521,11 +595,12 @@ export function buildPhasen(
           detail: [techniker.get(erster.technikerId)?.kuerzel, sortiert.length > 1 ? `${sortiert.length} Einsätze` : null].filter(Boolean).join(' · '),
         }
       : { phase: 'disponiert', label: 'Disponiert', erreicht: false, detail: 'im Auftragseingang' },
+    // jh› Echte Zeitstempel aus dem Verlauf (App) – erst wenn sie fehlen, gilt die Planannahme.
     letzter && unterwegsOderWeiter
-      ? { phase: 'unterwegs', label: 'Unterwegs', erreicht: true, zeit: formatZeitpunkt(toZeitpunkt(letzter.datum, Math.max(0, letzter.startMin - ANFAHRT_MIN))), detail: 'Abfahrt' }
+      ? { phase: 'unterwegs', label: 'Unterwegs', erreicht: true, zeit: formatZeitpunkt(zeitpunktVon(letzter, 'unterwegs') ?? toZeitpunkt(letzter.datum, Math.max(0, letzter.startMin - ANFAHRT_MIN))), detail: 'Abfahrt' }
       : { phase: 'unterwegs', label: 'Unterwegs', erreicht: false },
     letzter && vorOrtOderWeiter
-      ? { phase: 'vor-ort', label: 'Vor Ort', erreicht: true, zeit: formatZeitpunkt(letzter.statusSeit ?? toZeitpunkt(letzter.datum, letzter.startMin)), detail: 'Ankunft' }
+      ? { phase: 'vor-ort', label: 'Vor Ort', erreicht: true, zeit: formatZeitpunkt(zeitpunktVon(letzter, 'vor-ort') ?? letzter.statusSeit ?? toZeitpunkt(letzter.datum, letzter.startMin)), detail: 'Ankunft' }
       : { phase: 'vor-ort', label: 'Vor Ort', erreicht: false },
     buildErledigtSchritt(alleErledigt && !offenePendenz, letzter, offenePendenz, begonnen),
   ];
@@ -534,7 +609,7 @@ export function buildPhasen(
 
 function buildErledigtSchritt(erreicht: boolean, letzter: Einsatz | undefined, offenePendenz: Pendenz | null, begonnen: boolean): PhasenSchritt {
   if (erreicht && letzter) {
-    return { phase: 'erledigt', label: 'Erledigt', erreicht: true, zeit: formatZeitpunkt(toZeitpunkt(letzter.datum, einsatzEnde(letzter))) };
+    return { phase: 'erledigt', label: 'Erledigt', erreicht: true, zeit: formatZeitpunkt(zeitpunktVon(letzter, 'erledigt') ?? toZeitpunkt(letzter.datum, einsatzEnde(letzter))) };
   }
   if (letzter?.status === 'wartet-teil') return { phase: 'erledigt', label: 'Erledigt', erreicht: false, detail: 'wartet auf Teil' };
   if (offenePendenz?.anlass === 'folgetermin') return { phase: 'erledigt', label: 'Erledigt', erreicht: false, detail: 'Folgetermin offen' };
@@ -542,7 +617,7 @@ function buildErledigtSchritt(erreicht: boolean, letzter: Einsatz | undefined, o
   return { phase: 'erledigt', label: 'Erledigt', erreicht: false };
 }
 
-// ── §8 · Suche ───────────────────────────────────────────────────
+// ── §9 · Suche ───────────────────────────────────────────────────
 
 export function buildSuchIndex(stammdaten: DispoStammdaten, einsaetze: readonly Einsatz[], pendenzen: readonly Pendenz[]): SuchEintrag[] {
   const auftragIds = new Set([...einsaetze.map((einsatz) => einsatz.auftragId), ...pendenzen.map((pendenz) => pendenz.auftragId)]);

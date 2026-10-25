@@ -1,12 +1,14 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  mock/index.ts                                      │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Mock-Bestand zusammenstellen, veredeln (Fotos, Rapport) und prüfen    │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Mock-Bestand zusammenstellen, veredeln (Verlauf, Rapport) und prüfen  │
    └────────────────────────────────────────────────────────────────────────┘ */
 
-import { addDays, toZeitpunkt } from '../core/datum';
-import type { Auftrag, Foto, FotoMotiv, RapportStatus, RechnungStatus } from '../core/domain/auftrag';
+import { addDays } from '../core/datum';
+import type { Auftrag, RechnungStatus } from '../core/domain/auftrag';
 import type { Einsatz, Pendenz } from '../core/domain/einsatz';
+import type { Nachricht } from '../core/domain/nachricht';
+import type { Rapport } from '../core/domain/rapport';
 import type { Absenz, Geraet, GeraetEreignis, Kunde, Liegenschaft, Techniker } from '../core/domain/stammdaten';
 import { ABSENZEN } from './absenzen';
 import { HAND_AUFTRAEGE, HAND_GERAETE } from './auftraege';
@@ -14,6 +16,7 @@ import { HAND_EINSAETZE, HAND_PENDENZEN, HAND_TECHNIKER_HEUTE } from './einsaetz
 import { between, generateFill, mulberry32, pick, seedFrom } from './generator';
 import { MOCK_HEUTE, MOCK_REFERENZ_MIN } from './heute';
 import { KUNDEN, LIEGENSCHAFTEN } from './kunden';
+import { buildRapporte } from './rapporte';
 import { TECHNIKER } from './techniker';
 
 // ── §1 · Typen ───────────────────────────────────────────────────
@@ -30,6 +33,8 @@ export interface Stammdaten {
 export interface Bestand {
   einsaetze: readonly Einsatz[];
   pendenzen: readonly Pendenz[];
+  rapporte: readonly Rapport[];
+  nachrichten: readonly Nachricht[];
 }
 
 /** Telefonbuch für die Schnellerfassung: normalisierte Nummer → wer ruft an. */
@@ -62,11 +67,10 @@ const fuellung = generateFill({
   handTechnikerHeute: HAND_TECHNIKER_HEUTE,
 });
 
-const alleEinsaetze: readonly Einsatz[] = [...HAND_EINSAETZE, ...fuellung.einsaetze];
+const rohEinsaetze: readonly Einsatz[] = [...HAND_EINSAETZE, ...fuellung.einsaetze];
 
-// ── §3 · Veredelung: Fotos, Rapport, Verrechnung, Gerätehistorie ────
+// ── §3 · Veredelung: Verlauf, Rapporte, Verrechnung, Gerätehistorie ────
 
-const FOTO_MOTIVE: readonly FotoMotiv[] = ['typenschild', 'schaden', 'anschluss', 'einbau', 'uebersicht'];
 const HISTORIE_TEXTE = [
   'Laugenpumpe ersetzt',
   'Jahreswartung durchgeführt',
@@ -77,38 +81,28 @@ const HISTORIE_TEXTE = [
   'Garantiefall: Steuerplatine getauscht',
 ] as const;
 
-// jh› Fotos und Rapportstatus hängen am Einsatz, nicht am Entwurf: erledigt
-//     heisst «Fotos vorhanden, Rapport erstellt», früher heisst «unterschrieben».
-function veredleAuftrag(auftrag: Auftrag, einsaetze: readonly Einsatz[], technikerById: ReadonlyMap<string, Techniker>): Auftrag {
-  // jh› Massgebend ist der letzte Einsatz, der vor Ort war – ein geplanter Folgetermin hat noch keine Fotos.
-  const letzter = einsaetze
-    .filter((einsatz) => einsatz.auftragId === auftrag.id && einsatz.status !== 'geplant' && einsatz.status !== 'unterwegs')
-    .sort((a, b) => a.datum.localeCompare(b.datum) || a.startMin - b.startMin)
-    .pop();
-  if (!letzter) return auftrag;
+const rohAuftraege: readonly Auftrag[] = [...HAND_AUFTRAEGE, ...fuellung.auftraege];
+const rohGeraete: readonly Geraet[] = [...HAND_GERAETE, ...fuellung.geraete];
 
-  const zufall = mulberry32(seedFrom(`foto·${auftrag.id}`));
-  const kuerzel = technikerById.get(letzter.technikerId)?.kuerzel ?? '??';
-  const anzahl = between(zufall, 1, 4);
-  const fotos: Foto[] = Array.from({ length: anzahl }, (_, index) => ({
-    id: `F-${auftrag.id}-${index + 1}`,
-    motiv: FOTO_MOTIVE[(index + between(zufall, 0, 1)) % FOTO_MOTIVE.length] ?? 'uebersicht',
-    aufgenommenAm: toZeitpunkt(letzter.datum, letzter.startMin + 5 + index * 9),
-    technikerKuerzel: kuerzel,
-  }));
+// jh› Statusverläufe und Rapporte entstehen aus den Einsätzen – deterministisch
+//     mit Saat, damit Demo und Screenshots stabil bleiben.
+const { rapporte, einsaetze: alleEinsaetze } = buildRapporte(
+  { heute: MOCK_HEUTE, jetztMin: MOCK_REFERENZ_MIN, auftraege: byId(rohAuftraege), geraete: byId(rohGeraete), techniker: TECHNIKER },
+  rohEinsaetze,
+);
 
-  const vergangen = letzter.datum < MOCK_HEUTE;
-  let rapport: RapportStatus = 'erstellt';
-  let rechnungStatus: RechnungStatus = 'offen';
-  if (letzter.status === 'erledigt' && vergangen) {
-    rapport = 'unterschrieben';
-    rechnungStatus = zufall() < 0.55 ? 'bezahlt' : 'gestellt';
-  } else if (letzter.status === 'erledigt') {
-    rapport = zufall() < 0.3 ? 'offen' : 'erstellt';
-  } else if (letzter.status === 'wartet-teil') {
-    rapport = 'offen';
+// jh› Der Auftrag spiegelt seinen jüngsten Rapport: Status, Fotos, Verrechnung.
+//     Ohne Rapport, aber mit begonnenem Einsatz, bleibt der Rapport «offen».
+function veredleAuftrag(auftrag: Auftrag, einsaetze: readonly Einsatz[], rapporteProAuftrag: ReadonlyMap<string, readonly Rapport[]>): Auftrag {
+  const eigene = rapporteProAuftrag.get(auftrag.id) ?? [];
+  const juengster = [...eigene].sort((a, b) => a.erstelltAm.localeCompare(b.erstelltAm)).pop();
+  if (!juengster) {
+    const begonnen = einsaetze.some((einsatz) => einsatz.auftragId === auftrag.id && (einsatz.status === 'erledigt' || einsatz.status === 'wartet-teil'));
+    return begonnen ? { ...auftrag, rapport: 'offen', fotos: [] } : auftrag;
   }
-  return { ...auftrag, fotos, rapport, rechnungStatus };
+  const zufall = mulberry32(seedFrom(`rechnung·${auftrag.id}`));
+  const rechnungStatus: RechnungStatus = juengster.status === 'verrechnet' ? (zufall() < 0.55 ? 'bezahlt' : 'gestellt') : 'offen';
+  return { ...auftrag, rapport: juengster.status, rapportId: juengster.id, fotos: juengster.fotos, rechnungStatus };
 }
 
 function historieFor(geraet: Geraet, technikerListe: readonly Techniker[]): readonly GeraetEreignis[] {
@@ -122,11 +116,14 @@ function historieFor(geraet: Geraet, technikerListe: readonly Techniker[]): read
   })).sort((a, b) => b.datum.localeCompare(a.datum));
 }
 
-const technikerById = byId(TECHNIKER);
-const auftraege: readonly Auftrag[] = [...HAND_AUFTRAEGE, ...fuellung.auftraege].map((auftrag) =>
-  veredleAuftrag(auftrag, alleEinsaetze, technikerById),
-);
-const geraete: readonly Geraet[] = [...HAND_GERAETE, ...fuellung.geraete].map((geraet) => ({
+const rapporteProAuftrag = new Map<string, Rapport[]>();
+for (const rapport of rapporte) {
+  const liste = rapporteProAuftrag.get(rapport.auftragId) ?? [];
+  liste.push(rapport);
+  rapporteProAuftrag.set(rapport.auftragId, liste);
+}
+const auftraege: readonly Auftrag[] = rohAuftraege.map((auftrag) => veredleAuftrag(auftrag, alleEinsaetze, rapporteProAuftrag));
+const geraete: readonly Geraet[] = rohGeraete.map((geraet) => ({
   ...geraet,
   historie: historieFor(geraet, TECHNIKER),
 }));
@@ -145,6 +142,8 @@ export const mockStammdaten: Stammdaten = {
 export const mockBestand: Bestand = {
   einsaetze: alleEinsaetze,
   pendenzen: HAND_PENDENZEN,
+  rapporte,
+  nachrichten: [],
 };
 
 export { MOCK_HEUTE };
@@ -197,6 +196,11 @@ function assertConsistent(stammdaten: Stammdaten, bestand: Bestand): void {
   }
   for (const pendenz of bestand.pendenzen) {
     if (!stammdaten.auftraege.has(pendenz.auftragId)) fehler.push(`${pendenz.id}: Auftrag ${pendenz.auftragId}`);
+  }
+  const einsatzIds = new Set(bestand.einsaetze.map((einsatz) => einsatz.id));
+  for (const rapport of bestand.rapporte) {
+    if (!stammdaten.auftraege.has(rapport.auftragId)) fehler.push(`${rapport.id}: Auftrag ${rapport.auftragId}`);
+    if (!einsatzIds.has(rapport.einsatzId)) fehler.push(`${rapport.id}: Einsatz ${rapport.einsatzId}`);
   }
   for (const absenz of stammdaten.absenzen) {
     if (!technikerIds.has(absenz.technikerId)) fehler.push(`${absenz.id}: Techniker ${absenz.technikerId}`);

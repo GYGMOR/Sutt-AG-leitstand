@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/domain/einsatz.ts                             │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Einsatz (Termin eines Technikers) und Pendenz (zu planen)             │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Einsatz (Termin eines Technikers), Statusverlauf, Pendenz             │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import type { IsoDatum, IsoZeitpunkt, Minuten } from '../datum';
@@ -41,7 +41,30 @@ export function isAbgeschlossen(status: EinsatzStatus): boolean {
   return status === 'erledigt' || status === 'wartet-teil';
 }
 
-// ── §2 · Einsatz ─────────────────────────────────────────────────
+// ── §2 · Statusverlauf ───────────────────────────────────────────
+
+/** Wer den Status gesetzt hat: Techniker-App, Büro oder Mockdaten. */
+export type StatusQuelle = 'app' | 'buero' | 'mock';
+
+export interface StatusWechsel {
+  status: EinsatzStatus;
+  zeitpunkt: IsoZeitpunkt;
+  quelle: StatusQuelle;
+}
+
+/** Zeitpunkt des letzten Wechsels auf `status`, oder undefined. */
+export function zeitpunktVon(einsatz: Pick<Einsatz, 'verlauf'>, status: EinsatzStatus): IsoZeitpunkt | undefined {
+  const treffer = [...(einsatz.verlauf ?? [])].reverse().find((wechsel) => wechsel.status === status);
+  return treffer?.zeitpunkt;
+}
+
+// jh› Der Verlauf ist die Wahrheit, statusSeit nur der Spiegel des letzten Eintrags –
+//     Live-Puls und Rapportzeiten rechnen mit echten Zeitstempeln statt Annahmen.
+export function mitStatuswechsel(einsatz: Einsatz, status: EinsatzStatus, zeitpunkt: IsoZeitpunkt, quelle: StatusQuelle): Einsatz {
+  return { ...einsatz, status, statusSeit: zeitpunkt, verlauf: [...(einsatz.verlauf ?? []), { status, zeitpunkt, quelle }] };
+}
+
+// ── §3 · Einsatz ─────────────────────────────────────────────────
 
 /** Ein Termin eines Technikers für einen Auftrag. Ein Auftrag kann mehrere Einsätze haben. */
 export interface Einsatz {
@@ -52,15 +75,17 @@ export interface Einsatz {
   startMin: Minuten;
   dauerMin: Minuten;
   status: EinsatzStatus;
-  /** Zeitpunkt der letzten Statusmeldung (Mock: Ankunft vor Ort). */
+  /** Zeitpunkt der letzten Statusmeldung. */
   statusSeit?: IsoZeitpunkt;
+  /** Alle Statuswechsel in Reihenfolge – Grundlage für Zeiten im Rapport. */
+  verlauf?: readonly StatusWechsel[];
 }
 
 export function einsatzEnde(einsatz: Pick<Einsatz, 'startMin' | 'dauerMin'>): Minuten {
   return einsatz.startMin + einsatz.dauerMin;
 }
 
-// ── §3 · Pendenz ─────────────────────────────────────────────────
+// ── §4 · Pendenz ─────────────────────────────────────────────────
 
 export type PendenzAnlass = 'neu' | 'folgetermin';
 
