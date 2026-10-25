@@ -2,6 +2,30 @@
 
 Format: ein Abschnitt pro Revision, Bereiche wie im Commit-Stil (`dispo(kalender): … ◆`).
 
+## rev 03 · 2026.10 · v0.3.0 – Aussendienst: Techniker-App und Servicerapport
+
+### Neu
+- **Techniker-App** `/app` (ADR-002: Route in derselben SPA, kein zweites Projekt): Login-Weiche nach Rolle, Heute-Liste mit Tagesleiste (erledigt · Einsatz · Fahrt · jetzt), Einsatzkarte mit Anruf, Route und Details, Ein-Daumen-Status «Abfahrt → Angekommen → Fertig» (56 px, ein Knopf pro Moment), «Mieter informieren» (SMS «unterwegs» mit Ankunftszeit), Einsatz-Detail (Hinweise, Kontakte, Teile, Fotos, Statusmeldungen), Woche, Banner «Plan geändert … Gesehen», Offline-Hinweis, Telefonrahmen am Desktop (`?rahmen=0` blendet aus), Innendienst sieht jeden Techniker per `?als=T-MB`.
+- **Servicerapport** «in 90 Sekunden»: Zeiten aus den Statusknöpfen (Anfahrt = unterwegs → vor Ort, Arbeit = vor Ort → Fertig; 5-min-Steller), Checkliste je Geräteart, Bemerkung, Teile (eingebaut · ab Fahrzeug · bestellen), Fotos (Kamera oder Platzhalter, Motiv), Typenschild-Vorschlag (Mock-OCR) für Geräte aus der Schnellerfassung, Abschluss (erledigt · Folgetermin · Teil bestellt · nicht angetroffen) mit Folgen im Plan (Einsatzstatus, Pendenz im Eingang, Ersatzteil mit Liefertermin), Unterschrift mit dem Finger (SVG-Pfad), Speichern/Abschliessen, Mail-Vorlage, Druckansicht A4 `/rapporte/:id/druck` mit QR-Code.
+- **Büro**: Modul **Servicerapporte** `/rapporte` – Kacheln Alle · Fehlend · Zu prüfen · Zu verrechnen · Verrechnet sind zugleich Filter, Suche, Rapport lesend mit Freigeben · Zurück an Techniker (mit Bemerkung) · Verrechnen · Drucken · Per Mail · Im Plan; Akte-Abschnitt «Servicerapport» (Kennzahlen, Unterschrift, Rückmeldung, dieselben Knöpfe; ohne Rapport «In der App erfassen» im zweiten Fenster); Abschnitt «Nachrichten»; SMS-Terminbestätigung statt Schloss; Konflikt-Wächter mit «Rapport fehlt» (> 1 Tag) und «Unterschrift fehlt» (> 2 Tage); Panel Erledigt mit fünf Rapportstufen.
+- **Statusverlauf**: `Einsatz.verlauf[]` mit Quelle (app · buero · mock); Live-Puls, Akte-Verlauf und Rapportzeiten rechnen mit echten Zeitpunkten statt Planzeiten.
+- **Persistenz** (ADR-001): Stand in `localStorage` (`sl.dispo.stand.v1`, versioniert, nur für denselben Tag gültig), 300 ms entprellt; das `storage`-Ereignis spiegelt in andere Fenster – Techniker-App und Plantafel laufen nebeneinander synchron. «Demo zurücksetzen» im Benutzermenü und in der Palette.
+- **Mock-Versand**: SMS (Terminbestätigung, unterwegs, nicht angetroffen) und Mail (Rapport) mit Vorlage, editierbar vor dem Senden, Protokoll in der Akte.
+- **Tests**: vitest (`npm test`), 73 Tests für Reducer, Selektoren, Konflikte, Zeitraster, Scoring, Rapport-Logik, Persistenz und App-Modell; Strategie in `docs/tests/strategie.md`, Entwurf in `docs/design/step-2-aussendienst.md`.
+- **Mock**: Rapporte und Statusverläufe für erledigte Einsätze (Saat), drei Unterschriften, handverlesene Rapporte A02/A11/A30; fehlende Rapporte nur aus den letzten drei Tagen.
+
+### Geändert
+- `RapportStatus` um `freigegeben` und `verrechnet`; `Auftrag.rapportId`; der Rapport ist eine eigene Entität und spiegelt Status, Fotos und Rechnung auf den Auftrag.
+- Rapport-Icon und -Ton an einer Stelle (`modules/rapport/rapportStatus.ts`) für Panel, Akte und Modul.
+- `deleteAuftrag` räumt Rapporte und Nachrichten mit ab.
+- IDs neuer Objekte tragen eine Fenster-Kennung (`R-Nk3f1001`): mit gespeichertem Stand und zweitem Fenster begann der alte Zähler wieder bei 1 und überschrieb Bestehendes per ID.
+- Fenster-Spiegelung schreibt nur, wenn sich der Stand selbst geändert hat – kein Echo, das die jüngere Änderung des anderen Fensters überschreibt; freigegebene Rapporte nehmen kein verspätetes «Speichern» aus der App mehr an; ein erneutes Abschliessen legt keine zweite Pendenz an.
+- Mindestbreite 1024 px gilt nur noch für den Leitstand (`html[data-flaeche='app']` hebt sie auf).
+- `FotoKachel` und `useQrSvg` nach `core/` gezogen – Akte, Rapport und Druck teilen sie.
+
+### Offen
+- `jh# 012` Fotos nur im Fenster · `jh# 013` Offline-Warteschlange · `jh# 014` echte Typenschild-Erkennung · `jh# 015` Versionsnummer statt «letzter Schreiber gewinnt».
+
 ## rev 02 · 2026.10 · v0.2.0 – Disposition v2
 
 ### Behoben (§0 der Vorgabe)

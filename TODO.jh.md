@@ -11,6 +11,10 @@ Erledigt → `- [x]` setzen und die Marke im Code entfernen. `npm run jh:check` 
 - [ ] **jh# 009** · `modules/dispo/views/Plantafel.tsx` – Virtuelle Zeilen ab 20 Technikern (heute 9, alle gerendert).
 - [ ] **jh# 010** · `modules/dispo/Schnellerfassung.tsx` – Neues Gerät legt Modell/Typ als «noch nicht erfasst» an; Typenschild-Scan (Modul Geräte) soll das nachtragen.
 - [ ] **jh# 011** · `modules/dispo/views/Kalender.tsx` – Verknüpfungslinien auch im Monat und in der Mehrtages-Plantafel (heute nur Plantafel Tag und Kalender-Zeitraster; Pillen melden sich nicht bei der Block-Registry).
+- [ ] **jh# 012** · `modules/rapport/RapportFormular.tsx` – Kamerafotos leben nur als Object-URL im Fenster; Bildablage (IndexedDB oder Upload) fehlt – Platzhalter werden gespeichert, echte Bilder nicht.
+- [ ] **jh# 013** · `modules/app/AppLayout.tsx` – Offline ist nur ein Hinweis; echte Warteschlange (Service Worker, Wiederholung) für Statusmeldungen und Rapporte.
+- [ ] **jh# 014** · `modules/rapport/rapport.model.ts` – Typenschild-Vorschlag ist Mock-OCR (deterministisch pro Gerät); echte Erkennung über Kamera-API oder Modul Geräte.
+- [ ] **jh# 015** · `modules/dispo/store/persistenz.ts` – «Letzter Schreiber gewinnt» zwischen Fenstern; mit echter API Versionsnummer/ETag gegen verlorene Änderungen (ADR-001).
 
 ## Erledigt
 

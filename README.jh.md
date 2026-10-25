@@ -3,7 +3,7 @@
 Branchensoftware der **Sutt AG** (Haushalt-Apparate, Industriestrasse 24, 8152 Glattbrugg/Opfikon) –
 Service, Reparatur und Verkauf von Haushalts-Grossgeräten.
 
-**Stand:** rev 02 · v0.2.0 · Disposition v2 · klickbares Mockup mit Testdaten, ohne Backend.
+**Stand:** rev 03 · v0.3.0 · Aussendienst (Techniker-App, Servicerapport) auf Disposition v2 · klickbares Mockup mit Testdaten, ohne Backend.
 Diese Datei ist der Bauplan: **jedes folgende Modul** (Kunden, Geräte, Lager, Mietgeräte, Zeit …)
 wird exakt nach diesen Regeln aufgebaut. Änderungen je Revision stehen in `CHANGELOG.jh.md`.
 
@@ -15,6 +15,7 @@ wird exakt nach diesen Regeln aufgebaut. Änderungen je Revision stehen in `CHAN
 npm install
 npm run dev          # http://localhost:5173 → /login (Demo-Zugänge stehen unter dem Formular)
 npm run build        # Typecheck (tsc strict) + Produktions-Build
+npm test             # vitest: Reducer, Selektoren, Konflikte, Zeitraster, Scoring, Rapport, Persistenz, App-Modell
 npm run jh:check     # Signatur: Kopf, §-Marken, eof, jh#-Abgleich, Exporte, kein any
 npm run jh:sign      # Köpfe und §-Marken automatisch normieren
 npm run jh:contrast  # WCAG-Kontrast aller Textpaare, hell und dunkel
@@ -25,6 +26,11 @@ npm run demo:video   # Demo-Tour aufzeichnen → docs/demo/sutt-leitstand-demo.w
 Palette, Schnellerfassung, Druck, Dark Mode) mit Mauszeiger und Untertiteln ab, ca. 2½ Minuten, ohne Ton, und
 komprimiert auf rund 8 MB (VP9). Browser und ffmpeg kommen aus einer vorhandenen Playwright-Installation
 (`PLAYWRIGHT_CORE`, `PLAYWRIGHT_FFMPEG`) – nichts davon landet in `package.json`.
+
+**Zwei Fenster, ein Stand (rev 03):** `/dispo/plantafel` im ersten Fenster, `/app?als=T-MB` im zweiten – am Desktop im
+Telefonrahmen. Statusknöpfe, Rapporte und Freigaben erscheinen sofort drüben: der Stand liegt in `localStorage` und
+spiegelt sich über das `storage`-Ereignis (ADR-001). «Demo zurücksetzen» im Benutzermenü stellt den Ausgangsbestand her.
+Aussendienst-Konten (`mb`, `sk`) landen nach dem Login direkt in der App; Büro-Konten können dort jeden Techniker ansehen.
 
 Node ≥ 20.19 (Vite 7); `jh:contrast` braucht Node ≥ 23 (nativer TypeScript-Lauf).
 Optional `.env` nach `.env.example`: mit `VITE_GOOGLE_MAPS_API_KEY` erscheint Google Maps, ohne Schlüssel
@@ -46,6 +52,8 @@ MapLibre + OpenStreetMap, ohne Netz die Schemakarte. Die Akte sieht nie leer aus
 | UI-Lib   | keine – eigene Bausteine in `src/core/ui/`                                   |
 | Icons    | `lucide-react`, Strich **1.5**, Grösse **16 / 20**                           |
 | Schrift  | IBM Plex Sans (UI), IBM Plex Mono (Nummern, SN, Zeiten) – lokal via Fontsource |
+| Tests    | vitest 5 – reine Fachlogik, `*.test.ts` neben dem Code, Helfer in `src/test/testdaten.ts` |
+| Persistenz | `localStorage`-Stand (`sl.dispo.stand.v1`, tagesgebunden), Spiegelung über `storage` (ADR-001) |
 
 ---
 
@@ -67,34 +75,42 @@ src/
 │  ├─ modules.config.ts         einzige Quelle für Leiste, Palette, Routing, Rollen, Freischaltung
 │  ├─ aenderungen.ts            Zähler ungespeicherter Änderungen (Abmelden-Rückfrage)
 │  ├─ auth/                     Typen, authStore (Mock), RequireAuth, LoginPage, AbgemeldetPage
-│  ├─ domain/                   Stammdaten, Auftrag, Einsatz/Pendenz, Kategorie
-│  ├─ hooks/                    useNow · useHotkey · useDismiss · useElementSize · useHoverIntent · useMediaQuery
+│  ├─ domain/                   Stammdaten, Auftrag, Einsatz/Pendenz (Statusverlauf), Rapport, Nachricht, Kategorie
+│  ├─ hooks/                    useNow · useHotkey · useDismiss · useElementSize · useHoverIntent · useMediaQuery · useQrSvg
 │  ├─ layout/                   AppShell · Topbar · Sidebar · MiniKalender · DateNav · BenutzerMenu ·
 │  │                            KommandoPalette · ShortcutHilfe · FolgtPage
 │  └─ ui/                       Button · Chip · Avatar · Typenschild · DetailZeile · Popover · Dialog ·
-│                               Hovercard · Form · SegmentedControl · CapsLabel · Kbd · farben · cx
+│                               Hovercard · Form · SegmentedControl · CapsLabel · Kbd · FotoKachel · farben · cx
 ├─ modules/dispo/               ← ein Ordner pro Modul
 │  ├─ DispoPage.tsx             Modulwurzel: hängt Mock ein, Befehle, Hotkeys, Komposition
 │  ├─ DispoToolbar.tsx          Ansicht, Zeitraum, Zoom, Farbe nach, Filter, Undo/Redo, Neu
 │  ├─ dispo.types.ts            Ansicht, FarbeNach, Zoom, Filter, Auswahl, Bestand
 │  ├─ zeitraster.ts             Achse 06–20, Arbeitszeit 07–18, Skala, Spuren, freie Slots
 │  ├─ scoring.ts · konflikte.ts Smart-Slot-Bewertung, Konflikt-Wächter
-│  ├─ store/                    reducer (Undo/Redo), dispoStore, selectors, useDispoAktionen
+│  ├─ store/                    reducer (Undo/Redo), dispoStore (+ Persistenz, Fenster-Spiegelung), selectors, useDispoAktionen, persistenz
 │  ├─ drag/                     DispoDnd (dnd-kit, Vorschau, Smart-Slots)
 │  ├─ views/                    Plantafel · PlantafelKompakt · Kalender · Liste · Karte · EinsatzBlock
 │  ├─ panel/                    SeitenPanel · EingangTab · WartetTab · ErledigtTab · PendenzCard
-│  ├─ akte/                     Akte · Fotos · Verlauf · Ersatzteile · Bearbeiten · Verschieben · SlotVorschläge
+│  ├─ akte/                     Akte · Rapport · Nachrichten · Fotos · Verlauf · Ersatzteile · Bearbeiten · Verschieben · SlotVorschläge
 │  ├─ karte/                    MapCanvas (Wahl) · GoogleKarte · LibreKarte · SchemaKarte
 │  ├─ hover/                    Hovercard-Kontext und Einsatz-Kurzansicht
 │  ├─ druck/                    TechnikerDruck (A4, QR)
 │  └─ Schnellerfassung · KapazitaetsBand · LivePuls · KundenChips · ProtokollPopover
-└─ mock/                        Testdaten – nur von Modulwurzeln und App.tsx importiert
-scripts/jh-sign.mjs · scripts/contrast.jh.ts
+├─ modules/app/                 Techniker-App (rev 03): AppPage (Routen, Kontext) · AppLayout (Telefonrahmen, Tabs, Menü) ·
+│                               HeuteSeite · EinsatzSeite · WocheSeite · RapportSeite · EinsatzKarte · app.model
+├─ modules/rapport/             Servicerapport, geteilt von App und Büro: RapportFormular · UnterschriftFeld · NachrichtDialog ·
+│                               ZurueckDialog · RapportDruck (A4, QR) · rapport.model · rapportStatus
+├─ modules/rapporte/            Büro-Modul «Servicerapporte»: RapportePage (Kacheln als Filter, Liste, Prüfung, Freigabe)
+├─ mock/                        Testdaten – nur von Modulwurzeln und App.tsx importiert (rapporte.ts: Statusverläufe, Rapporte)
+└─ test/testdaten.ts            Testhelfer auf dem echten Mock (deterministisch, relativ zu heute)
+scripts/jh-sign.mjs · scripts/contrast.jh.ts · scripts/demo.jh.mjs
+docs/adr · docs/design · docs/tests · docs/prompts
 TODO.jh.md · CHANGELOG.jh.md
 ```
 
 **Abhängigkeitsrichtung:** `modules/*` → `core/*`. `core` kennt keine Module und keine Mockdaten
-(Mock-Auth bekommt sein Benutzerverzeichnis in `main.tsx` injiziert).
+(Mock-Auth bekommt sein Benutzerverzeichnis in `main.tsx` injiziert). `modules/app` und `modules/rapporte` sind
+weitere Sichten auf den Dispo-Store (ADR-002); `modules/rapport` ist der geteilte Rapport-Baustein ohne eigenen Store.
 
 **Muster pro Modul:** `*.types.ts` → `store/*.reducer.ts` (rein) → `store/*.selectors.ts` (rein) →
 `store/use*Aktionen.ts` (Protokolltext, IDs, Zeitstempel) → Komponenten (dumm, explizite Props).
@@ -257,16 +273,38 @@ Seitenleiste zeigt `v0.2.0 · ◆ JH`; der Tooltip trägt Build-Datum und Commit
 - **Liste**: sortierbar, gruppierbar (Techniker/Status/Kategorie/Region), Spalten ein-/ausblendbar, Mehrfachauswahl → Techniker zuweisen, auf Datum verschieben.
 - **Karte**: Pins in Tagesreihenfolge, Linien pro Techniker ab Werkhof, synchrone Tourenliste, Karte/Schema umschaltbar.
 - **Rechtes Panel**: Eingang (nach Dringlichkeit, dann Alter) · Wartet auf Teil (Liefertermin, «Folgetermin vorschlagen») ·
-  Erledigt (Rapport offen/erstellt/unterschrieben, Rechnung offen/gestellt/bezahlt); Suche, Ziehgriff, Schiene.
-- **Akte**: siehe CHANGELOG rev 02; Bearbeiten-Dialog, Verschieben-Popover, Kopieren legt eine Pendenz an, Löschen entfernt Einsätze und Pendenzen (undo-fähig).
+  Erledigt (Rapport offen/erstellt/unterschrieben/freigegeben/verrechnet, Rechnung offen/gestellt/bezahlt); Suche, Ziehgriff, Schiene.
+- **Akte**: siehe CHANGELOG rev 02; Bearbeiten-Dialog, Verschieben-Popover, Kopieren legt eine Pendenz an, Löschen entfernt Einsätze, Pendenzen, Rapporte und Nachrichten (undo-fähig);
+  seit rev 03 Abschnitte «Servicerapport» (Kennzahlen, Unterschrift, Freigeben · Zurück · Verrechnen · Drucken) und «Nachrichten», SMS-Terminbestätigung statt Schloss.
 - **Tastatur**: `T` heute · `←/→` blättern · `1–4` Ansicht · `[` `]` Leisten · `N` neuer Auftrag · `Strg+K` Palette ·
   `Esc` schliessen · `Strg+Z/Y` · `?` Hilfe · Drag: Leertaste, Pfeile, ↵.
+
+### Aussendienst v0.3 – Techniker-App und Servicerapport
+- **Techniker-App** `/app`: Aussendienst-Konten landen hier nach dem Login; der Innendienst öffnet sie aus der Akte
+  («Techniker-App öffnen» / «In der App erfassen», zweites Fenster) oder per `?als=T-MB`. Heute-Liste mit Tagesleiste
+  (erledigt · Einsatz · Fahrt · jetzt), Einsatzkarten in Reihenfolge, **ein** grosser Statusknopf für den Einsatz des Moments
+  («Abfahrt» → «Angekommen» → «Fertig – Rapport»), Anruf, Route, Details, «Mieter informieren» (SMS mit Ankunftszeit),
+  Woche, Banner «Plan geändert» mit «Gesehen», Offline-Hinweis. Am Desktop im Telefonrahmen 390 × 844 (`?rahmen=0` ohne).
+- **Servicerapport**: vorausgefüllt aus Auftrag, Gerät und Statusverlauf – Zeiten (Anfahrt/Arbeit/Pause im 5-min-Raster,
+  verrechenbar), Checkliste je Geräteart plus eigene Schritte, Bemerkung, Teile (eingebaut · ab Fahrzeug · bestellen),
+  Fotos mit Motiv (Kamera oder Platzhalter), Typenschild-Vorschlag für «noch nicht erfasste» Geräte, Abschluss
+  (erledigt · Folgetermin · Teil bestellt · nicht angetroffen), Unterschrift mit dem Finger. Speichern = «erstellt», mit
+  Unterschrift «unterschrieben»; Abschliessen setzt den Einsatzstatus, legt bei Bedarf die Pendenz in den Eingang und
+  schreibt bestellte Teile mit Liefertermin an den Auftrag. Druck A4 mit QR-Code (`/rapporte/:id/druck`).
+- **Büro**: Modul Servicerapporte `/rapporte` (Kacheln Alle · Fehlend · Zu prüfen · Zu verrechnen · Verrechnet als Filter,
+  Suche, Rapport lesend mit Freigeben · Zurück an Techniker · Verrechnen · Drucken · Per Mail · Im Plan), Akte-Abschnitt
+  «Servicerapport», Konflikte «Rapport fehlt» / «Unterschrift fehlt», Panel Erledigt mit fünf Stufen.
+  Rapportstatus: offen → erstellt → unterschrieben → freigegeben → verrechnet (Rechnung «gestellt»); «Zurück an Techniker»
+  öffnet ihn wieder, löscht die Unterschrift und zeigt dem Techniker die Bemerkung des Büros.
+- **Persistenz & Demo**: Stand in `localStorage`, zwischen Fenstern gespiegelt; «Demo zurücksetzen» (Benutzermenü, Palette)
+  lädt den Ausgangsbestand – in allen Fenstern.
 
 ### Mockdaten
 Alles hängt am echten Datum (`MOCK_HEUTE`). Heute (6 Techniker) und der Eingang sind handverlesen, die
 übrigen Tage und Techniker füllt ein deterministischer Generator (Saat = Datum + Techniker); Absenzen liegen
 relativ zu heute. Koordinaten sind Näherungen auf Strassenniveau, Fahrzeit = Luftlinie × 1.35 bei 28 km/h + 4 min.
-Alle Firmen, Personen, Nummern und E-Mails (`.example`) sind **erfunden**.
+Erledigte Einsätze tragen Statusverläufe (Abfahrt, Ankunft, Fertig) und Rapporte aus der Saat; fehlende Rapporte gibt es
+nur aus den letzten drei Tagen. Alle Firmen, Personen, Nummern und E-Mails (`.example`) sind **erfunden**.
 
 ---
 
@@ -301,6 +339,21 @@ Alle Firmen, Personen, Nummern und E-Mails (`.example`) sind **erfunden**.
 13. **Techniker-Kalender wie in Outlook** – Jeder Techniker ist ein Kalender mit eigener Farbe, per Chip ein- und ausblendbar;
     im Tag nebeneinander, in der Woche überlagert mit Kürzel und Farbbalken. *Warum:* Das Modell kennt jeder aus Outlook –
     niemand muss lernen, wie man drei Kollegen vergleicht.
+14. **Ein-Daumen-Status** (rev 03) – In der App gibt es pro Moment genau einen grossen Knopf: Abfahrt, Angekommen, Fertig.
+    Jeder Druck ist ein Zeitstempel; der Leitstand sieht ihn sofort (Live-Puls, Verlauf, Block). *Warum:* Der Techniker steht
+    mit der Werkzeugkiste vor der Tür – zwei Sekunden, ein Daumen, kein Formular.
+15. **Rapport in 90 Sekunden** – Zeiten kommen aus den Statusknöpfen, die Checkliste aus der Geräteart, Teile aus dem Auftrag,
+    der Fehlercode aus dem Fehlerbild. Der Techniker bestätigt, korrigiert, lässt unterschreiben. *Warum:* Der Papierrapport
+    wird abends im Auto geschrieben – oder gar nicht. Hier entsteht er vor Ort, mit Unterschrift des Mieters.
+16. **Abschluss mit Folgen** – «Teil bestellt» setzt den Einsatz auf «Wartet auf Teil», legt das Ersatzteil mit Liefertermin an
+    und den Folgetermin in den Eingang; «Nicht angetroffen» hält die SMS-Vorlage bereit. *Warum:* Der Rapport ist kein
+    Dokument, sondern der nächste Planungsschritt – nichts davon muss das Büro abtippen.
+17. **Zwei Fenster, ein Stand** – Plantafel und Techniker-App teilen den Stand über `localStorage`; eine Verschiebung im Büro
+    meldet die App als «Plan geändert», ein Statusknopf im Feld färbt den Block im Leitstand. *Warum:* Die Demo zeigt die
+    Rückkopplung Büro ↔ Feld live – ohne Server, mit denselben Regeln, die später die API einhält (ADR-001).
+18. **Typenschild-Vorschlag** – Fotografiert der Techniker das Typenschild eines «noch nicht erfassten» Geräts, schlägt der
+    Rapport Modell, Typ und Seriennummer vor; «Übernehmen» schreibt sie an das Gerät. *Warum:* Gerätedaten aus der
+    Telefon-Schnellerfassung würden sonst nie nachgetragen (`jh# 010`, `jh# 014`).
 
 ---
 
@@ -314,15 +367,23 @@ Alle Firmen, Personen, Nummern und E-Mails (`.example`) sind **erfunden**.
 6. Nummernkreis der Aufträge (`26-04817`)? – `mock/auftraege.ts`
 7. Verlaufsphasen vollständig («offeriert», «verrechnet»)? – `akte/AkteVerlauf.tsx`
 8. Planen vor dem Liefertermin nur Hinweis oder sperren? – `drag/DispoDnd.tsx`
-9. Status aus der Techniker-App statt vom Disponenten? – `akte/Akte.tsx`
+9. Status kommt seit rev 03 aus der Techniker-App – darf das Büro ihn überschreiben, und wer gewinnt bei Widerspruch? – `akte/Akte.tsx`
 10. Benutzer & Anmeldung (heute Demo-Zugänge) – `core/auth/`
 11. «Malerarbeiten» selbst oder vermittelt? – `core/domain/kategorie.ts`
+12. Nummernkreis der Servicerapporte (`R-26-00417`)? – `core/domain/rapport.ts`
+13. Checklisten je Geräteart – heute im Kopf des Technikers oder auf dem Papierrapport? – `core/domain/rapport.ts`
+14. Lieferfrist beim Hersteller (angenommen 3 Arbeitstage) – je Marke verschieden? – `store/useDispoAktionen.ts`
+15. Büronummer und Absendername für SMS und Mail? – `core/domain/nachricht.ts`
+16. Fristen für «Rapport fehlt» (1 Tag) und «Unterschrift fehlt» (2 Tage) im Konflikt-Wächter? – `modules/dispo/konflikte.ts`
+17. Genügt die Unterschrift auf dem Telefon (Name, Zeit, Pfad) der Buchhaltung, oder braucht es den Mail-Beleg? – `modules/rapport/UnterschriftFeld.tsx`
 
 ---
 
-## 10 · Bewusst nicht in v0.2
+## 10 · Bewusst nicht in v0.3
 
-Kein Backend, keine Auth-Prüfung, keine echten Daten, keine Persistenz der Planänderungen (Reload = Ausgangslage),
+Kein Backend, keine Auth-Prüfung, keine echten Daten. Persistenz nur als `localStorage`-Stand desselben Tages (Reload hält
+ihn, «Demo zurücksetzen» verwirft ihn, ein neuer Tag beginnt frisch). Kein echter SMS/Mail-Versand (Vorschau + Protokoll),
+kein echtes OCR (`jh# 014`), Kamerafotos nur im Fenster (`jh# 012`), keine Offline-Warteschlange (`jh# 013`),
 kein Routing-Dienst (Fahrzeit ist Luftlinie × Faktor), OSM-Kacheln nur fürs Mockup (`jh# 007`).
 
 ---
@@ -337,5 +398,8 @@ Panel «Erledigt», Panel-Schiene, Hovercard.
 Die grosse Karte zeigt auf den Bildern die Schemakarte: der eingebettete Prüf-Browser drosselt `requestAnimationFrame`,
 MapLibre meldet kein `load`, nach 10 s greift der Fallback. Im normalen Browser erscheinen die OSM-Kacheln – wie im
 Kartenkopf der Akte zu sehen.
+
+rev 03 (Techniker-App im Telefonrahmen, Rapport-Erfassung, Modul Servicerapporte, Akte mit Rapport-Abschnitt) ist noch
+nicht abgelichtet – die Bilder entstehen mit der zweiten Demo-Tour (`npm run demo:video`).
 
 /* ◆ jh · eof */
