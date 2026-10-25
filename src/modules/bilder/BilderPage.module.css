@@ -1,0 +1,96 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/bilder/BilderPage.module.css               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Bilder: Galerie nach Tag, Kacheln mit Beschriftung                    │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Galerie ────────────────────────────────────────────── */
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.galerie {
+  flex: 1;
+  min-height: 0;
+  padding: 0 16px 24px;
+  overflow-y: auto;
+  background: var(--sl-paper);
+}
+
+.tag {
+  padding-top: 16px;
+}
+
+.tag-kopf {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 6px 0;
+  background: var(--sl-paper);
+  border-bottom: var(--sl-hairline);
+}
+
+.tag-datum {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.tag-datum .mono {
+  font-weight: var(--sl-fw-regular);
+  color: var(--sl-mute);
+}
+
+.tag-anzahl {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.raster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 10px;
+  padding-top: 10px;
+}
+
+.bild {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 6px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+  text-align: left;
+}
+
+.bild:hover {
+  border-color: var(--sl-line-strong);
+  background: var(--sl-hover);
+}
+
+.bild-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.bild-motiv {
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+}
+
+.bild-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ◆ jh · eof */
