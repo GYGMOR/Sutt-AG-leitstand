@@ -1,0 +1,182 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dashboard/DashboardPage.module.css         │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Dashboard: Kopf, Kachelwand, Kartenraster, Listen                     │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Seite ──────────────────────────────────────────────── */
+
+.seite {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  min-height: 0;
+  padding: 16px 24px 32px;
+  overflow-y: auto;
+  background: var(--sl-paper);
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.titel {
+  font-size: var(--sl-fs-28);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+}
+
+.kopf-text {
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Raster ─────────────────────────────────────────────── */
+
+.raster {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 12px;
+}
+
+.karte {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px 14px 12px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.karte-feld {
+  grid-row: span 2;
+}
+
+.karte-kapazitaet {
+  padding: 0;
+  overflow: hidden;
+}
+
+.karte-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.karte-fuss {
+  margin-top: auto;
+  padding-top: 6px;
+  border-top: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.leer {
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+}
+
+/* ── §3 · Feld ───────────────────────────────────────────────── */
+
+.feld {
+  display: flex;
+  flex-direction: column;
+}
+
+.feld-zeile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+}
+
+.feld-zeile:last-child {
+  border-bottom: 0;
+}
+
+.feld-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.feld-name {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+}
+
+.feld-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feld-zaehler {
+  padding: 2px 6px;
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.feld-zaehler:hover {
+  background: var(--sl-hover);
+}
+
+/* ── §4 · Listen ─────────────────────────────────────────────── */
+
+.liste {
+  display: flex;
+  flex-direction: column;
+}
+
+.listen-zeile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-13);
+}
+
+.listen-zeile:last-child {
+  border-bottom: 0;
+}
+
+.listen-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--sl-ink-2);
+}
+
+.listen-haupt {
+  color: var(--sl-ink);
+  font-weight: var(--sl-fw-medium);
+}
+
+.listen-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+}
+
+/* ◆ jh · eof */
