@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  styles/tokens.css                                  │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Design-Tokens (Light) – einzige Quelle für Farbe, Mass, Typo          │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -38,7 +38,8 @@
   --sl-danger: #b3261e;
   --sl-danger-ink: #9a1f18;
   --sl-danger-wash: rgb(179 38 30 / 0.1);
-  --sl-ok: #2e7d5b;
+  /* jh› rev 04: Grün auch als Schrift auf Paper (Kacheln, Chips) – 4.6:1 statt 4.47:1. */
+  --sl-ok: #2b7857;
   --sl-warn: #c08a00;
 
   /* Rahmen (Topbar, Login links) – Anthrazit in beiden Modi */

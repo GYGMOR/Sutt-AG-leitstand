@@ -1,12 +1,13 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/KundenChips.tsx                      │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Kunden-Info-Chips: Rechnung offen, Stammkunde, Schlüssel, Hund …      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { CircleParking, Dog, KeyRound, Receipt, Star, TriangleAlert } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useHeute } from '../../core/arbeitstag';
+import { HINWEIS_LABEL } from '../../core/domain/stammdaten';
 import type { HinweisArt, Kunde, KundenHinweis, Liegenschaft } from '../../core/domain/stammdaten';
 import { formatSeit } from '../../core/format';
 import { Chip } from '../../core/ui/Chip';
@@ -15,7 +16,7 @@ import styles from './KundenChips.module.css';
 
 // ── §1 · Zuordnung ───────────────────────────────────────────────
 
-const ICON: Readonly<Record<HinweisArt, LucideIcon>> = {
+export const HINWEIS_ICON: Readonly<Record<HinweisArt, LucideIcon>> = {
   'rechnung-offen': Receipt,
   stammkunde: Star,
   'schluessel-verwaltung': KeyRound,
@@ -24,16 +25,9 @@ const ICON: Readonly<Record<HinweisArt, LucideIcon>> = {
   parkplatz: CircleParking,
 };
 
-const KURZ: Readonly<Record<HinweisArt, string>> = {
-  'rechnung-offen': 'Rechnung offen',
-  stammkunde: 'Stammkunde',
-  'schluessel-verwaltung': 'Schlüssel bei Verwaltung',
-  hund: 'Hund im Haus',
-  vorsicht: 'Vorsicht',
-  parkplatz: 'Parkieren',
-};
+const KURZ = HINWEIS_LABEL;
 
-const TON: Readonly<Record<HinweisArt, ChipTone>> = {
+export const HINWEIS_TON: Readonly<Record<HinweisArt, ChipTone>> = {
   'rechnung-offen': 'danger',
   stammkunde: 'ok',
   'schluessel-verwaltung': 'neutral',
@@ -46,7 +40,8 @@ const TON: Readonly<Record<HinweisArt, ChipTone>> = {
 
 interface KundenChipsProps {
   kunde: Kunde;
-  liegenschaft: Liegenschaft;
+  /** Fehlt sie (Kundendossier), zählen nur die Hinweise des Kunden. */
+  liegenschaft?: Liegenschaft;
   /** Nur Icons mit Tooltip (Karten im Eingang, Hovercard). */
   kompakt?: boolean;
 }
@@ -55,7 +50,7 @@ interface KundenChipsProps {
 //     Liegenschaft zusammen, Rechnungsstand aus dem Datum gerechnet.
 export function KundenChips({ kunde, liegenschaft, kompakt = false }: KundenChipsProps) {
   const heute = useHeute();
-  const hinweise: KundenHinweis[] = [...kunde.hinweise, ...liegenschaft.hinweise];
+  const hinweise: KundenHinweis[] = [...kunde.hinweise, ...(liegenschaft?.hinweise ?? [])];
   if (kunde.rechnungOffenSeit && !hinweise.some((hinweis) => hinweis.art === 'rechnung-offen')) {
     hinweise.unshift({ art: 'rechnung-offen', text: `Rechnung offen ${formatSeit(kunde.rechnungOffenSeit, heute)}` });
   }
@@ -64,7 +59,7 @@ export function KundenChips({ kunde, liegenschaft, kompakt = false }: KundenChip
   return (
     <div className={styles.chips}>
       {hinweise.map((hinweis, index) => {
-        const Icon = ICON[hinweis.art];
+        const Icon = HINWEIS_ICON[hinweis.art];
         const label = hinweis.art === 'rechnung-offen' && kunde.rechnungOffenSeit ? `Rechnung offen ${formatSeit(kunde.rechnungOffenSeit, heute)}` : KURZ[hinweis.art];
         if (kompakt) {
           return (
@@ -74,7 +69,7 @@ export function KundenChips({ kunde, liegenschaft, kompakt = false }: KundenChip
           );
         }
         return (
-          <Chip key={`${hinweis.art}-${index}`} icon={Icon} tone={TON[hinweis.art]} size="md" title={hinweis.text}>
+          <Chip key={`${hinweis.art}-${index}`} icon={Icon} tone={HINWEIS_TON[hinweis.art]} size="md" title={hinweis.text}>
             {label}
           </Chip>
         );

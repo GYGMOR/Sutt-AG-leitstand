@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/akte/AkteFotos.module.css            │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Fotoraster und Lightbox                                               │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -71,36 +71,5 @@
 }
 
 /* ── §2 · Lightbox ───────────────────────────────────────────── */
-
-.lightbox {
-  position: relative;
-  display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) 32px;
-  gap: var(--sl-space-3);
-  align-items: center;
-  justify-items: center;
-  padding-bottom: 24px;
-}
-
-.zaehler {
-  position: absolute;
-  left: 44px;
-  bottom: 0;
-  font-family: var(--sl-font-mono);
-  font-size: var(--sl-fs-12);
-  color: var(--sl-mute);
-}
-
-.schliessen-hinweis {
-  position: absolute;
-  right: 44px;
-  bottom: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--sl-font-mono);
-  font-size: var(--sl-fs-label);
-  color: var(--sl-mute);
-}
 
 /* ◆ jh · eof */

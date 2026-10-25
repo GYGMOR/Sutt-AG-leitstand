@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/akte/Akte.tsx                        │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Auftrags-Akte: Karte, Kopf, Einsatz, Rapport, Fotos, Teile, Verlauf   │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -44,7 +44,8 @@ import { CapsLabel } from '../../../core/ui/CapsLabel';
 import { Chip } from '../../../core/ui/Chip';
 import { DetailZeile } from '../../../core/ui/DetailZeile';
 import { ConfirmDialog, Dialog } from '../../../core/ui/Dialog';
-import { Typenschild, TypenschildPlatte } from '../../../core/ui/Typenschild';
+import { TypenschildPlatte } from '../../../core/ui/Typenschild';
+import { Verweis, ZIEL } from '../../../core/ui/Verweis';
 import { cx } from '../../../core/ui/cx';
 import { kategorieKlasse, statusKlasse } from '../../../core/ui/farben';
 import { NachrichtDialog } from '../../rapport/NachrichtDialog';
@@ -200,7 +201,7 @@ export function Akte({
         {/* ── Kopf ── */}
         <header className={styles.kopf}>
           <div className={styles.kopfZeile}>
-            <Typenschild label="Auftrag" wert={auftrag.nummer} size="md" />
+            <Verweis zu={ZIEL.auftrag(auftrag.id)} label="Auftrag" wert={auftrag.nummer} size="md" title="Im Modul Aufträge öffnen" />
             <IconButton icon={Pencil} label="Bearbeiten" size="sm" onClick={() => setBearbeiten(true)} />
           </div>
           <h2 className={styles.titel}>{kunde.name}</h2>
@@ -357,6 +358,7 @@ export function Akte({
               </>
             }
             zusatz={`${KUNDENART_LABEL[kunde.art]} · ${kunde.nummer}`}
+            aktionen={<Verweis zu={ZIEL.kunde(kunde.id)} label="Kunde" wert={kunde.nummer} title="Kundendossier öffnen" />}
           />
           <DetailZeile
             icon={Phone}
@@ -395,7 +397,7 @@ export function Akte({
         </Abschnitt>
 
         {/* ── Gerät & Fehlerbild ── */}
-        <Abschnitt titel="Gerät & Fehlerbild">
+        <Abschnitt titel="Gerät & Fehlerbild" zusatz={<Verweis zu={ZIEL.geraet(geraet.id)} label="Kartei" wert={geraet.seriennummer} title="Gerätekartei öffnen" />}>
           <TypenschildPlatte
             titel="Typenschild"
             marke={geraet.marke}

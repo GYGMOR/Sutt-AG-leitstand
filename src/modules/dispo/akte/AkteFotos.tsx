@@ -1,17 +1,16 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/akte/AkteFotos.tsx                   │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Fotos im 4er-Raster mit Lightbox                                      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useState } from 'react';
-import { Camera, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import { FOTO_MOTIV_LABEL } from '../../../core/domain/auftrag';
 import type { Foto } from '../../../core/domain/auftrag';
 import { formatZeitpunkt } from '../../../core/format';
-import { IconButton } from '../../../core/ui/Button';
-import { Dialog } from '../../../core/ui/Dialog';
 import { FotoKachel } from '../../../core/ui/FotoKachel';
+import { FotoLightbox } from '../../../core/ui/FotoLightbox';
 import styles from './AkteFotos.module.css';
 
 // ── §1 · Komponente ──────────────────────────────────────────────
@@ -22,7 +21,6 @@ interface AkteFotosProps {
 
 export function AkteFotos({ fotos }: AkteFotosProps) {
   const [offen, setOffen] = useState<number | null>(null);
-  const aktuell = offen !== null ? fotos[offen] : undefined;
 
   if (fotos.length === 0) {
     return (
@@ -45,21 +43,7 @@ export function AkteFotos({ fotos }: AkteFotosProps) {
         ))}
       </ul>
 
-      <Dialog open={aktuell !== undefined} onClose={() => setOffen(null)} titel={aktuell ? FOTO_MOTIV_LABEL[aktuell.motiv] : ''} untertitel={aktuell ? `${formatZeitpunkt(aktuell.aufgenommenAm)} · ${aktuell.technikerKuerzel}` : undefined} breite="md">
-        {aktuell && offen !== null && (
-          <div className={styles.lightbox}>
-            <IconButton icon={ChevronLeft} label="Vorheriges Foto" onClick={() => setOffen((offen + fotos.length - 1) % fotos.length)} disabled={fotos.length < 2} />
-            <FotoKachel foto={aktuell} gross />
-            <IconButton icon={ChevronRight} label="Nächstes Foto" onClick={() => setOffen((offen + 1) % fotos.length)} disabled={fotos.length < 2} />
-            <span className={styles.zaehler}>
-              {offen + 1} / {fotos.length}
-            </span>
-            <span className={styles.schliessenHinweis}>
-              <X size={16} strokeWidth={1.5} aria-hidden /> Esc
-            </span>
-          </div>
-        )}
-      </Dialog>
+      <FotoLightbox fotos={fotos} offen={offen} onWechsel={setOffen} onClose={() => setOffen(null)} />
     </>
   );
 }

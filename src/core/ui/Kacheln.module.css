@@ -1,0 +1,107 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Kacheln.module.css                         │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Zählkacheln: Reihe, aktive Kachel, Töne, grosse Form fürs Dashboard   │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Reihe ──────────────────────────────────────────────── */
+
+.kacheln {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 1px;
+  border-bottom: var(--sl-hairline);
+  background: var(--sl-line-soft);
+}
+
+.kachel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px 10px 8px;
+  background: var(--sl-surface);
+  text-align: left;
+}
+
+.kachel:hover {
+  background: var(--sl-hover);
+}
+
+.aktiv {
+  box-shadow: inset 0 -3px 0 var(--sl-ink);
+}
+
+.zahl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sl-font-mono);
+  font-size: 20px;
+  font-weight: var(--sl-fw-semibold);
+  line-height: 1.1;
+}
+
+.icon {
+  color: var(--sl-mute);
+}
+
+.label {
+  font-size: 10px;
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hinweis {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+/* ── §2 · Töne ───────────────────────────────────────────────── */
+
+.signal .zahl {
+  color: var(--sl-signal-ink);
+}
+
+.ok .zahl {
+  color: var(--sl-ok);
+}
+
+.danger .zahl {
+  color: var(--sl-danger-ink);
+}
+
+.mute .zahl {
+  color: var(--sl-mute);
+}
+
+/* ── §3 · Gross (Dashboard) ──────────────────────────────────── */
+
+.gross {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  border-bottom: 0;
+  background: transparent;
+}
+
+.gross .kachel {
+  gap: 4px;
+  padding: 14px 16px 12px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+}
+
+.gross .zahl {
+  font-size: 28px;
+}
+
+.gross .label {
+  font-size: var(--sl-fs-label);
+}
+
+/* ◆ jh · eof */

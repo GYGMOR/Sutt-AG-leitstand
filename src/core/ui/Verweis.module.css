@@ -1,0 +1,40 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Verweis.module.css                         │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Verweis als Typenschild mit Pfeil                                     │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Verweis ────────────────────────────────────────────── */
+
+.verweis {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 2px 4px 2px 0;
+  border-radius: var(--sl-radius-1);
+  color: var(--sl-ink);
+  text-decoration: none;
+}
+
+.verweis:hover {
+  background: var(--sl-hover);
+}
+
+.verweis:hover .pfeil {
+  color: var(--sl-signal-ink);
+}
+
+.text {
+  font-size: var(--sl-fs-13);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pfeil {
+  flex: none;
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

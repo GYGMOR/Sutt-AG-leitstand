@@ -1,0 +1,118 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Tabelle.module.css                         │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Tabelle: klebender Kopf, Sortierknöpfe, aktive Zeile, Container       │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rahmen ─────────────────────────────────────────────── */
+
+.rahmen {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  container-type: inline-size;
+}
+
+.tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sl-fs-13);
+}
+
+.tabelle thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0 10px;
+  border-bottom: var(--sl-hairline);
+  background: var(--sl-surface);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.kopf-text,
+.sort-knopf {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.sort-knopf:hover {
+  color: var(--sl-ink);
+}
+
+.sort-knopf svg {
+  opacity: 0.5;
+}
+
+.sort-aktiv {
+  color: var(--sl-ink);
+}
+
+.sort-aktiv svg {
+  opacity: 1;
+}
+
+/* ── §2 · Zeilen ─────────────────────────────────────────────── */
+
+.zeile td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--sl-line-soft);
+  vertical-align: middle;
+}
+
+.dicht .zeile td {
+  padding: 5px 8px;
+}
+
+.klickbar {
+  cursor: pointer;
+}
+
+.klickbar:hover td {
+  background: var(--sl-hover);
+}
+
+.klickbar:focus-visible {
+  outline: 2px solid var(--sl-signal);
+  outline-offset: -2px;
+}
+
+.aktiv td {
+  background: var(--sl-paper);
+}
+
+.aktiv td:first-child {
+  box-shadow: inset 3px 0 0 var(--sl-signal);
+}
+
+.rechts {
+  text-align: right;
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.leer {
+  padding: 24px 16px;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+  text-align: center;
+}
+
+/* ── §3 · Schmal ─────────────────────────────────────────────── */
+
+@container (max-width: 760px) {
+  .nebensaechlich {
+    display: none;
+  }
+}
+
+/* ◆ jh · eof */

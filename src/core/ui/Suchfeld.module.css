@@ -1,0 +1,36 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Suchfeld.module.css                        │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Suchfeld: Lupe links, Leeren rechts                                   │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Feld ───────────────────────────────────────────────── */
+
+.suche {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+}
+
+.lupe {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--sl-mute);
+  pointer-events: none;
+}
+
+.feld {
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.leeren {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ◆ jh · eof */

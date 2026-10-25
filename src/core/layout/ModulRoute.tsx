@@ -1,0 +1,29 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/layout/ModulRoute.tsx                         │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Rollen-Wächter je Modulroute: gesperrt → Folgt-Seite mit Begründung   │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+import type { ReactNode } from 'react';
+import { useBenutzer } from '../auth/authStore';
+import { findModul, pruefeFreigabe } from '../modules.config';
+import type { ModulId } from '../modules.config';
+import { FolgtPage } from './FolgtPage';
+
+// ── §1 · Komponente ──────────────────────────────────────────────
+
+interface ModulRouteProps {
+  id: ModulId;
+  children: ReactNode;
+}
+
+// jh› Seitenleiste und Palette zeigen das Schloss – die Route muss es ebenso tun,
+//     sonst öffnet ein getippter Pfad das Modul an der Rolle vorbei.
+export function ModulRoute({ id, children }: ModulRouteProps) {
+  const benutzer = useBenutzer();
+  const freigabe = pruefeFreigabe(findModul(id), benutzer?.rolle ?? null);
+  if (!freigabe.ok) return <FolgtPage />;
+  return <>{children}</>;
+}
+
+/* ◆ jh · eof */

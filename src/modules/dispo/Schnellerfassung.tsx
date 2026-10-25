@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/Schnellerfassung.tsx                 │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Telefon-Schnellerfassung (N): Nummer → Kunde → Gerät → Slot, < 30 s   │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -44,6 +44,15 @@ export interface TelefonTreffer {
   wohnungNummer?: string;
 }
 
+/** Vorbelegung aus Kunden-, Geräte- oder Auftragsdossier – die Nummer bleibt frei. */
+export interface Vorbelegung {
+  kundeId?: string;
+  liegenschaftId?: string;
+  geraetId?: string;
+  wohnungNummer?: string;
+  telefon?: string;
+}
+
 interface SchnellerfassungProps {
   open: boolean;
   stammdaten: DispoStammdaten;
@@ -51,6 +60,7 @@ interface SchnellerfassungProps {
   telefonbuch: readonly TelefonTreffer[];
   heute: IsoDatum;
   jetztMin: Minuten;
+  vorbelegung?: Vorbelegung;
   onClose: () => void;
   onCreate: (auftrag: Auftrag, optionen: { geraet?: Geraet; pendenz?: Pendenz; einsatz?: Einsatz }) => void;
 }
@@ -65,7 +75,7 @@ function nurZiffern(text: string): string {
 
 // ── §2 · Komponente ──────────────────────────────────────────────
 
-export function Schnellerfassung({ open, stammdaten, einsaetze, telefonbuch, heute, jetztMin, onClose, onCreate }: SchnellerfassungProps) {
+export function Schnellerfassung({ open, stammdaten, einsaetze, telefonbuch, heute, jetztMin, vorbelegung, onClose, onCreate }: SchnellerfassungProps) {
   const [telefon, setTelefon] = useState('');
   const [kundeId, setKundeId] = useState('');
   const [liegenschaftId, setLiegenschaftId] = useState('');
@@ -88,6 +98,14 @@ export function Schnellerfassung({ open, stammdaten, einsaetze, telefonbuch, heu
     if (!open) return undefined;
     setStart(Date.now());
     setSekunden(0);
+    // jh› Aus einem Dossier geöffnet: Kunde, Liegenschaft, Gerät stehen schon – nur das Problem fehlt.
+    if (vorbelegung) {
+      if (vorbelegung.kundeId) setKundeId(vorbelegung.kundeId);
+      if (vorbelegung.liegenschaftId) setLiegenschaftId(vorbelegung.liegenschaftId);
+      if (vorbelegung.geraetId) setGeraetId(vorbelegung.geraetId);
+      if (vorbelegung.wohnungNummer) setWohnung(vorbelegung.wohnungNummer);
+      if (vorbelegung.telefon) setTelefon(vorbelegung.telefon);
+    }
     window.setTimeout(() => telefonRef.current?.focus(), 0);
     const timer = window.setInterval(() => setSekunden(Math.floor((Date.now() - start) / 1000)), 1000);
     return () => window.clearInterval(timer);

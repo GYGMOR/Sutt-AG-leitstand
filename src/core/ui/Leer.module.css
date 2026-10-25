@@ -1,0 +1,40 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Leer.module.css                            │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Leerzustand                                                           │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Leer ───────────────────────────────────────────────── */
+
+.leer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--sl-mute);
+}
+
+.fuellend {
+  height: 100%;
+  min-height: 240px;
+}
+
+.icon {
+  color: var(--sl-mute-2);
+}
+
+.titel {
+  font-size: var(--sl-fs-16);
+  font-weight: var(--sl-fw-semibold);
+  color: var(--sl-ink);
+}
+
+.text {
+  max-width: 420px;
+  font-size: var(--sl-fs-13);
+}
+
+/* ◆ jh · eof */
