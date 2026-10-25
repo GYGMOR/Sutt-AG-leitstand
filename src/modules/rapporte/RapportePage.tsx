@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/rapporte/RapportePage.tsx                  │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Modul Servicerapporte: Sichten, Liste, Freigabe, Verrechnung          │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -33,6 +33,7 @@ import { buildFehlendeRapporte, buildRapportViews, zaehleRapporte } from '../dis
 import type { ErledigtView, RapportView } from '../dispo/store/dispo.selectors';
 import { initDispoStore, useDispoState } from '../dispo/store/dispoStore';
 import { useDispoAktionen } from '../dispo/store/useDispoAktionen';
+import { useDemoReset } from '../dispo/store/useDemoReset';
 import { NachrichtDialog } from '../rapport/NachrichtDialog';
 import { entwurfAus } from '../rapport/rapport.model';
 import { RapportFormular } from '../rapport/RapportFormular';
@@ -284,8 +285,10 @@ export function RapportePage() {
     [setDatum, aktionen, navigate],
   );
 
+  const demoReset = useDemoReset();
   const kommandos = useMemo<Kommando[]>(
     () => [
+      demoReset.kommando,
       ...SICHTEN.map<Kommando>((eintrag) => ({
         id: `rapporte:${eintrag.id}`,
         label: `Rapporte: ${eintrag.label}`,
@@ -302,12 +305,13 @@ export function RapportePage() {
         ? [{ id: 'rapporte:verrechnen', label: `${gewaehlt.rapport.nummer} verrechnen`, gruppe: 'aktion' as const, icon: Receipt, run: () => aktionen.verrechnenRapport(gewaehlt.rapport.id) }]
         : []),
     ],
-    [gewaehlt, aktionen, navigate],
+    [gewaehlt, aktionen, navigate, demoReset.kommando],
   );
   useRegisterKommandos('rapporte', kommandos);
 
   return (
-    <AppShell modul={findModul('rapporte')}>
+    <AppShell modul={findModul('rapporte')} menueEintraege={demoReset.menueEintraege}>
+      {demoReset.dialog}
       <div className={cx(styles.seite, gewaehlt && styles.seiteDetail)}>
         <section className={styles.listeSpalte} aria-label="Rapporte">
           <div className={styles.kacheln} role="tablist" aria-label="Sicht">
