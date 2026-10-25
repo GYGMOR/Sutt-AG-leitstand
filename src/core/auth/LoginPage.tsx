@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/auth/LoginPage.tsx                            │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Anmeldeseite (Mock): Benutzername, Passwort, Rolle, Rollen-Weiche     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -21,13 +21,16 @@ import styles from './LoginPage.module.css';
 // ── §1 · Komponente ──────────────────────────────────────────────
 
 const STANDARD_ZIEL = '/dispo/plantafel';
+const DASHBOARD_ZIEL = '/dashboard';
 const APP_ZIEL = '/app';
 
-// jh› Aussendienst landet auf dem Handy-Plan, Innendienst im Leitstand – ausser jemand
-//     kam von einer bestimmten Seite, dann zurück dorthin.
+// jh› Aussendienst landet auf dem Handy-Plan, die Disposition in der Plantafel, Büro und
+//     Administration im Tagesüberblick – ausser jemand kam von einer bestimmten Seite.
 function zielFuer(rolle: Rolle, von: string | undefined): string {
-  if (von && von !== STANDARD_ZIEL && von !== '/') return von;
-  return rolle === 'aussendienst' ? APP_ZIEL : STANDARD_ZIEL;
+  if (von && von !== STANDARD_ZIEL && von !== DASHBOARD_ZIEL && von !== '/') return von;
+  if (rolle === 'aussendienst') return APP_ZIEL;
+  if (rolle === 'disposition') return STANDARD_ZIEL;
+  return DASHBOARD_ZIEL;
 }
 
 export function LoginPage() {

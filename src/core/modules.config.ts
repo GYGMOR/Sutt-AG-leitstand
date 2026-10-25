@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/modules.config.ts                             │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 04                                               │
    │  Modul-Register: einzige Quelle für Leiste, Palette und Routing        │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -90,8 +90,8 @@ const INNENDIENST: readonly Rolle[] = ['buero', 'disposition', 'administration']
 export const MODULE: readonly Modul[] = [
   {
     id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, gruppe: 'uebersicht', pfad: '/dashboard',
-    freigeschaltet: false, version: 'v0.3', rollen: ALLE,
-    beschreibung: 'Tagesüberblick: offene Aufträge, Auslastung, Konflikte, fällige Rapporte und Rechnungen auf einen Blick.',
+    freigeschaltet: true, rollen: ALLE,
+    beschreibung: 'Tagesüberblick: Feld, Eingang, Konflikte, fällige Rapporte, Rechnungen und Lieferungen – jede Zahl ein Sprung ins Modul.',
   },
   {
     id: 'plantafel', label: 'Plantafel', icon: CalendarRange, gruppe: 'disposition', pfad: '/dispo/plantafel',
@@ -120,28 +120,28 @@ export const MODULE: readonly Modul[] = [
   },
   {
     id: 'auftraege', label: 'Aufträge', icon: ClipboardList, gruppe: 'auftraege-kunden', pfad: '/auftraege',
-    freigeschaltet: false, version: 'v0.3', rollen: ALLE,
-    beschreibung: 'Auftragsverwaltung von der Anfrage bis zur Verrechnung: Reparatur, Service, Montage, Garantie, Offerten.',
+    freigeschaltet: true, rollen: ALLE,
+    beschreibung: 'Alle Aufträge von der Anfrage bis zur Zahlung: Phase ablesbar, Dossier mit Einsätzen, Rapport, Teilen und Rechnung.',
   },
   {
     id: 'kunden', label: 'Kunden & Liegenschaften', icon: Users, gruppe: 'auftraege-kunden', pfad: '/kunden',
-    freigeschaltet: false, version: 'v0.3', rollen: INNENDIENST,
-    beschreibung: 'Verwaltungen, Eigentümer, Mieter und Liegenschaften mit Wohnungen, Zugängen und Hauswarten.',
+    freigeschaltet: true, rollen: INNENDIENST,
+    beschreibung: 'Verwaltungen, Private und Gewerbe mit Liegenschaften, Hauswarten, Zugängen, Geräten und Aufträgen.',
   },
   {
     id: 'geraete', label: 'Geräte', icon: WashingMachine, gruppe: 'auftraege-kunden', pfad: '/geraete',
-    freigeschaltet: false, version: 'v0.4', rollen: ALLE,
-    beschreibung: 'Gerätekartei mit Typenschild-Scan, Garantie, Ersatzteil-Historie und allen Einsätzen pro Gerät.',
+    freigeschaltet: true, rollen: ALLE,
+    beschreibung: 'Gerätekartei mit Typenschild, Garantie, Standort, Ersatzteil-Historie und allen Einsätzen pro Gerät.',
   },
   {
     id: 'bilder', label: 'Bilder', icon: Images, gruppe: 'auftraege-kunden', pfad: '/bilder',
-    freigeschaltet: false, version: 'v0.4', rollen: ALLE,
-    beschreibung: 'Fotos aus dem Aussendienst, dem Auftrag und Gerät zugeordnet, für Rapport und Garantiefall.',
+    freigeschaltet: true, rollen: ALLE,
+    beschreibung: 'Alle Fotos aus dem Aussendienst – nach Tag, Motiv, Techniker, Kunde und Marke, mit Sprung zu Auftrag und Gerät.',
   },
   {
     id: 'lager', label: 'Lager & Ersatzteile', icon: Warehouse, gruppe: 'material', pfad: '/lager',
-    freigeschaltet: false, version: 'v0.4', rollen: INNENDIENST,
-    beschreibung: 'Lagerbestand Glattbrugg, Fahrzeuglager, Bestellungen beim Hersteller mit Lieferterminen.',
+    freigeschaltet: true, rollen: INNENDIENST,
+    beschreibung: 'Bestand Glattbrugg und Fahrzeuglager, Bestellungen mit Liefertermin, Wareneingang, Umbuchung, Journal.',
   },
   {
     id: 'mietgeraete', label: 'Mietgeräte', icon: KeyRound, gruppe: 'material', pfad: '/mietgeraete',
