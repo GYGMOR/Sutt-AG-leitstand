@@ -1,0 +1,147 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/auftraege/AuftraegePage.module.css         │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Aufträge: Tabellenzellen, Dossier-Abschnitte, Einsatzliste            │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Tabelle ────────────────────────────────────────────── */
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.zelle-kunde {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.kunde-name {
+  font-weight: var(--sl-fw-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kunde-ort {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.zelle-text {
+  display: block;
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zelle-techniker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sl-font-mono);
+}
+
+.leer-wert {
+  color: var(--sl-mute-2);
+}
+
+/* ── §2 · Dossier ────────────────────────────────────────────── */
+
+.dossier {
+  display: flex;
+  flex-direction: column;
+}
+
+.pendenz {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-signal);
+  border-radius: var(--sl-radius-1);
+  background: color-mix(in srgb, var(--sl-signal) 8%, var(--sl-surface));
+  font-size: var(--sl-fs-13);
+}
+
+.pendenz > span {
+  flex: 1;
+  min-width: 200px;
+}
+
+.einsaetze {
+  display: flex;
+  flex-direction: column;
+}
+
+.einsatz {
+  display: grid;
+  grid-template-columns: 8px auto auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 2px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-13);
+}
+
+.einsatz:last-child {
+  border-bottom: 0;
+}
+
+.einsatz-punkt {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sl-status, var(--sl-mute));
+}
+
+.einsatz-techniker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sl-font-mono);
+}
+
+.einsatz-status {
+  color: var(--sl-ink-2);
+}
+
+.fehlerbild {
+  margin: 10px 0 6px;
+  padding: 6px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-line-strong);
+  font-size: var(--sl-fs-13);
+}
+
+.notiz {
+  margin-bottom: 8px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.bestellungen {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.bestellungen li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.fussnote {
+  padding-top: 10px;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

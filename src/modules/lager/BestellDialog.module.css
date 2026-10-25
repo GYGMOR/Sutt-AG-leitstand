@@ -1,0 +1,26 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/lager/BestellDialog.module.css             │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Bestelldialog                                                         │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Inhalt ─────────────────────────────────────────────── */
+
+.inhalt {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.zeile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.hinweis {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */
