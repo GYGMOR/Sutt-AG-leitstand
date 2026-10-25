@@ -1,0 +1,184 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/geraete/GeraetePage.module.css             │
+   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  Geräte: Tabellenzellen, Dossier, Vorschlag, Teile-Tabelle, Formular   │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Tabelle ────────────────────────────────────────────── */
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.zelle-geraet {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.geraet-name {
+  font-weight: var(--sl-fw-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.geraet-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.leer-wert {
+  color: var(--sl-mute-2);
+}
+
+/* ── §2 · Dossier ────────────────────────────────────────────── */
+
+.dossier {
+  display: flex;
+  flex-direction: column;
+}
+
+.leer {
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+}
+
+.vorschlag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 4px;
+  padding: 10px 12px;
+  border-left: var(--sl-mark-width) solid var(--sl-signal);
+  border-radius: var(--sl-radius-1);
+  background: color-mix(in srgb, var(--sl-signal) 8%, var(--sl-surface));
+}
+
+.vorschlag-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--sl-fs-13);
+}
+
+.vorschlag-hinweis {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.einsaetze {
+  display: flex;
+  flex-direction: column;
+}
+
+.einsatz {
+  display: grid;
+  grid-template-columns: 8px auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-13);
+}
+
+.einsatz:last-child {
+  border-bottom: 0;
+}
+
+.einsatz-punkt {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sl-status, var(--sl-mute));
+}
+
+.einsatz-techniker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sl-font-mono);
+}
+
+.einsatz-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.teile {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sl-fs-13);
+}
+
+.teile th {
+  padding: 4px 8px 4px 0;
+  border-bottom: var(--sl-hairline);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+  text-align: left;
+}
+
+.teile td {
+  padding: 6px 8px 6px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+  vertical-align: middle;
+}
+
+.teil-nummer {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.historie {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--sl-fs-13);
+}
+
+.historie li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.historie svg {
+  color: var(--sl-mute);
+}
+
+.auftraege {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auftraege li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+/* ── §3 · Formular ───────────────────────────────────────────── */
+
+.formular {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.zeile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ◆ jh · eof */
