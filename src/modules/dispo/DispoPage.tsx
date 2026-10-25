@@ -1,11 +1,11 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/DispoPage.tsx                        │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 03                                               │
    │  Modulwurzel Disposition: Ansichten, Panel, Akte, DnD, Befehle         │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CalendarDays, CalendarRange, List, Map as MapIcon, Palette, Plus, Redo2, TriangleAlert, Undo2, UserRound } from 'lucide-react';
+import { CalendarDays, CalendarRange, List, Map as MapIcon, Palette, Plus, Redo2, RotateCcw, TriangleAlert, Undo2, UserRound } from 'lucide-react';
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import { meldeAenderungen } from '../../core/aenderungen';
 import { ZEITRAUM_LABEL, useArbeitstag } from '../../core/arbeitstag';
@@ -21,10 +21,12 @@ import { useNow } from '../../core/hooks/useNow';
 import { useRegisterKommandos, useRegisterSuchQuelle } from '../../core/kommando';
 import type { Kommando, SuchQuelle } from '../../core/kommando';
 import { AppShell } from '../../core/layout/AppShell';
+import type { MenueEintrag } from '../../core/layout/BenutzerMenu';
 import { findModul } from '../../core/modules.config';
 import { normalizeSuchtext } from '../../core/suche';
+import { ConfirmDialog } from '../../core/ui/Dialog';
 import { cx } from '../../core/ui/cx';
-import { mockBestand, mockStammdaten, mockTelefonbuch } from '../../mock';
+import { MOCK_HEUTE, mockBestand, mockStammdaten, mockTelefonbuch } from '../../mock';
 import { Akte } from './akte/Akte';
 import { buildAkte } from './akte/akte.model';
 import { DispoDnd } from './drag/DispoDnd';
@@ -49,6 +51,7 @@ import {
   buildTagesZeilen,
   buildWartetViews,
   pulsFor,
+  rapportFuerEinsatz,
   visibleTechniker,
 } from './store/dispo.selectors';
 import type { Puls } from './store/dispo.selectors';
@@ -66,7 +69,7 @@ import styles from './DispoPage.module.css';
 // ── §1 · Konfiguration ───────────────────────────────────────────
 
 // jh› Die Modulwurzel hängt den Mock ein – einzige Stelle, die mock/ importiert.
-initDispoStore(mockStammdaten, mockBestand);
+initDispoStore(mockStammdaten, mockBestand, MOCK_HEUTE);
 
 const ZEITRAEUME: Readonly<Record<Ansicht, readonly Zeitraum[]>> = {
   plantafel: ['tag', '3tage', 'arbeitswoche', 'woche'],
@@ -109,6 +112,7 @@ function DispoInhalt({ ansicht }: { ansicht: Ansicht }) {
   const [filter, setFilter] = useState<DispoFilter>(LEERER_FILTER);
   const [panelSuche, setPanelSuche] = useState('');
   const [schnellOffen, setSchnellOffen] = useState(false);
+  const [resetOffen, setResetOffen] = useState(false);
   const [konfliktIndex, setKonfliktIndex] = useState(0);
   const [restHoehe, setRestHoehe] = useState(0);
   const [skalaInfo, setSkalaInfo] = useState<{ skala: Skala; rowH: number } | null>(null);
@@ -121,7 +125,7 @@ function DispoInhalt({ ansicht }: { ansicht: Ansicht }) {
   }, [zeitraum, arbeitstag.zeitraum, setZeitraum]);
   const sichtbareTage = useMemo(() => (zeitraum === arbeitstag.zeitraum ? tage : [datum]), [zeitraum, arbeitstag.zeitraum, tage, datum]);
 
-  const { stammdaten, einsaetze, pendenzen, auswahl } = state;
+  const { stammdaten, einsaetze, pendenzen, rapporte, nachrichten, auswahl } = state;
 
   // ·· Ansichtsmodelle
   const tagesZeilen = useMemo(
@@ -164,14 +168,14 @@ function DispoInhalt({ ansicht }: { ansicht: Ansicht }) {
   );
   const erledigtTage = useMemo(() => rangeDays(startOfWeek(datum), addDays(startOfWeek(datum), 6)), [datum]);
   const erledigtViews = useMemo(
-    () => buildErledigtViews(stammdaten, einsaetze, erledigtTage).filter((view) => passtZurSuche([view.auftrag.nummer, view.kunde.name, view.auftrag.fehlerbild, view.techniker.nachname])),
-    [stammdaten, einsaetze, erledigtTage, passtZurSuche],
+    () => buildErledigtViews(stammdaten, einsaetze, erledigtTage, rapporte).filter((view) => passtZurSuche([view.auftrag.nummer, view.kunde.name, view.auftrag.fehlerbild, view.techniker.nachname])),
+    [stammdaten, einsaetze, erledigtTage, rapporte, passtZurSuche],
   );
   const zaehler: Readonly<Record<PanelTab, number>> = { eingang: pendenzen.length, wartet: wartetViews.length, erledigt: erledigtViews.length };
   const dringend = pendenzViews.filter((view) => view.dringend).length;
 
   const akte = useMemo(() => buildAkte(stammdaten, einsaetze, pendenzen, auswahl), [stammdaten, einsaetze, pendenzen, auswahl]);
-  const konflikte = useMemo(() => findKonflikte(stammdaten, einsaetze, heute), [stammdaten, einsaetze, heute]);
+  const konflikte = useMemo(() => findKonflikte(stammdaten, einsaetze, heute, rapporte), [stammdaten, einsaetze, heute, rapporte]);
   const suchIndex = useMemo(() => buildSuchIndex(stammdaten, einsaetze, pendenzen), [stammdaten, einsaetze, pendenzen]);
 
   useEffect(() => {
@@ -242,6 +246,7 @@ function DispoInhalt({ ansicht }: { ansicht: Ansicht }) {
       { id: 'dispo:undo', label: 'Rückgängig', gruppe: 'aktion', icon: Undo2, kuerzel: 'Strg Z', run: aktionen.undo, ...(state.protokoll.length === 0 ? { gesperrt: 'Nichts rückgängig zu machen' } : {}) },
       { id: 'dispo:redo', label: 'Wiederherstellen', gruppe: 'aktion', icon: Redo2, kuerzel: 'Strg Y', run: aktionen.redo, ...(state.zukunft.length === 0 ? { gesperrt: 'Nichts wiederherzustellen' } : {}) },
       { id: 'dispo:konflikt', label: konflikte.length > 0 ? `Nächster Konflikt (${konflikte.length})` : 'Konflikte prüfen', gruppe: 'aktion', icon: TriangleAlert, run: naechsterKonflikt, ...(konflikte.length === 0 ? { gesperrt: 'Keine Konflikte' } : {}) },
+      { id: 'dispo:reset', label: 'Demo zurücksetzen (Ausgangsbestand)', gruppe: 'system', icon: RotateCcw, run: () => setResetOffen(true) },
       { id: 'nav:heute', label: 'Gehe zu heute', gruppe: 'navigation', kuerzel: 'T', run: () => setDatum(heute) },
       { id: 'nav:morgen', label: 'Gehe zu morgen', gruppe: 'navigation', run: () => setDatum(addDays(heute, 1)) },
       { id: 'nav:gestern', label: 'Gehe zu gestern', gruppe: 'navigation', run: () => setDatum(addDays(heute, -1)) },
@@ -289,6 +294,9 @@ function DispoInhalt({ ansicht }: { ansicht: Ansicht }) {
   );
   useRegisterSuchQuelle(suchQuelle);
 
+  // jh› «Demo zurücksetzen» im Benutzermenü: Ausgangsbestand laden, gespeicherten Stand löschen – auch im zweiten Fenster.
+  const menueEintraege = useMemo<MenueEintrag[]>(() => [{ id: 'demo-reset', label: 'Demo zurücksetzen', icon: RotateCcw, run: () => setResetOffen(true), gefaehrlich: true }], []);
+
   // ·· Filteraktionen
   const toggleTechniker = useCallback((id: string) => setFilter((aktuell) => ({ ...aktuell, technikerIds: toggleIn(aktuell.technikerIds, id) })), []);
   const toggleStatus = useCallback((status: EinsatzStatus) => setFilter((aktuell) => ({ ...aktuell, status: toggleIn(aktuell.status, status) })), []);
@@ -311,7 +319,7 @@ function DispoInhalt({ ansicht }: { ansicht: Ansicht }) {
   );
 
   return (
-    <AppShell modul={findModul(ansicht)} topbarExtras={konfliktBadge}>
+    <AppShell modul={findModul(ansicht)} topbarExtras={konfliktBadge} menueEintraege={menueEintraege}>
       <DispoDnd stammdaten={stammdaten} einsaetze={einsaetze} heute={heute} jetztMin={jetztMin} tastaturSchritt={tastaturSchritt} onPlan={aktionen.planPendenz} onMove={aktionen.moveEinsatz} onUnplan={aktionen.unplanEinsatz}>
         <div className={styles.dispo}>
           <section className={styles.planBereich} aria-label="Einsatzplan">
@@ -441,6 +449,12 @@ function DispoInhalt({ ansicht }: { ansicht: Ansicht }) {
                   onDelete={aktionen.deleteAuftrag}
                   onSelectPendenz={(pendenzId) => aktionen.select({ art: 'pendenz', pendenzId })}
                   onOpenEinsatz={openEinsatz}
+                  rapport={akte.einsatz ? rapportFuerEinsatz(rapporte, akte.einsatz.id) : undefined}
+                  nachrichten={nachrichten.filter((nachricht) => nachricht.auftragId === akte.auftrag.id)}
+                  onFreigebenRapport={aktionen.freigebenRapport}
+                  onVerrechnenRapport={aktionen.verrechnenRapport}
+                  onZurueckRapport={aktionen.zurueckAnTechniker}
+                  onNachricht={aktionen.sendeNachricht}
                 />
               ) : null
             }
@@ -484,6 +498,18 @@ function DispoInhalt({ ansicht }: { ansicht: Ansicht }) {
               if (optionen.einsatz) setDatum(optionen.einsatz.datum);
               setAnsicht({ panelEingeklappt: false, ...(optionen.pendenz ? { panelTab: 'eingang' as const } : {}) });
             }}
+          />
+          <ConfirmDialog
+            open={resetOffen}
+            titel="Demo zurücksetzen?"
+            text="Alle Änderungen dieser Sitzung – Verschiebungen, Status, Rapporte, Nachrichten – werden verworfen und der Ausgangsbestand geladen. Ein zweites Fenster folgt automatisch."
+            bestaetigen="Zurücksetzen"
+            gefaehrlich
+            onConfirm={() => {
+              setResetOffen(false);
+              aktionen.resetDemo();
+            }}
+            onClose={() => setResetOffen(false)}
           />
           <EinsatzHovercard stammdaten={stammdaten} einsaetze={einsaetze} unterdrueckt={schnellOffen} />
         </div>

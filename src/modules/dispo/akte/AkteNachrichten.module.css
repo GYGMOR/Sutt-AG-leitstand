@@ -1,0 +1,75 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/akte/AkteNachrichten.module.css      │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Nachrichtenliste der Akte                                             │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Liste ──────────────────────────────────────────────── */
+
+.liste {
+  display: flex;
+  flex-direction: column;
+}
+
+.nachricht {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+}
+
+.nachricht:last-child {
+  border-bottom: 0;
+}
+
+.kanal {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sl-paper);
+  color: var(--sl-ink-2);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-size: var(--sl-fs-12);
+}
+
+.von {
+  color: var(--sl-mute);
+}
+
+.an {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.inhalt {
+  margin-top: 2px;
+  padding: 6px 8px;
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+  white-space: pre-line;
+}
+
+/* ◆ jh · eof */

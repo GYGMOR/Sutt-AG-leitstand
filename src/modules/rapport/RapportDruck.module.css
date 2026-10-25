@@ -1,0 +1,290 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/rapport/RapportDruck.module.css            │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Rapport als A4 (Bildschirm und @media print)                          │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Bildschirm ─────────────────────────────────────────── */
+
+.seite {
+  min-height: 100vh;
+  padding: 0 0 48px;
+  background: var(--sl-paper);
+}
+
+.steuerung {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-space-4);
+  padding: 10px 24px;
+  border-bottom: var(--sl-hairline);
+  background: var(--sl-surface);
+}
+
+.steuerung-text {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.blatt {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 24px auto 0;
+  padding: 16mm 14mm;
+  background: #ffffff;
+  color: #1a1a1a;
+  box-shadow: var(--sl-shadow-float);
+  font-size: 10pt;
+  line-height: 1.35;
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.klein {
+  display: block;
+  font-size: 8pt;
+  color: #6b6b6b;
+}
+
+/* ── §2 · Kopf & Parteien ────────────────────────────────────── */
+
+.kopf {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #1a1a1a;
+}
+
+.wortmarke {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.raute {
+  width: 10px;
+  height: 10px;
+  margin-right: 4px;
+  background: #f86c04;
+  transform: rotate(45deg);
+}
+
+.firma {
+  font-size: 14pt;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.produkt {
+  font-size: 14pt;
+  color: #6b6b6b;
+}
+
+.kopf-rechts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.titel {
+  font-family: var(--sl-font-mono);
+  font-size: 14pt;
+  font-weight: 600;
+}
+
+.datum {
+  font-size: 9pt;
+  color: #6b6b6b;
+}
+
+.parteien {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 0;
+  border-bottom: 1px solid #dad7d2;
+}
+
+.daten {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+}
+
+.daten dt {
+  font-size: 8pt;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+}
+
+.daten dd {
+  margin-top: 2px;
+  font-size: 9.5pt;
+}
+
+.qr {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.qr-bild {
+  width: 26mm;
+  height: 26mm;
+}
+
+.qr-bild svg {
+  width: 100%;
+  height: 100%;
+}
+
+.qr-platzhalter {
+  width: 26mm;
+  height: 26mm;
+  border: 1px dashed #bdb8b0;
+}
+
+.qr-text {
+  font-size: 8pt;
+  color: #6b6b6b;
+}
+
+/* ── §3 · Blöcke ─────────────────────────────────────────────── */
+
+.block {
+  padding: 10px 0;
+  border-bottom: 1px solid #dad7d2;
+  break-inside: avoid;
+}
+
+.block-titel {
+  margin-bottom: 6px;
+  font-size: 8pt;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+}
+
+.tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt;
+}
+
+.tabelle th {
+  padding: 4px 6px 4px 0;
+  font-size: 8pt;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+  text-align: left;
+}
+
+.tabelle thead th {
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.tabelle td {
+  padding: 5px 12px 5px 0;
+  border-bottom: 1px solid #ebe8e3;
+  vertical-align: top;
+}
+
+.liste {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 16px;
+  font-size: 9pt;
+}
+
+.kaestchen {
+  display: inline-block;
+  width: 14px;
+  margin-right: 4px;
+}
+
+.offen {
+  color: #6b6b6b;
+}
+
+.bemerkung {
+  margin-top: 6px;
+  padding: 6px 8px;
+  border-left: 2px solid #dad7d2;
+  font-size: 9pt;
+}
+
+.fotos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.signaturen {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  padding: 14px 0;
+}
+
+.signatur {
+  max-width: 260px;
+}
+
+.techniker-name {
+  margin-top: 28px;
+  padding-top: 4px;
+  border-top: 1px solid #bdb8b0;
+  font-size: 9.5pt;
+}
+
+.fuss {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 8px;
+  border-top: 1px solid #dad7d2;
+  font-size: 8pt;
+  color: #6b6b6b;
+}
+
+/* ── §4 · Druck ──────────────────────────────────────────────── */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  .seite {
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .steuerung {
+    display: none;
+  }
+
+  .blatt {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+}
+
+/* ◆ jh · eof */

@@ -1,26 +1,25 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/panel/ErledigtTab.tsx                │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 03                                               │
    │  Tab Erledigt: Rapport- und Rechnungsstatus der erledigten Einsätze    │
    └────────────────────────────────────────────────────────────────────────┘ */
 
-import { Check, FileCheck, FileText, Receipt, Signature } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { Check, Receipt } from 'lucide-react';
 import { RAPPORT_LABEL, RECHNUNG_LABEL } from '../../../core/domain/auftrag';
-import type { RapportStatus, RechnungStatus } from '../../../core/domain/auftrag';
+import type { RechnungStatus } from '../../../core/domain/auftrag';
 import { formatDatumKurz, formatWochentag, formatZeitspanne } from '../../../core/format';
 import { Avatar } from '../../../core/ui/Avatar';
 import { Chip } from '../../../core/ui/Chip';
 import type { ChipTone } from '../../../core/ui/Chip';
 import { Typenschild } from '../../../core/ui/Typenschild';
 import { cx } from '../../../core/ui/cx';
+import { RAPPORT_ICON, RAPPORT_TON } from '../../rapport/rapportStatus';
 import type { ErledigtView } from '../store/dispo.selectors';
 import styles from './PanelTabs.module.css';
 
 // ── §1 · Status-Chips ────────────────────────────────────────────
 
-const RAPPORT_ICON: Readonly<Record<RapportStatus, LucideIcon>> = { offen: FileText, erstellt: FileCheck, unterschrieben: Signature };
-const RAPPORT_TON: Readonly<Record<RapportStatus, ChipTone>> = { offen: 'signal', erstellt: 'neutral', unterschrieben: 'ok' };
+// jh› Rapport-Icon und -Ton kommen aus modules/rapport – eine Sprache für Panel, Akte und Modul.
 const RECHNUNG_TON: Readonly<Record<RechnungStatus, ChipTone>> = { offen: 'mute', gestellt: 'neutral', bezahlt: 'ok' };
 
 // ── §2 · Komponente ──────────────────────────────────────────────

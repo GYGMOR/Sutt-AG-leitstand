@@ -1,0 +1,122 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/dispo/akte/AkteRapport.module.css          │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Rapport-Abschnitt der Akte: Kopf, Fakten, Unterschrift, Knöpfe        │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Aufbau ─────────────────────────────────────────────── */
+
+.rapport {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.fakten {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+}
+
+.fakten dt {
+  font-size: var(--sl-fs-label);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.fakten dd {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink);
+}
+
+.bemerkung {
+  padding: 6px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-line-strong);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+/* ── §2 · Unterschrift & Rückmeldung ─────────────────────────── */
+
+.unterschrift {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.unterschrift-bild {
+  width: 120px;
+  height: 45px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+}
+
+.unterschrift-name,
+.ohne {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.ohne {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rueckmeldung {
+  display: flex;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: var(--sl-radius-1);
+  background: color-mix(in srgb, var(--sl-signal) 10%, var(--sl-surface));
+  font-size: var(--sl-fs-12);
+}
+
+.rueckmeldung svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+/* ── §3 · Zustände & Knöpfe ──────────────────────────────────── */
+
+.fehlt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-signal-ink);
+}
+
+.hinweis {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.knoepfe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.meta {
+  margin-left: auto;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

@@ -1,0 +1,364 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/rapport/RapportFormular.module.css         │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Rapport-Karten: Kopf, Zeiten, Checkliste, Teile, Fotos, Abschluss     │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rahmen ─────────────────────────────────────────────── */
+
+.formular {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  container-type: inline-size;
+}
+
+.karte {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px 16px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.zeile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zeile > :first-child {
+  flex: 1;
+}
+
+.schmal {
+  max-width: 130px;
+}
+
+.hinweis {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.leer {
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+}
+
+.versteckt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* ── §2 · Kopf ───────────────────────────────────────────────── */
+
+.kopf-zeile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.titel {
+  font-size: 20px;
+  font-weight: var(--sl-fw-semibold);
+  line-height: 1.2;
+}
+
+.untertitel {
+  margin-top: -6px;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+}
+
+.fakten {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  font-size: var(--sl-fs-13);
+}
+
+.fakten dt {
+  font-size: 10px;
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.fakten dd {
+  margin-top: 2px;
+}
+
+.breit {
+  grid-column: 1 / -1;
+}
+
+.code {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  border: 1px solid var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+}
+
+.rueckmeldung {
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-signal);
+  background: color-mix(in srgb, var(--sl-signal) 8%, var(--sl-surface));
+  font-size: var(--sl-fs-13);
+}
+
+/* ── §3 · Zeiten ─────────────────────────────────────────────── */
+
+.zeit-zeile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+}
+
+.zeit-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.zeit-label {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+}
+
+.zeit-hinweis {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.zeit-steller {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+}
+
+.zeit-wert {
+  min-width: 64px;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-13);
+  text-align: center;
+}
+
+.summe {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+}
+
+/* ── §4 · Arbeiten & Teile ───────────────────────────────────── */
+
+.checkliste {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.schritt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 4px;
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-13);
+  text-align: left;
+  color: var(--sl-ink-2);
+}
+
+.schritt:hover:not(:disabled) {
+  background: var(--sl-hover);
+}
+
+.schritt-erledigt {
+  color: var(--sl-ink);
+}
+
+.schritt-erledigt svg {
+  color: var(--sl-ok);
+}
+
+.teile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.teil {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+}
+
+.teil-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.teil-name {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+}
+
+.teil-nummer {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.teil-aktionen {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── §5 · Fotos ──────────────────────────────────────────────── */
+
+.fotos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@container (min-width: 520px) {
+  .fotos {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.foto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.foto-label {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.foto-aktionen {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.foto-aktionen > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.vorschlag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--sl-ok);
+  border-radius: var(--sl-radius-1);
+  background: color-mix(in srgb, var(--sl-ok) 10%, var(--sl-surface));
+}
+
+.vorschlag-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  font-size: var(--sl-fs-12);
+}
+
+/* ── §6 · Abschluss & Unterschrift ───────────────────────────── */
+
+.abschluss {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+@container (min-width: 520px) {
+  .abschluss {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.abschluss-knopf {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 56px;
+  padding: 10px 12px 10px 16px;
+  border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  text-align: left;
+}
+
+.abschluss-knopf:hover:not(:disabled) {
+  border-color: var(--sl-line-strong);
+}
+
+.abschluss-aktiv,
+.abschluss-aktiv:hover:not(:disabled) {
+  border-color: var(--sl-ink);
+}
+
+.abschluss-aktiv::before {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: var(--sl-mark-width);
+  background: var(--sl-signal);
+}
+
+.abschluss-label {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.abschluss-text {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.signatur-anzeige {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.signatur-name {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+/* ◆ jh · eof */

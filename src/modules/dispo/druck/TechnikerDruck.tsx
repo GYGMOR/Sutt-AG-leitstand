@@ -1,10 +1,10 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/druck/TechnikerDruck.tsx             │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 03                                               │
    │  Tagesplan pro Techniker als A4 mit QR-Code zur Google-Maps-Route      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { ArrowLeft, Printer } from 'lucide-react';
 import { Navigate, useNavigate, useParams } from 'react-router';
 import { useArbeitstag } from '../../../core/arbeitstag';
@@ -12,33 +12,17 @@ import { KATEGORIE_LABEL } from '../../../core/domain/kategorie';
 import { formatAdresse, fullName } from '../../../core/domain/stammdaten';
 import { formatDatumLang, formatDauer, formatKm, formatZeit, formatZeitspanne } from '../../../core/format';
 import { googleTourUrl } from '../../../core/geo';
+import { useQrSvg } from '../../../core/hooks/useQrSvg';
 import { Button } from '../../../core/ui/Button';
-import { mockBestand, mockStammdaten } from '../../../mock';
+import { MOCK_HEUTE, mockBestand, mockStammdaten } from '../../../mock';
 import { LEERER_FILTER } from '../dispo.types';
 import { buildTagesZeilen } from '../store/dispo.selectors';
 import { initDispoStore, useDispoState } from '../store/dispoStore';
 import styles from './TechnikerDruck.module.css';
 
-initDispoStore(mockStammdaten, mockBestand);
+initDispoStore(mockStammdaten, mockBestand, MOCK_HEUTE);
 
-// ── §1 · QR-Code ─────────────────────────────────────────────────
-
-function useQrSvg(text: string): string | null {
-  const [svg, setSvg] = useState<string | null>(null);
-  useEffect(() => {
-    let aktiv = true;
-    // jh› qrcode lädt lazy – nur die Druckseite braucht es.
-    void import('qrcode').then((modul) => modul.toString(text, { type: 'svg', margin: 0, errorCorrectionLevel: 'M' })).then((ergebnis) => {
-      if (aktiv) setSvg(ergebnis);
-    });
-    return () => {
-      aktiv = false;
-    };
-  }, [text]);
-  return svg;
-}
-
-// ── §2 · Komponente ──────────────────────────────────────────────
+// ── §1 · Komponente ──────────────────────────────────────────────
 
 export function TechnikerDruck() {
   const { technikerId } = useParams();

@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/akte/Akte.tsx                        │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Auftrags-Akte: Karte, Kopf, Detailzeilen, Fotos, Teile, Verlauf, Tun  │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Auftrags-Akte: Karte, Kopf, Einsatz, Rapport, Fotos, Teile, Verlauf   │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useMemo, useRef, useState } from 'react';
@@ -14,10 +14,8 @@ import {
   Car,
   ChevronDown,
   Copy,
-  FileText,
   Inbox,
   Link2,
-  Lock,
   MapPin,
   Maximize2,
   MessageSquare,
@@ -35,6 +33,8 @@ import type { IsoDatum, Minuten } from '../../../core/datum';
 import { EINSATZ_STATUS, STATUS_LABEL, isMovable } from '../../../core/domain/einsatz';
 import type { Einsatz, EinsatzStatus } from '../../../core/domain/einsatz';
 import { KATEGORIE_LABEL } from '../../../core/domain/kategorie';
+import type { Nachricht } from '../../../core/domain/nachricht';
+import type { Rapport } from '../../../core/domain/rapport';
 import { KENNUNG_LABEL, KUNDENART_LABEL, formatAdresse, fullName } from '../../../core/domain/stammdaten';
 import { formatDatum, formatDatumKurz, formatDauer, formatKm, formatWochentag, formatZeitspanne } from '../../../core/format';
 import { googleRouteUrl } from '../../../core/geo';
@@ -47,14 +47,18 @@ import { ConfirmDialog, Dialog } from '../../../core/ui/Dialog';
 import { Typenschild, TypenschildPlatte } from '../../../core/ui/Typenschild';
 import { cx } from '../../../core/ui/cx';
 import { kategorieKlasse, statusKlasse } from '../../../core/ui/farben';
+import { NachrichtDialog } from '../../rapport/NachrichtDialog';
 import type { DispoStammdaten, PlanZiel } from '../dispo.types';
 import { MapCanvas } from '../karte/MapCanvas';
 import type { KartenLinie, KartenPin } from '../karte/karte.types';
 import { KundenChips } from '../KundenChips';
 import type { EinsatzAenderung } from '../store/dispo.reducer';
 import { verknuepfungenFuerAuftrag } from '../store/dispo.selectors';
+import type { NachrichtEntwurf } from '../store/useDispoAktionen';
 import { AkteErsatzteile } from './AkteErsatzteile';
 import { AkteFotos } from './AkteFotos';
+import { AkteNachrichten } from './AkteNachrichten';
+import { AkteRapport } from './AkteRapport';
 import { AkteVerlauf } from './AkteVerlauf';
 import type { AuftragAkte } from './akte.model';
 import { BearbeitenDialog } from './BearbeitenDialog';
@@ -81,16 +85,14 @@ function kopieren(text: string): void {
   void navigator.clipboard?.writeText(text).catch(() => undefined);
 }
 
-function Kontaktaktionen({ telefon, name }: { telefon: string; name: string }) {
+// jh› SMS nur für den Kontakt vor Ort – dorthin gehen Terminbestätigung und «unterwegs».
+function Kontaktaktionen({ telefon, name, onSms }: { telefon: string; name: string; onSms?: () => void }) {
   return (
     <>
       <a className={styles.telefon} href={`tel:${telefon.replace(/\s/g, '')}`} title={`${name} anrufen`} aria-label={`${name} anrufen`}>
         <Phone size={16} strokeWidth={1.5} aria-hidden />
       </a>
-      <span className={styles.gesperrtIcon} title="SMS-Bestätigung – Modul «SMS & Website» folgt (v0.6)">
-        <MessageSquare size={16} strokeWidth={1.5} aria-hidden />
-        <Lock size={16} strokeWidth={1.5} aria-hidden className={styles.schlossKlein} />
-      </span>
+      {onSms && <IconButton icon={MessageSquare} label={`SMS an ${name}`} size="sm" onClick={onSms} />}
     </>
   );
 }
@@ -114,16 +116,47 @@ interface AkteProps {
   onDelete: (auftragId: string) => void;
   onSelectPendenz: (pendenzId: string) => void;
   onOpenEinsatz: (einsatz: Einsatz) => void;
+  /** Rapport zum gewählten Einsatz, falls die Techniker-App einen geliefert hat. */
+  rapport: Rapport | undefined;
+  nachrichten: readonly Nachricht[];
+  onFreigebenRapport: (rapportId: string) => void;
+  onVerrechnenRapport: (rapportId: string) => void;
+  onZurueckRapport: (rapportId: string, bemerkung: string) => void;
+  onNachricht: (entwurf: NachrichtEntwurf) => void;
 }
 
 // jh› Nicht-modal im Panel: der Plan bleibt bedienbar, ein Klick auf den
 //     nächsten Einsatz wechselt die Akte, ohne das Panel zu schliessen.
-export function Akte({ akte, stammdaten, einsaetze, heute, jetztMin, onClose, onSetStatus, onRequestFolgetermin, onUnplan, onPlan, onMove, onSave, onCopy, onDelete, onSelectPendenz, onOpenEinsatz }: AkteProps) {
+export function Akte({
+  akte,
+  stammdaten,
+  einsaetze,
+  heute,
+  jetztMin,
+  onClose,
+  onSetStatus,
+  onRequestFolgetermin,
+  onUnplan,
+  onPlan,
+  onMove,
+  onSave,
+  onCopy,
+  onDelete,
+  onSelectPendenz,
+  onOpenEinsatz,
+  rapport,
+  nachrichten,
+  onFreigebenRapport,
+  onVerrechnenRapport,
+  onZurueckRapport,
+  onNachricht,
+}: AkteProps) {
   const { auftrag, kunde, liegenschaft, geraet, einsatz, pendenz, techniker, koordinaten, vorgaenger } = akte;
   const [bearbeiten, setBearbeiten] = useState(false);
   const [verschieben, setVerschieben] = useState(false);
   const [loeschen, setLoeschen] = useState(false);
   const [kartenDialog, setKartenDialog] = useState(false);
+  const [sms, setSms] = useState(false);
   const [historieOffen, setHistorieOffen] = useState(false);
   const verschiebenRef = useRef<HTMLButtonElement>(null);
 
@@ -270,7 +303,7 @@ export function Akte({ akte, stammdaten, einsaetze, heute, jetztMin, onClose, on
                 </p>
               </div>
             </div>
-            {/* jh? Status setzt im Mockup der Disponent – später meldet ihn die Techniker-App. */}
+            {/* jh› Status meldet die Techniker-App (Quelle «app»); das Büro korrigiert hier mit Quelle «buero». */}
             <div className={styles.statusleiste} role="radiogroup" aria-label="Status setzen">
               {EINSATZ_STATUS.map(({ status, label }) => (
                 <button
@@ -285,6 +318,13 @@ export function Akte({ akte, stammdaten, einsaetze, heute, jetztMin, onClose, on
                 </button>
               ))}
             </div>
+          </Abschnitt>
+        )}
+
+        {/* ── Servicerapport ── */}
+        {einsatz && (
+          <Abschnitt titel="Servicerapport">
+            <AkteRapport rapport={rapport} einsatz={einsatz} techniker={techniker} heute={heute} onFreigeben={onFreigebenRapport} onVerrechnen={onVerrechnenRapport} onZurueck={onZurueckRapport} />
           </Abschnitt>
         )}
 
@@ -323,7 +363,7 @@ export function Akte({ akte, stammdaten, einsaetze, heute, jetztMin, onClose, on
             label={auftrag.kontaktVorOrt.rolle}
             wert={auftrag.kontaktVorOrt.name}
             zusatz={<span className={styles.mono}>{auftrag.kontaktVorOrt.telefon}</span>}
-            aktionen={<Kontaktaktionen telefon={auftrag.kontaktVorOrt.telefon} name={auftrag.kontaktVorOrt.name} />}
+            aktionen={<Kontaktaktionen telefon={auftrag.kontaktVorOrt.telefon} name={auftrag.kontaktVorOrt.name} {...(einsatz ? { onSms: () => setSms(true) } : {})} />}
           />
           {kunde.kontakt.name !== auftrag.kontaktVorOrt.name && (
             <DetailZeile
@@ -401,6 +441,12 @@ export function Akte({ akte, stammdaten, einsaetze, heute, jetztMin, onClose, on
           <AkteVerlauf phasen={akte.phasen} />
         </Abschnitt>
 
+        {nachrichten.length > 0 && (
+          <Abschnitt titel="Nachrichten" zusatz={<span className={styles.mono}>{nachrichten.length}</span>}>
+            <AkteNachrichten nachrichten={nachrichten} />
+          </Abschnitt>
+        )}
+
         {zeigeEinsatzListe && (
           <Abschnitt titel="Einsätze zu diesem Auftrag" zusatz={<span className={styles.mono}>{akte.einsaetze.length}</span>}>
             <ul className={styles.einsatzListe}>
@@ -444,12 +490,11 @@ export function Akte({ akte, stammdaten, einsaetze, heute, jetztMin, onClose, on
             Folgetermin im Eingang
           </Button>
         )}
-        <span className={styles.gesperrt} title="Modul «Servicerapporte» folgt (v0.6)">
-          <Lock size={16} strokeWidth={1.5} aria-hidden /> <FileText size={16} strokeWidth={1.5} aria-hidden /> Servicerapport
-        </span>
-        <span className={styles.gesperrt} title="Modul «SMS & Website» folgt (v0.6)">
-          <Lock size={16} strokeWidth={1.5} aria-hidden /> <MessageSquare size={16} strokeWidth={1.5} aria-hidden /> SMS
-        </span>
+        {einsatz && (
+          <Button variant="secondary" size="sm" icon={MessageSquare} onClick={() => setSms(true)}>
+            SMS
+          </Button>
+        )}
         <Button variant="danger" size="sm" icon={Trash} className={styles.loeschen} onClick={() => setLoeschen(true)}>
           Löschen
         </Button>
@@ -471,6 +516,7 @@ export function Akte({ akte, stammdaten, einsaetze, heute, jetztMin, onClose, on
       {einsatz && verschieben && (
         <VerschiebenPopover anchor={verschiebenRef.current} open einsatz={einsatz} techniker={stammdaten.techniker} onClose={() => setVerschieben(false)} onMove={(ziel) => onMove(einsatz.id, ziel)} />
       )}
+      {sms && <NachrichtDialog open art="terminbestaetigung" auftrag={auftrag} einsatz={einsatz} techniker={techniker} onSenden={onNachricht} onClose={() => setSms(false)} />}
       <ConfirmDialog
         open={loeschen}
         titel={`Auftrag ${auftrag.nummer} löschen?`}

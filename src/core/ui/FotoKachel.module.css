@@ -1,0 +1,38 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/FotoKachel.module.css                      │
+   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  Fotokachel: Platzhalter-Strich und echtes Bild                        │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Kachel ─────────────────────────────────────────────── */
+
+.kachel {
+  display: block;
+  width: 100%;
+  aspect-ratio: 10 / 9;
+  border-radius: var(--sl-radius-1);
+  overflow: hidden;
+}
+
+.kachel-gross {
+  width: min(100%, 420px);
+}
+
+.kachel-grund {
+  fill: var(--sl-paper);
+}
+
+.kachel-strich {
+  fill: none;
+  stroke: var(--sl-mute);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bild {
+  object-fit: cover;
+  background: var(--sl-paper);
+}
+
+/* ◆ jh · eof */

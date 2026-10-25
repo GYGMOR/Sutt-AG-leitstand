@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/akte/Akte.module.css                 │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 03                                               │
    │  Akte im rechten Panel                                                 │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -302,25 +302,6 @@
   color: var(--sl-ink);
 }
 
-.gesperrt-icon {
-  position: relative;
-  display: inline-grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  color: var(--sl-mute-2);
-  cursor: not-allowed;
-}
-
-.schloss-klein {
-  position: absolute;
-  right: -3px;
-  bottom: -2px;
-  width: 10px;
-  height: 10px;
-  color: var(--sl-mute);
-}
-
 .wohnung {
   color: var(--sl-ink-2);
 }
@@ -426,19 +407,6 @@
   padding: 10px var(--sl-space-4);
   border-top: var(--sl-hairline);
   background: var(--sl-paper);
-}
-
-.gesperrt {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 24px;
-  padding: 0 8px;
-  border: 1px dashed var(--sl-line-strong);
-  border-radius: var(--sl-radius-1);
-  font-size: var(--sl-fs-12);
-  color: var(--sl-mute);
-  cursor: not-allowed;
 }
 
 /* jh› Löschen ganz rechts, abgesetzt – der gefährliche Knopf steht nie neben «Speichern». */
