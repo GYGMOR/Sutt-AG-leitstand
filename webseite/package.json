@@ -1,0 +1,22 @@
+{
+  "name": "sutt-webseite",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Website der Sutt AG – Neuaufbau (Startgerüst mit denselben Tokens wie Leitstand und App)",
+  "author": "◆ JH",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/ibm-plex-sans": "^5.3.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "^7.3.7"
+  }
+}

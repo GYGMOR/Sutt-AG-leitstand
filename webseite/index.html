@@ -1,0 +1,89 @@
+<!doctype html>
+<!-- ┌────────────────────────────────────────────────────────────────────────┐
+     │  SUTT·LEITSTAND  ·  webseite/index.html                                │
+     │  ◆ JH · 2026.10 · rev 05                                               │
+     │  Website der Sutt AG – Startgerüst für den Neuaufbau                   │
+     └────────────────────────────────────────────────────────────────────────┘ -->
+<html lang="de-CH">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="◆ JH" />
+    <meta name="description" content="Sutt AG, Glattbrugg – Service, Reparatur und Verkauf von Haushalt-Grossgeräten" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Sutt AG – Haushalt-Grossgeräte</title>
+  </head>
+  <body>
+    <header class="kopf">
+      <a class="marke" href="#start"><span class="raute" aria-hidden></span> SUTT AG</a>
+      <nav class="navigation" aria-label="Seiten">
+        <a href="#leistungen">Leistungen</a>
+        <a href="#so-arbeiten-wir">So arbeiten wir</a>
+        <a href="#kontakt">Kontakt</a>
+        <a class="knopf" href="/app/" data-ziel="app">Techniker-App</a>
+        <a class="knopf knopf-leise" href="/" data-ziel="leitstand">Leitstand</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="buehne" id="start">
+        <p class="vorzeile">Haushalt-Grossgeräte · Glattbrugg</p>
+        <h1>Service, Reparatur und Verkauf – mit Terminen, die halten.</h1>
+        <p class="einleitung">
+          Die Sutt AG wartet, repariert und ersetzt Waschmaschinen, Tumbler, Geschirrspüler, Kühlschränke und Herde
+          für Verwaltungen, Gewerbe und Privathaushalte im Raum Zürich. Dieses Gerüst ist der Start für den Neuaufbau
+          der Website – mit derselben Handschrift wie Leitstand und Techniker-App.
+        </p>
+        <div class="aktionen">
+          <a class="knopf knopf-gross" href="#kontakt">Termin anfragen</a>
+          <a class="knopf knopf-gross knopf-leise" href="tel:+41448091200">044 809 12 00</a>
+        </div>
+      </section>
+
+      <section class="abschnitt" id="leistungen">
+        <h2>Leistungen</h2>
+        <div class="karten">
+          <article class="karte"><h3>Reparatur</h3><p>Fehlerdiagnose vor Ort, Ersatzteile aus dem Fahrzeuglager, Rapport mit Unterschrift auf dem Tablet.</p></article>
+          <article class="karte"><h3>Installation und Montage</h3><p>Neue Geräte liefern, anschliessen, alte entsorgen – inklusive Einweisung.</p></article>
+          <article class="karte"><h3>Lieferung und Mietgeräte</h3><p>Überbrückung bei längeren Reparaturen mit Mietgeräten, Lieferung in der ganzen Region.</p></article>
+          <article class="karte"><h3>Garantie und Notfall</h3><p>Garantiefälle direkt mit dem Hersteller, Notfalltermine am selben Tag für Verwaltungen.</p></article>
+        </div>
+      </section>
+
+      <section class="abschnitt" id="so-arbeiten-wir">
+        <h2>So arbeiten wir</h2>
+        <ol class="schritte">
+          <li><strong>Anfrage</strong> – Telefon, E-Mail oder Portal; die Disposition erfasst den Auftrag während des Gesprächs.</li>
+          <li><strong>Termin</strong> – Bestätigung per SMS, der Techniker meldet sich, wenn er unterwegs ist.</li>
+          <li><strong>Einsatz</strong> – Diagnose, Reparatur, Rapport mit Unterschrift; Ersatzteile werden bestellt und der Folgetermin vorgeschlagen.</li>
+          <li><strong>Abschluss</strong> – Rapport per Mail, Rechnung aus dem Leitstand.</li>
+        </ol>
+      </section>
+
+      <section class="abschnitt" id="kontakt">
+        <h2>Kontakt</h2>
+        <div class="kontakt">
+          <address>
+            <strong>Sutt AG</strong><br />
+            Industriestrasse 24<br />
+            8152 Glattbrugg<br />
+            <a href="tel:+41448091200">044 809 12 00</a><br />
+            <a href="mailto:service@sutt.example">service@sutt.example</a>
+          </address>
+          <dl class="zeiten">
+            <dt>Mo – Fr</dt><dd>07:00 – 12:00 · 13:00 – 17:30</dd>
+            <dt>Notfall</dt><dd>Verwaltungen nach Vereinbarung</dd>
+          </dl>
+        </div>
+      </section>
+    </main>
+
+    <footer class="fuss">
+      <span>© <span id="jahr"></span> Sutt AG · Alle Angaben erfunden (Mockup)</span>
+      <span class="signatur">◆ JH</span>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
+<!-- ◆ jh · eof -->
