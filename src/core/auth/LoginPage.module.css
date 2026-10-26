@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/auth/LoginPage.module.css                     │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Anmeldeformular                                                       │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Anmeldeformular, Anbieter-Tasten (SSO), Dialog «Konto wählen»         │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 /* ── §1 · Formular ───────────────────────────────────────────── */
@@ -108,6 +108,142 @@
   letter-spacing: var(--sl-tracking-label);
   text-transform: uppercase;
   color: var(--sl-mute);
+}
+
+/* ── §3 · Anbieter (SSO) ─────────────────────────────────────── */
+
+.anbieter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-2);
+}
+
+.anbieter-knopf {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-14);
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-ink);
+}
+
+.anbieter-knopf:hover {
+  border-color: var(--sl-ink);
+  background: var(--sl-hover);
+}
+
+.anbieter-marke {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  width: 16px;
+  height: 16px;
+}
+
+.anbieter-marke span {
+  background: currentColor;
+}
+
+.anbieter-marke.google span {
+  border-radius: 50%;
+}
+
+.trenner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--sl-fs-label);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.trenner::before,
+.trenner::after {
+  content: '';
+  flex: 1;
+  border-top: var(--sl-hairline);
+}
+
+/* ── §4 · Konto wählen ───────────────────────────────────────── */
+
+.konten {
+  display: flex;
+  flex-direction: column;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+}
+
+.konten li + li {
+  border-top: 1px solid var(--sl-line-soft);
+}
+
+.konto {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.konto:hover {
+  background: var(--sl-hover);
+}
+
+.konto-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--sl-chrome-2);
+  color: var(--sl-chrome-ink);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+}
+
+.konto-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.konto-name {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+}
+
+.konto-mail {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fehler {
+  margin-top: var(--sl-space-3);
+  padding: 8px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-danger);
+  background: var(--sl-danger-wash);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-danger-ink);
+}
+
+.konten + .hinweis,
+.fehler + .hinweis {
+  margin-top: var(--sl-space-3);
 }
 
 /* ◆ jh · eof */
