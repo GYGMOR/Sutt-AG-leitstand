@@ -2,6 +2,35 @@
 
 Format: ein Abschnitt pro Revision, Bereiche wie im Commit-Stil (`dispo(kalender): … ◆`).
 
+## rev 05 · 2026.10 · v0.5.0 – Personal: Zeiterfassung, Absenzen, Benutzer & Rollen, Einstellungen, Datenschutz
+
+### Neu
+- **Zeiterfassung** `/zeiterfassung/:id?` mit fünf Ansichten (`?ansicht=`): **Liste** (Zeitkonten des Monats), **Tag** (Zeitstrahl je Person mit Arbeits- und Pausenblöcken, Jetzt-Linie), **Woche** (ein farbiger Chip je Tag und Person – Soll erreicht · läuft · Abweichung/manuell · Regel verletzt · fehlt · Absenz · frei –, Erfasst/Erwartet, Saldo Woche, Überstunden/Kompensiert), **Monat** (Matrix Personen × Tage mit Tagessaldo, Absenzkürzel, Feiertagszeile, Soll/Ist/Saldo/Total/Ferienrest, Totalzeile), **Jahr** (Monatssaldi mit Abschlussmarke, Monate vor dem Übertrag leer). Kacheln als Sicht (Eingestempelt, Warnungen, Zu prüfen, Eingereicht, Ohne Abschluss), Zeitraum-Navigation je Ansicht, CSV je Ansicht, Klick auf Chip oder Zelle öffnet das Dossier am Tag.
+- **Stempeluhr**: Pille in jeder Topbar (Kommen · Pause · Weiter · Gehen); **grosse Uhr** mit Kreis (grün Einstempeln, rot Ausstempeln, gelb Pause beenden), Sekundenzähler der heutigen Arbeit, Zonenzeit mit MEZ/MESZ, Hinweis am Umstellungstag, runde Tasten Notiz · Pause · **Nachtragen** · Einsatz, Einträge von heute – responsiv (Handy untereinander, ab 640 px Kreis links); eigenes Dossier zeigt sie, die Techniker-App bekommt den Tab **Zeit** (Uhr, Woche als Chips, Monat, letzte Tage, Nachtragen, Monat einreichen) und einen Stempelstreifen auf der Heute-Seite.
+- **Zeitzone im Programm** (`core/zeitzone.ts`): Betrieb hat eine IANA-Zone (Standard `Europe/Zurich`, Einstellungen → Betrieb); Stempel entstehen in Zonenzeit, Dauern am Umstellungstag sind echt (23/25 Stunden), nächste Umstellung wird angezeigt – Regeln aus der ICU-Datenbank, keine eigene Tabelle.
+- **Zeitkonto**: Tagessoll aus Arbeitszeitmodell × Pensum × Feiertag/Absenz, ArG-Hinweise (Pause 15, Ruhezeit 15a, Zeitfenster 10, Sonntag 18, Nacht 16), Korrekturen mit Grund und Spur (ArGV 1 Art. 73), Löschen als Markierung, Zeiten aus dem Einsatzplan übernehmen, Notiz/Einsatz am laufenden Eintrag, Monatsabschluss einreichen → genehmigen/zurückweisen (Vier-Augen), Gleitzeit-Saldo mit Übertrag per Stichtag.
+- **Ferien & Absenzen** `/absenzen/:id?`: Liste oder Planer (Personen × Tage, Artfarben, beantragt gestrichelt), Antrag mit halbem Tag, Entscheid, Ferienkonto (Anspruch, Übertrag, bezogen, geplant, beantragt, Rest), Konflikt mit geplanten Einsätzen, Ganztag im Plan.
+- **Benutzer & Rollen** `/benutzer/:bereich?`: Konten (Dossier mit **Rechte-Matrix** – aus der Rolle, Zusatz, entzogen –, Umfang eigene/Team/alle, Anbieter, Journal, Sperren), **Rollen & Rechte** (Matrix aller Rechte × Rollen), Mitarbeitende (Personalakte, Ferienkonto, Datenschutz, Auskunft nach DSG Art. 25), **Organigramm** (bestimmt den Umfang «Team»), Konto und Person anlegen/bearbeiten.
+- **Einstellungen** `/einstellungen/:bereich?` (Administration): Betrieb (Firma, Kanton, Zeitzone mit aktueller Zeit und nächster Umstellung, Arbeitszeitmodell, Sitzungsablauf), Feiertage (gesetzlich je Kanton mit Osterformel, betriebliche freie Tage), **Anmeldung** (Microsoft Entra ID und Google Workspace: Tenant/Domain, Client-ID, E-Mail-Domain, Gruppen → Rolle, JIT, Umleitungs-URI, Verbindungstest, nur SSO), Datenschutz (verantwortliche Stelle, Datenkatalog mit Fristen, Löschlauf), Protokoll (Journal mit Filtern und CSV), Module (je Mandant ein-/ausschalten).
+- **Anmeldung mit Geschäftskonto**: Tasten «Mit Microsoft-/Google-Konto anmelden», Mock-Dialog «Konto wählen» mit derselben Prüfung wie später gegen das ID-Token (Domain, Subject/E-Mail, Sperre, Gruppen → Rolle, JIT), «nur SSO» blendet die lokale Anmeldung aus, automatische Abmeldung nach Inaktivität.
+- **Meine Daten** `/meine-daten` (Benutzermenü): Konto, Personalakte, wer meine Daten angesehen hat, Kategorien mit Fristen, Rechte (Auskunft, Berichtigung, Löschung), verantwortliche Stelle, Export als JSON.
+- **Datenschutz by design** (ADR-007): Journal append-only mit Einsicht/Export/Anmeldung, Gesundheitsdaten nur mit Recht (sonst «Abwesend» – Plantafel, Dashboard, App, Zeiterfassung über `useStandFuerSicht`), Datenkatalog mit Zweck, Rechtsgrundlage, Frist, Löschart, Löschlauf, Auskunft; Konzept in `docs/datenschutz/konzept.md`.
+- **Dashboard · Auswertung**: Donut «Im Dienst jetzt», Balken «Auslastung heute», Linie «Erledigte Einsätze, 28 Tage», gestapelte Säulen «Rapporte je Woche», Anteile «Einsätze nach Kategorie» – eigene Diagramm-Bausteine (`core/ui/Diagramm.tsx`: dünne Marken, leise Gitter, Tooltip, Tastatur, Tabellen-Zwilling je Karte, hell/dunkel geprüfte Palette `--sl-dv-*`).
+- **Rechte** (ADR-005): Recht = Bereich:Aktion, Profile je Rolle, Zusatz/Entzug je Konto, Umfang über das Organigramm, Module dreistufig (Register, Mandant, Rolle); `useRechte()` für alle Module.
+- **Mandant** (`core/mandant`): eigener kleiner Store `sl.mandant.v1`, in andere Fenster gespiegelt, «Demo zurücksetzen» stellt ihn mit.
+- **Tests**: 196 vitest-Tests – neu Zeitzone (Offset, Umstellungstage, Dauer über die Umstellung), Zeit (Stempel, Soll, ArG, Umstellung), Feiertage, Absenzen, Rechte, Identität (Claims → Konto), Aufbewahrung, Modelle Zeiterfassung (Töne, Woche, Jahr, Tag), Absenzen, Benutzer, Einstellungen, Dashboard-Auswertung, Reducer Personal.
+- **Docs**: `docs/design/step-4-personal.md`, ADR-005 (Rechte), ADR-006 (SSO/OIDC), ADR-007 (Datenschutz/Journal), `docs/datenschutz/konzept.md`.
+
+### Geändert
+- Stand-Format **v4**: Mitarbeitende, Konten, Absenzen, Zeiteinträge, Monatsabschlüsse und Journal im Schnappschuss; ältere Stände werden verworfen.
+- Topbar mit Steckplatz (`registerTopbarExtra`) für die Stempeluhr; Benutzermenü mit «Meine Daten & Datenschutz».
+- Module Zeiterfassung, Absenzen, Benutzer & Rollen, Einstellungen freigeschaltet; Sidebar, Palette und Routen folgen dem Register und den Mandanten-Freigaben.
+- Mock: Personalakten mit Hierarchie, Konten mit Anbieter-Verknüpfung, Zeiten der letzten zwei Monate (mit ArG-konformen Pausen), Absenzen, Journal; Testzeit unter vitest 11:00.
+- Login-Seite zeigt den Firmennamen des Mandanten.
+
+### Offen
+- `jh# 018` tzdata-Version Server/Client · `jh# 019` Stempel offline puffern · `jh# 020` echter OIDC-Ablauf · `jh# 021` serverseitiger Löschlauf · Fragen 25–31 in README §9.
+
 ## rev 04 · 2026.10 · v0.4.0 – Betrieb: Dashboard, Aufträge, Kunden, Geräte, Bilder, Lager
 
 ### Neu

@@ -1,7 +1,7 @@
 {
   "name": "sutt-leitstand",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "SUTT Leitstand – Branchensoftware Sutt AG · Disposition, Aussendienst, Aufträge, Kunden, Geräte, Bilder, Lager (Mockup)",
   "author": "◆ JH",
   "type": "module",

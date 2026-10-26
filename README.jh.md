@@ -3,7 +3,7 @@
 Branchensoftware der **Sutt AG** (Haushalt-Apparate, Industriestrasse 24, 8152 Glattbrugg/Opfikon) –
 Service, Reparatur und Verkauf von Haushalts-Grossgeräten.
 
-**Stand:** rev 04 · v0.4.0 · Betrieb (Dashboard, Aufträge, Kunden, Geräte, Bilder, Lager) auf Aussendienst v0.3 und Disposition v2 · klickbares Mockup mit Testdaten, ohne Backend.
+**Stand:** rev 05 · v0.5.0 · Personal (Zeiterfassung, Absenzen, Benutzer & Rollen, Einstellungen mit SSO, Datenschutz, Dashboard-Diagramme) auf Betrieb v0.4, Aussendienst v0.3 und Disposition v2 · klickbares Mockup mit Testdaten, ohne Backend.
 Diese Datei ist der Bauplan: **jedes folgende Modul** (Kunden, Geräte, Lager, Mietgeräte, Zeit …)
 wird exakt nach diesen Regeln aufgebaut. Änderungen je Revision stehen in `CHANGELOG.jh.md`.
 
@@ -36,6 +36,11 @@ Aussendienst-Konten (`mb`, `sk`) landen nach dem Login direkt in der App; Büro-
 App. Kunden und Lager sind Innendienst-Module: Aussendienst sieht dort die Folgt-Seite mit Rollenhinweis.
 Eigene Skills für die Weiterarbeit liegen in `.claude/skills/` (`sutt-modul`, `sutt-pruefung`).
 
+**Personal (rev 05):** Stempeluhr in jeder Topbar und als grosse Uhr (`/zeiterfassung/<eigene id>`, App-Tab «Zeit»); Admin und Büro
+sehen `/zeiterfassung?ansicht=woche|monat|jahr|tag`. `admin` meldet sich auch «Mit Microsoft-Konto» an (Mock-Dialog «Konto wählen»,
+Andrea Dietrich · SG-Admin); Einstellungen → Anmeldung zeigt die Tenant-Konfiguration. Zeitzone des Betriebs: Europe/Zurich mit
+Zeitumstellung im Programm (Einstellungen → Betrieb). «Meine Daten» im Benutzermenü zeigt jeder Person, was gespeichert ist.
+
 Node ≥ 20.19 (Vite 7); `jh:contrast` braucht Node ≥ 23 (nativer TypeScript-Lauf).
 Optional `.env` nach `.env.example`: mit `VITE_GOOGLE_MAPS_API_KEY` erscheint Google Maps, ohne Schlüssel
 MapLibre + OpenStreetMap, ohne Netz die Schemakarte. Die Akte sieht nie leer aus.
@@ -57,7 +62,9 @@ MapLibre + OpenStreetMap, ohne Netz die Schemakarte. Die Akte sieht nie leer aus
 | Icons    | `lucide-react`, Strich **1.5**, Grösse **16 / 20**                           |
 | Schrift  | IBM Plex Sans (UI), IBM Plex Mono (Nummern, SN, Zeiten) – lokal via Fontsource |
 | Tests    | vitest 5 – reine Fachlogik, `*.test.ts` neben dem Code, Helfer in `src/test/testdaten.ts` |
-| Persistenz | `localStorage`-Stand (`sl.dispo.stand.v1`, tagesgebunden), Spiegelung über `storage` (ADR-001) |
+| Persistenz | `localStorage`-Stand (`sl.dispo.stand.v1`, v4, tagesgebunden) + Mandant (`sl.mandant.v1`), Spiegelung über `storage` (ADR-001) |
+| Zeitzone | `Intl.DateTimeFormat` (ICU) in `core/zeitzone.ts` – Zone des Betriebs, Umstellung im Programm, keine Bibliothek |
+| Diagramme | eigene SVG/HTML-Bausteine `core/ui/Diagramm.tsx` – Donut, Balken, Linie, Säulen, Anteile; Palette `--sl-dv-*` |
 
 ---
 
@@ -78,15 +85,23 @@ src/
 │  ├─ suche.ts · kommando.ts    Suchindex, Registry für Palette (Befehle + Suchquellen)
 │  ├─ modules.config.ts         einzige Quelle für Leiste, Palette, Routing, Rollen, Freischaltung
 │  ├─ aenderungen.ts            Zähler ungespeicherter Änderungen (Abmelden-Rückfrage)
-│  ├─ auth/                     Typen, authStore (Mock), RequireAuth, LoginPage, AbgemeldetPage
+│  ├─ zeitzone.ts               Zonenzeit, Wandzeit → Zeitpunkt, Dauer über die Umstellung, Umstellungstage (ICU)
+│  ├─ datei.ts                  Download (CSV, JSON)
+│  ├─ auth/                     Typen, authStore (lokal + Anbieter), identitaet (OIDC-Claims → Konto, JIT), RequireAuth (Ablauf),
+│  │                            LoginPage (Anbieter-Tasten), IdentitaetDialog (Mock «Konto wählen»), AbgemeldetPage
+│  ├─ berechtigung/rechte.ts    Recht = Bereich:Aktion, Profile je Rolle, Zusatz/Entzug, Umfang, darfPerson (Organigramm)
+│  ├─ datenschutz/              Datenkatalog: Zweck, Rechtsgrundlage, Aufbewahrung, Löschfristen
+│  ├─ mandant/                  Mandant (Firma, Kanton, Zeitzone, Arbeitszeit, Feiertage, Anbieter, Fristen, Module) + Store
 │  ├─ domain/                   Stammdaten (Orte, Hinweise), Auftrag, Einsatz/Pendenz, Rapport, Nachricht, Kategorie,
-│  │                            Lager (Orte, Artikel, Bestand, Bestellung, Bewegung), Verrechnung (Betrag)
+│  │                            Lager (Orte, Artikel, Bestand, Bestellung, Bewegung), Verrechnung (Betrag),
+│  │                            Personal (Mitarbeiter, Hierarchie), Zeit (Stempel, Tagessaldo, ArG, Abschluss), Absenz
+│  │                            (Arten, Ferienkonto, Maskierung), Feiertage (Kanton, Osterformel), Journal (append-only)
 │  ├─ hooks/                    useNow · useHotkey · useDismiss · useElementSize · useHoverIntent · useMediaQuery · useQrSvg
 │  ├─ layout/                   AppShell · Topbar · Sidebar · MiniKalender · DateNav · BenutzerMenu ·
-│  │                            KommandoPalette · ShortcutHilfe · FolgtPage · ModulRoute (Rolle je Route)
+│  │                            KommandoPalette · ShortcutHilfe · FolgtPage · ModulRoute (Rolle, Mandant) · slots (Topbar-Steckplatz)
 │  └─ ui/                       Button · Chip · Avatar · Typenschild · DetailZeile · Popover · Dialog · Hovercard · Form ·
 │                               SegmentedControl · CapsLabel · Kbd · FotoKachel · FotoLightbox · ModulSeite (Liste + Dossier) ·
-│                               Kacheln · Tabelle · Suchfeld · Leer · Verweis · farben · cx
+│                               Kacheln · Tabelle · Suchfeld · Leer · Verweis · Diagramm (Donut, Balken, Linie, Säulen, Anteile) · farben · cx
 ├─ modules/dispo/               ← ein Ordner pro Modul
 │  ├─ DispoPage.tsx             Modulwurzel: hängt Mock ein, Befehle, Hotkeys, Komposition
 │  ├─ DispoToolbar.tsx          Ansicht, Zeitraum, Zoom, Farbe nach, Filter, Undo/Redo, Neu
@@ -116,10 +131,19 @@ src/
 ├─ modules/lager/               Lager & Ersatzteile: LagerPage · ArtikelDossier · BestellungDossier · BestellDialog ·
 │                               LagerDialoge (Umbuchen, Korrektur, Artikel) · lager.model
 ├─ modules/suche/               globaleSuche – Suchquellen Aufträge/Kunden/Geräte für die Palette auf jeder Seite
-├─ mock/                        Testdaten – nur von Modulwurzeln und App.tsx importiert (rapporte.ts, lager.ts: Verläufe, Rapporte, Lager)
+├─ modules/personal/            geteilt (rev 05): rechte (useRechte, useStandFuerSicht) · personal.model (Zeitkonto, Stempellage, CSV) ·
+│                               useStempeluhr · Stempeluhr (Pille, grosse Uhr, Streifen) · PersonAvatar · anmeldung · MeineDatenPage
+├─ modules/zeiterfassung/       ZeiterfassungPage (Liste · Tag · Woche · Monat · Jahr) · WochenUebersicht (Chips) · MonatsMatrix (+ Jahr) ·
+│                               TagesBild (Zeitstrahl) · ZeitkontoDossier · ZeitDialoge · zeiterfassung.model
+├─ modules/absenzen/            AbsenzenPage (Liste, Planer) · AbsenzDossier · AbsenzDialog · Jahresplaner · absenzen.model
+├─ modules/benutzer/            BenutzerPage (Konten, Rollen & Rechte, Mitarbeitende, Organigramm) · KontoDossier (Rechte-Matrix) ·
+│                               MitarbeiterDossier · KontoDialog · MitarbeiterDialog · benutzer.model (Auskunft DSG 25)
+├─ modules/einstellungen/       EinstellungenPage · Betrieb (Zeitzone, Arbeitszeit, Feiertage) · Anmeldung (Microsoft, Google) ·
+│                               Datenschutz (Stelle, Fristen, Löschlauf, Protokoll) · Module · einstellungen.model
+├─ mock/                        Testdaten – nur von Modulwurzeln und main.tsx importiert (personal, benutzer, identitaeten, zeit, absenzen, journal …)
 └─ test/testdaten.ts            Testhelfer auf dem echten Mock (deterministisch, relativ zu heute)
 scripts/jh-sign.mjs · scripts/contrast.jh.ts · scripts/demo.jh.mjs
-docs/adr (001–004) · docs/design · docs/tests · docs/prompts · .claude/skills (sutt-modul, sutt-pruefung)
+docs/adr (001–007) · docs/design · docs/datenschutz · docs/tests · docs/prompts · .claude/skills (sutt-modul, sutt-pruefung)
 TODO.jh.md · CHANGELOG.jh.md
 ```
 
@@ -338,6 +362,30 @@ Seitenleiste zeigt `v0.2.0 · ◆ JH`; der Tooltip trägt Build-Datum und Commit
 - **Querverweise**: Jede Nummer (Auftrag, Kunde, Gerät, Rapport, Artikel, Bestellung) ist ein Sprung ins Modul; `Strg+K`
   findet Aufträge, Kunden und Geräte auf jeder Seite. Techniker-App: Tab «Fahrzeug» und Teile «im Fahrzeug» im Rapport.
 
+### Personal v0.5 – Zeiterfassung, Absenzen, Benutzer & Rollen, Einstellungen, Datenschutz
+- **Stempeluhr**: Pille in jeder Topbar; grosse Uhr mit Kreis (grün Einstempeln · rot Ausstempeln · gelb Pause beenden),
+  Sekundenzähler, Zonenzeit MEZ/MESZ, Hinweis am Umstellungstag, runde Tasten Notiz · Pause · **Nachtragen** · Einsatz,
+  Einträge von heute – auf Handy, Tablet und PC (Container-Query). Techniker-App: Tab «Zeit» und Stempelstreifen auf «Heute».
+- **Zeiterfassung** `/zeiterfassung/:id?` mit Ansichten Liste · Tag (Zeitstrahl) · Woche (Chips je Tag, Erfasst/Erwartet,
+  Überstunden/Kompensiert) · Monat (Matrix Personen × Tage mit Tagessaldo, Feiertage, Ferienrest) · Jahr (Monatssaldi);
+  Kacheln als Sicht, CSV je Ansicht, Dossier je Person mit Monat, Abschluss, Tagen, Einträgen und Korrekturspur (ArGV 1 Art. 73),
+  ArG-Hinweise (Pause, Ruhezeit, 14-Stunden-Fenster, Sonntag, Nacht), Zeiten aus dem Einsatzplan, Monatsabschluss (Vier-Augen).
+- **Zeitzone im Programm**: Zone des Betriebs (Standard Europe/Zurich) in den Einstellungen; Stempel in Zonenzeit, Dauern am
+  Umstellungstag echt (23/25 Stunden), nächste Umstellung sichtbar – Regeln aus der ICU-Datenbank (`core/zeitzone.ts`).
+- **Ferien & Absenzen** `/absenzen/:id?`: Liste oder Planer, Antrag (halber Tag), Entscheid, Ferienkonto, Konflikt mit Einsätzen,
+  Ganztag im Plan; Krankheit und Unfall nur mit Recht «Gesundheitsdaten sehen», sonst «Abwesend».
+- **Benutzer & Rollen** `/benutzer/:bereich?`: Konten mit Rechte-Matrix (aus der Rolle · Zusatz · entzogen), Umfang eigene/Team/alle,
+  Anbieter-Verknüpfung, Sperren; Rollen & Rechte als Matrix; Mitarbeitende mit Personalakte, Ferienkonto, Auskunft (DSG Art. 25);
+  Organigramm (bestimmt «Team»).
+- **Einstellungen** `/einstellungen/:bereich?` (Administration): Betrieb, Feiertage (Kanton, Osterformel, betriebliche Tage),
+  Anmeldung (Microsoft Entra ID, Google Workspace – Tenant, Domain, Gruppen → Rolle, JIT, Umleitungs-URI, Verbindungstest,
+  nur SSO), Datenschutz (Stelle, Datenkatalog mit Fristen, Löschlauf), Protokoll (Journal, CSV), Module je Mandant.
+- **Anmeldung**: «Mit Microsoft-/Google-Konto anmelden» (Mock-Dialog «Konto wählen»), Prüfung Domain → Konto → Sperre → Gruppen →
+  JIT; «nur SSO» blendet die lokale Anmeldung aus; automatische Abmeldung nach Inaktivität.
+- **Meine Daten** `/meine-daten`: Konto, Personalakte, Einsichten durch andere, Kategorien mit Fristen, Rechte, Export (JSON).
+- **Dashboard · Auswertung**: Im Dienst jetzt (Donut), Auslastung heute (Balken), Erledigte Einsätze 28 Tage (Linie), Rapporte je
+  Woche (gestapelte Säulen), Einsätze nach Kategorie (Anteile) – mit Tooltip, Tastatur und Tabellen-Zwilling je Karte.
+
 ### Mockdaten
 Alles hängt am echten Datum (`MOCK_HEUTE`). Heute (6 Techniker) und der Eingang sind handverlesen, die
 übrigen Tage und Techniker füllt ein deterministischer Generator (Saat = Datum + Techniker); Absenzen liegen
@@ -408,6 +456,27 @@ aus den erledigten Einsätzen. Alle Firmen, Personen, Nummern und E-Mails (`.exa
     Umzüge und Ersatz ergeben sich von selbst. *Warum:* Eine separat gepflegte Gerätedatei veraltet – die Auftragsgeschichte nicht.
 24. **Betrag auf Knopfdruck** – Arbeitszeit × Stundensatz, Anfahrtspauschale, eingebaute Teile – im Auftrag, bei offenen
     Rechnungen und als Summe «zu verrechnen» auf dem Dashboard. *Warum:* Das Büro sieht das Geld, bevor die Buchhaltung kommt.
+25. **Ein Kreis, eine Handlung** (rev 05) – Die Stempeluhr zeigt genau die Taste, die jetzt dran ist: grün rein, rot raus, gelb
+    weiter; der Sekundenzähler läuft, Nachtragen bleibt eine Taste daneben. *Warum:* Stempeln passiert hundertmal im Monat – es
+    muss ohne Lesen gehen, auf dem Handy wie am PC.
+26. **Zeitzone gehört dem Betrieb** – Stempel entstehen in Europe/Zurich, nicht in der Zone des Geräts; die Umstellung rechnet
+    das Programm selbst (23- und 25-Stunden-Tage, nächste Umstellung sichtbar). *Warum:* Ein Techniker im Ausland oder ein Handy
+    mit falscher Zone darf kein Zeitkonto verschieben – und am letzten Oktobersonntag stimmt die Nachtschicht.
+27. **Ein Tag, ein Chip** – In der Wochenübersicht ist jeder Tag ein farbiger Chip mit Stunden; der Monat ist eine Matrix mit
+    Tagessaldo (+0:12 / −1:05), das Jahr eine Matrix mit Monatssaldi. *Warum:* Die Personaladministration sucht Muster – wer
+    fehlt, wer baut Minus auf, wo wurde nachgetragen – und findet sie mit einem Blick statt mit einer Pivot-Tabelle.
+28. **Rechte lesbar wie eine Matrix** – Jedes Konto zeigt jedes Recht als Pille: aus der Rolle, Zusatz, entzogen, nicht enthalten;
+    der Umfang «Team» kommt aus dem Organigramm. *Warum:* «Darf SK das?» beantwortet sich ohne Rückfrage an die IT, und eine
+    Ausnahme braucht keine neue Rolle.
+29. **Anmelden mit dem Geschäftskonto** – OIDC gegen Microsoft Entra ID oder Google Workspace, Gruppen bestimmen die Rolle, das
+    erste Anmelden legt das Konto an. *Warum:* Kein zweites Passwort, MFA und Austritt beim Verzeichnis – die Administration
+    pflegt eine Liste, nicht zwei.
+30. **Datenschutz als Mechanik** – Journal, das auch Einsichten kennt; Gesundheitsdaten nur mit Recht, sonst «Abwesend»;
+    Datenkatalog mit Fristen und Löschlauf; «Meine Daten» mit Auskunft auf Knopfdruck. *Warum:* DSG und DSGVO sind keine PDF
+    im Anhang, sondern Regeln, die das System selbst einhält – und jede Person sieht, wer ihre Daten angeschaut hat.
+31. **Zahlen, die sich an die Module halten** – Die Diagramme des Dashboards rechnen aus denselben Selektoren wie die Listen;
+    jede Karte hat Tabelle, Tooltip und Tastatur, Farben folgen der Sache (Kategorie wie in der Plantafel). *Warum:* Ein Diagramm,
+    das etwas anderes zeigt als die Liste daneben, ist schlimmer als keines.
 
 ---
 
@@ -437,18 +506,25 @@ aus den erledigten Einsätzen. Alle Firmen, Personen, Nummern und E-Mails (`.exa
 22. Wer bucht den Wareneingang – Büro oder Lager, mit Lieferschein-Scan? – `modules/lager/BestellungDossier.tsx`
 23. Kundenarten vollständig (Verwaltung, Privat, Gewerbe) oder auch Eigentümergemeinschaften? – `core/domain/stammdaten.ts`
 24. Regionen-Zuordnung neuer Liegenschaften nach Ort oder Tourenplan (Ortsliste mit PLZ)? – `core/domain/stammdaten.ts`
+25. Gleitzeit: Obergrenze, Verfall am Jahresende, Übertrag-Stichtag (heute 31.08.)? – `core/domain/zeit.ts`
+26. Kernzeit 09–16 Uhr und 42-Stunden-Woche für alle, oder je Funktion (Lernende, Büro 80 %)? – `core/mandant/mandant.types.ts`
+27. Ferienübertrag: wie viele Tage, bis wann zu beziehen? – `core/domain/absenz.ts`
+28. Gruppen im Entra-Tenant (SG-Aussendienst, SG-Disposition, SG-Buero, SG-Admin) – wer pflegt sie, wird Google gebraucht? – `core/auth/identitaet.ts`
+29. Datenschutzberater/in benennen, Aufbewahrungsfristen mit Treuhand bestätigen? – `core/datenschutz/aufbewahrung.ts`
+30. Darf aus dem Ausland gestempelt werden (Zonenzeit ist Schweiz) – oder nur aus dem Fahrzeug/Büro? – `modules/personal/useStempeluhr.ts`
+31. Wer genehmigt Monate und Absenzen des Dispositionsleiters (Vier-Augen-Prinzip ganz oben)? – `core/berechtigung/rechte.ts`
 
 ---
 
-## 10 · Bewusst nicht in v0.4
+## 10 · Bewusst nicht in v0.5
 
-Kein Backend, keine Auth-Prüfung, keine echten Daten. Persistenz nur als `localStorage`-Stand desselben Tages (Reload hält
-ihn, «Demo zurücksetzen» verwirft ihn, ein neuer Tag beginnt frisch). Kein echter SMS/Mail-Versand (Vorschau + Protokoll),
-kein echtes OCR (`jh# 014`), Kamerafotos nur im Fenster (`jh# 012`), keine Offline-Warteschlange (`jh# 013`),
-kein Routing-Dienst (Fahrzeit ist Luftlinie × Faktor), OSM-Kacheln nur fürs Mockup (`jh# 007`), keine Geokodierung neuer
-Liegenschaften (`jh# 016`), Fahrzeuglager in der App nur lesend (`jh# 017`), keine Rechnungsstellung/Mahnwesen (Buchhaltung
-v0.7), Techniker und Absenzen noch feste Stammdaten (Personal v0.5), keine Lieferanten-Anbindung (Bestellung ist ein Datensatz,
-kein Versand).
+Kein Backend, keine echte Token-Prüfung (Anbieter als Mock-Dialog, `jh# 020`), keine echten Daten. Persistenz nur als
+`localStorage`-Stand desselben Tages (Reload hält ihn, «Demo zurücksetzen» verwirft ihn, ein neuer Tag beginnt frisch).
+Kein echter SMS/Mail-Versand (Vorschau + Protokoll), kein echtes OCR (`jh# 014`), Kamerafotos nur im Fenster (`jh# 012`),
+keine Offline-Warteschlange (`jh# 013`, Stempel `jh# 019`), kein Routing-Dienst (Fahrzeit ist Luftlinie × Faktor), OSM-Kacheln
+nur fürs Mockup (`jh# 007`), keine Geokodierung neuer Liegenschaften (`jh# 016`), Fahrzeuglager in der App nur lesend (`jh# 017`),
+Löschlauf nur für den Browser-Stand (`jh# 021`), tzdata-Abgleich mit der API (`jh# 018`), keine Rechnungsstellung/Mahnwesen
+(Buchhaltung v0.7), keine Lieferanten-Anbindung, keine Lohnschnittstelle (CSV-Export der Zeitkonten ist der Weg).
 
 ---
 
@@ -463,8 +539,8 @@ Die grosse Karte zeigt auf den Bildern die Schemakarte: der eingebettete Prüf-B
 MapLibre meldet kein `load`, nach 10 s greift der Fallback. Im normalen Browser erscheinen die OSM-Kacheln – wie im
 Kartenkopf der Akte zu sehen.
 
-rev 03 (Techniker-App im Telefonrahmen, Rapport-Erfassung, Modul Servicerapporte, Akte mit Rapport-Abschnitt) und rev 04
-(Dashboard, Aufträge, Kunden, Geräte, Bilder, Lager) sind noch nicht abgelichtet – die Bilder entstehen mit der zweiten
-Demo-Tour (`npm run demo:video`).
+rev 03 (Techniker-App im Telefonrahmen, Rapport-Erfassung, Modul Servicerapporte, Akte mit Rapport-Abschnitt), rev 04
+(Dashboard, Aufträge, Kunden, Geräte, Bilder, Lager) und rev 05 (Stempeluhr, Wochen-Chips, Monatsmatrix, Rechte-Matrix,
+Einstellungen, Diagramme) sind noch nicht abgelichtet – die Bilder entstehen mit der zweiten Demo-Tour (`npm run demo:video`).
 
 /* ◆ jh · eof */
