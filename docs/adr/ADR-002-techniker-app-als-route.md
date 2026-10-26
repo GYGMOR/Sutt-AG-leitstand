@@ -1,6 +1,6 @@
 # ADR-002: Techniker-App als Route `/app` in derselben SPA
 
-**Status:** Accepted · **Datum:** 2026-10-25 · **Entscheid:** ◆ JH (Projektleitung)
+**Status:** Superseded durch [ADR-008](ADR-008-techniker-app-eigenes-projekt.md) (rev 05) · **Datum:** 2026-10-25 · **Entscheid:** ◆ JH (Projektleitung)
 
 ## Kontext
 

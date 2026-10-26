@@ -3,7 +3,7 @@
 Branchensoftware der **Sutt AG** (Haushalt-Apparate, Industriestrasse 24, 8152 Glattbrugg/Opfikon) –
 Service, Reparatur und Verkauf von Haushalts-Grossgeräten.
 
-**Stand:** rev 05 · v0.5.0 · Personal (Zeiterfassung, Absenzen, Benutzer & Rollen, Einstellungen mit SSO, Datenschutz, Dashboard-Diagramme) auf Betrieb v0.4, Aussendienst v0.3 und Disposition v2 · klickbares Mockup mit Testdaten, ohne Backend.
+**Stand:** rev 05 · v0.5.0 · Personal (Zeiterfassung, Absenzen, Benutzer & Rollen, Einstellungen mit SSO, Datenschutz, Dashboard-Diagramme) auf Betrieb v0.4, Aussendienst v0.3 und Disposition v2 · **Techniker-App als eigenes Projekt `app/`** (ADR-008) und Website-Gerüst `webseite/` · klickbares Mockup mit Testdaten, ohne Backend.
 Diese Datei ist der Bauplan: **jedes folgende Modul** (Kunden, Geräte, Lager, Mietgeräte, Zeit …)
 wird exakt nach diesen Regeln aufgebaut. Änderungen je Revision stehen in `CHANGELOG.jh.md`.
 
@@ -14,8 +14,12 @@ wird exakt nach diesen Regeln aufgebaut. Änderungen je Revision stehen in `CHAN
 ```bash
 npm install
 npm run dev          # http://localhost:5173 → /login (Demo-Zugänge stehen unter dem Formular)
-npm run build        # Typecheck (tsc strict) + Produktions-Build
+npm run dev:app      # Techniker-App: http://localhost:5174/app/ – und über den Leitstand http://localhost:5173/app/
+npm run dev:web      # Website-Gerüst: http://localhost:5175
+npm run build        # Typecheck (tsc strict) + Produktions-Build des Leitstands → dist/
+npm run build:app    # Techniker-App → app/dist/ (base /app/) · build:web · build:alle baut alle drei
 npm test             # vitest: Reducer, Selektoren, Konflikte, Zeitraster, Scoring, Rapport, Persistenz, App-Modell
+npm run test:alle    # dazu die Tests der App (Tour, Scan) · typecheck:alle prüft alle drei Projekte
 npm run jh:check     # Signatur: Kopf, §-Marken, eof, jh#-Abgleich, Exporte, kein any
 npm run jh:sign      # Köpfe und §-Marken automatisch normieren
 npm run jh:contrast  # WCAG-Kontrast aller Textpaare, hell und dunkel
@@ -27,10 +31,12 @@ Palette, Schnellerfassung, Druck, Dark Mode) mit Mauszeiger und Untertiteln ab, 
 komprimiert auf rund 8 MB (VP9). Browser und ffmpeg kommen aus einer vorhandenen Playwright-Installation
 (`PLAYWRIGHT_CORE`, `PLAYWRIGHT_FFMPEG`) – nichts davon landet in `package.json`.
 
-**Zwei Fenster, ein Stand (rev 03):** `/dispo/plantafel` im ersten Fenster, `/app?als=T-MB` im zweiten – am Desktop im
-Telefonrahmen. Statusknöpfe, Rapporte und Freigaben erscheinen sofort drüben: der Stand liegt in `localStorage` und
-spiegelt sich über das `storage`-Ereignis (ADR-001). «Demo zurücksetzen» im Benutzermenü stellt den Ausgangsbestand her.
-Aussendienst-Konten (`mb`, `sk`) landen nach dem Login direkt in der App; Büro-Konten können dort jeden Techniker ansehen.
+**Zwei Fenster, ein Stand (rev 03, seit rev 05 zwei Projekte):** `/dispo/plantafel` im ersten Fenster, `/app/?als=T-MB`
+im zweiten (dazu läuft `npm run dev:app`). Statusknöpfe, Rapporte und Freigaben erscheinen sofort drüben: der Stand liegt in
+`localStorage` und spiegelt sich über das `storage`-Ereignis (ADR-001); Leitstand und App teilen den Ursprung – im Dev-Modus
+über den Proxy `/app` → 5174, gehostet unter einer Domain (ADR-008). «Demo zurücksetzen» im Benutzermenü stellt den
+Ausgangsbestand her. Aussendienst-Konten (`mb`, `sk`) landen nach dem Login direkt in der App; Büro-Konten können dort
+jeden Techniker ansehen (Profil → «Als Techniker ansehen»).
 
 **Start je Rolle (rev 04):** `rw` (Büro) und `admin` starten im Dashboard, `jh` (Disposition) in der Plantafel, `mb`/`sk` in der
 App. Kunden und Lager sind Innendienst-Module: Aussendienst sieht dort die Folgt-Seite mit Rollenhinweis.
@@ -40,6 +46,14 @@ Eigene Skills für die Weiterarbeit liegen in `.claude/skills/` (`sutt-modul`, `
 sehen `/zeiterfassung?ansicht=woche|monat|jahr|tag`. `admin` meldet sich auch «Mit Microsoft-Konto» an (Mock-Dialog «Konto wählen»,
 Andrea Dietrich · SG-Admin); Einstellungen → Anmeldung zeigt die Tenant-Konfiguration. Zeitzone des Betriebs: Europe/Zurich mit
 Zeitumstellung im Programm (Einstellungen → Betrieb). «Meine Daten» im Benutzermenü zeigt jeder Person, was gespeichert ist.
+
+**Techniker-App (rev 05):** eigenes Projekt `app/` – responsiv von A bis Z: unter 900 px Kopf oben und Tabs unten
+(Heute · Tour · Zeit · Kamera · Mehr), ab 900 px Rand links und zweispaltige Seiten (Tablet quer, Laptop). Alles, was der
+Aussendienst draussen braucht: Tagesplan mit Ein-Daumen-Status, Tour mit Karte, Stempeluhr, Kamera (Fotos zum Einsatz,
+Typenschild lesen), Scanner (Artikel, Auftrag, Rapport-QR, Seriennummer), Fahrzeuglager mit Verbrauch und Nachschub,
+Absenzen, Servicerapport, Profil – Einstellungen und Verwaltung bleiben im Leitstand. Handy-Test: `http://<Laptop-IP>:5174/app/`
+im selben WLAN; «Zum Startbildschirm hinzufügen» installiert sie (Manifest, Icon). `npm install` legt unter Windows ohne
+Symlink-Recht die Workspace-Links nicht an (EISDIR) – die Skripte laufen trotzdem über die Root-`node_modules`.
 
 Node ≥ 20.19 (Vite 7); `jh:contrast` braucht Node ≥ 23 (nativer TypeScript-Lauf).
 Optional `.env` nach `.env.example`: mit `VITE_GOOGLE_MAPS_API_KEY` erscheint Google Maps, ohne Schlüssel
@@ -65,6 +79,7 @@ MapLibre + OpenStreetMap, ohne Netz die Schemakarte. Die Akte sieht nie leer aus
 | Persistenz | `localStorage`-Stand (`sl.dispo.stand.v1`, v4, tagesgebunden) + Mandant (`sl.mandant.v1`), Spiegelung über `storage` (ADR-001) |
 | Zeitzone | `Intl.DateTimeFormat` (ICU) in `core/zeitzone.ts` – Zone des Betriebs, Umstellung im Programm, keine Bibliothek |
 | Diagramme | eigene SVG/HTML-Bausteine `core/ui/Diagramm.tsx` – Donut, Balken, Linie, Säulen, Anteile; Palette `--sl-dv-*` |
+| Projekte | npm-Workspaces: `.` Leitstand · `app/` Techniker-App (Alias `@sl` → `src/`, base `/app/`) · `webseite/` Gerüst – ein Build je Projekt (ADR-008) |
 
 ---
 
@@ -117,8 +132,7 @@ src/
 │  ├─ hover/                    Hovercard-Kontext und Einsatz-Kurzansicht
 │  ├─ druck/                    TechnikerDruck (A4, QR)
 │  └─ Schnellerfassung · KapazitaetsBand · LivePuls · KundenChips · ProtokollPopover
-├─ modules/app/                 Techniker-App (rev 03): AppPage (Routen, Kontext) · AppLayout (Telefonrahmen, Tabs, Menü) ·
-│                               HeuteSeite · EinsatzSeite · WocheSeite · RapportSeite · EinsatzKarte · app.model
+├─ modules/app/app.model.ts     geteiltes App-Modell (Tageszeile, nächster Schritt, Technikerwahl) – die App selbst liegt in app/
 ├─ modules/rapport/             Servicerapport, geteilt von App und Büro: RapportFormular · UnterschriftFeld · NachrichtDialog ·
 │                               ZurueckDialog · RapportDruck (A4, QR) · rapport.model · rapportStatus
 ├─ modules/rapporte/            Büro-Modul «Servicerapporte»: RapportePage (Kacheln als Filter, Liste, Prüfung, Freigabe)
@@ -142,15 +156,25 @@ src/
 │                               Datenschutz (Stelle, Fristen, Löschlauf, Protokoll) · Module · einstellungen.model
 ├─ mock/                        Testdaten – nur von Modulwurzeln und main.tsx importiert (personal, benutzer, identitaeten, zeit, absenzen, journal …)
 └─ test/testdaten.ts            Testhelfer auf dem echten Mock (deterministisch, relativ zu heute)
+app/                            Techniker-App – eigenes Vite-Projekt, base /app/, Alias @sl → ../src (ADR-008)
+├─ index.html · public/         Manifest, Icon (installierbar), Viewport mit safe-area
+├─ src/main.tsx · App.tsx       Fonts, Tokens, Store + Mock, Router (basename /app)
+├─ src/rahmen/                  AppKontext · Geschuetzt (Sitzung, Techniker, ?als=, online) · AppRahmen (Tabs/Rand, Mehr-Blatt) · navigation
+├─ src/seiten/                  Anmelden · Heute · Woche · Einsatz · Rapport · Tour · Scannen · Kamera · Zeit · Absenzen · Fahrzeug · Profil
+├─ src/bausteine/               EinsatzKarte · Scanner (BarcodeDetector, Kamera) · Seiten.module.css
+└─ src/model/                   tour.model (Stopps, Strecke, Maps-Link) · scan.model (Code → Artikel/Auftrag/Rapport/Gerät/Link)
+webseite/                       Website-Gerüst (Vite, Port 5175, Tokens aus src/styles) – Neuaufbau folgt
 scripts/jh-sign.mjs · scripts/contrast.jh.ts · scripts/demo.jh.mjs
-docs/adr (001–007) · docs/design · docs/datenschutz · docs/tests · docs/prompts · .claude/skills (sutt-modul, sutt-pruefung)
+docs/adr (001–008) · docs/design · docs/datenschutz · docs/tests · docs/prompts · .claude/skills (sutt-modul, sutt-pruefung)
 TODO.jh.md · CHANGELOG.jh.md
 ```
 
 **Abhängigkeitsrichtung:** `modules/*` → `core/*`. `core` kennt keine Module und keine Mockdaten
 (Mock-Auth bekommt sein Benutzerverzeichnis in `main.tsx` injiziert). Alle Module sind Sichten auf **einen** Stand
 (ADR-003): Dashboard, Aufträge, Kunden, Geräte, Bilder, Lager, App und Rapporte lesen und schreiben denselben Store;
-`modules/rapport` ist der geteilte Rapport-Baustein ohne eigenen Store.
+`modules/rapport` ist der geteilte Rapport-Baustein ohne eigenen Store. `app/` importiert über `@sl` nur `core/*`, den
+Dispo-Store, Mock und die Modelle/Dialoge der Module (Rapport, Stempeluhr, Absenzen, Zeit) – nie Views der Disposition;
+der Leitstand importiert nichts aus `app/`.
 
 **Muster pro Modul:** `*.types.ts` → `store/*.reducer.ts` (rein) → `store/*.selectors.ts` (rein) →
 `store/use*Aktionen.ts` (Protokolltext, IDs, Zeitstempel) → Komponenten (dumm, explizite Props).
@@ -324,7 +348,8 @@ Seitenleiste zeigt `v0.2.0 · ◆ JH`; der Tooltip trägt Build-Datum und Commit
   («Techniker-App öffnen» / «In der App erfassen», zweites Fenster) oder per `?als=T-MB`. Heute-Liste mit Tagesleiste
   (erledigt · Einsatz · Fahrt · jetzt), Einsatzkarten in Reihenfolge, **ein** grosser Statusknopf für den Einsatz des Moments
   («Abfahrt» → «Angekommen» → «Fertig – Rapport»), Anruf, Route, Details, «Mieter informieren» (SMS mit Ankunftszeit),
-  Woche, Banner «Plan geändert» mit «Gesehen», Offline-Hinweis. Am Desktop im Telefonrahmen 390 × 844 (`?rahmen=0` ohne).
+  Woche, Banner «Plan geändert» mit «Gesehen», Offline-Hinweis. Bis rev 04 im Telefonrahmen in derselben SPA – seit rev 05
+  ein eigenes Projekt `app/` (siehe «Techniker-App v0.5»).
 - **Servicerapport**: vorausgefüllt aus Auftrag, Gerät und Statusverlauf – Zeiten (Anfahrt/Arbeit/Pause im 5-min-Raster,
   verrechenbar), Checkliste je Geräteart plus eigene Schritte, Bemerkung, Teile (eingebaut · ab Fahrzeug · bestellen),
   Fotos mit Motiv (Kamera oder Platzhalter), Typenschild-Vorschlag für «noch nicht erfasste» Geräte, Abschluss
@@ -385,6 +410,33 @@ Seitenleiste zeigt `v0.2.0 · ◆ JH`; der Tooltip trägt Build-Datum und Commit
 - **Meine Daten** `/meine-daten`: Konto, Personalakte, Einsichten durch andere, Kategorien mit Fristen, Rechte, Export (JSON).
 - **Dashboard · Auswertung**: Im Dienst jetzt (Donut), Auslastung heute (Balken), Erledigte Einsätze 28 Tage (Linie), Rapporte je
   Woche (gestapelte Säulen), Einsätze nach Kategorie (Anteile) – mit Tooltip, Tastatur und Tabellen-Zwilling je Karte.
+
+### Techniker-App v0.5 – eigenes Projekt `app/`
+- **Rahmen**: unter 900 px Kopf (Marke, Datum, Online-Punkt, Avatar → Profil) und Tabs unten Heute · Tour · Zeit · Kamera · **Mehr**
+  (Blatt mit Scannen, Woche, Fahrzeug, Absenzen, Profil, hell/dunkel, Leitstand, Abmelden); ab 900 px Rand links mit allen Bereichen,
+  Seiten zweispaltig, Inhalt bis 1120 px. Offline-Banner, 16-px-Eingaben gegen den iOS-Zoom, safe-area unten.
+- **Anmelden** `/app/anmelden`: Microsoft/Google (Mock «Konto wählen»), lokal mit Demo-Zugängen; dieselbe Sitzung wie der Leitstand.
+- **Heute** / **Woche**: Stempelstreifen, Tagesleiste, nummerierte Einsatzkarten mit Ein-Daumen-Status, Anruf, Route, Mieter informieren,
+  Banner «Plan geändert»; **Einsatz** zweispaltig (Karte + Fotos | Hinweise, Kontakte, Ersatzteile, Statusmeldungen); **Rapport** mit dem
+  geteilten Formular (`modules/rapport`).
+- **Tour**: Stopps · Strecke · Fahrt · Einsatz, Karte (Google → MapLibre → Schema) mit nummerierten Pins und Linie ab Werkhof,
+  «Resttour in Google Maps», «Nächster Stopp», Stoppliste mit Abfahrtszeit und Navigation je Adresse.
+- **Scannen**: Kamera über `BarcodeDetector` (QR, Code 128/39, EAN, Data Matrix) mit Handeingabe und Beispielcodes; Ergebnis je Art –
+  Artikel (an Bord/Glattbrugg, **Verbrauch melden**, **Nachschub**), Auftrag (Einsatz öffnen), Rapport-QR (Rapport), Seriennummer
+  (Gerät → Typenschild fotografieren), Link; Verlauf «Zuletzt gescannt».
+- **Kamera**: Einsatz wählen, Motiv antippen (Typenschild, Schaden, Anschluss, Einbau …), auslösen (`capture=environment`, mehrere),
+  speichern → Fotos am Auftrag (Akte, Gerät, Modul Bilder); «Typenschild lesen» (Mock-OCR) → Gerät nachtragen.
+- **Zeit**: grosse Stempeluhr (grün/rot/gelb, Sekunden, Zonenzeit), Woche als Chips, Monat mit Soll/Ist/Saldo/Total und letzten Tagen,
+  Nachtragen, Monat einreichen, Sprung ins Zeitkonto des Leitstands.
+- **Absenzen**: Ferienkonto (Anspruch, bezogen, geplant, Rest), kommende und vergangene, beantragen, beantragte ändern/zurückziehen –
+  derselbe Dialog wie im Leitstand.
+- **Fahrzeug**: Bestand an Bord nach Gruppe, knappe Teile, **−1 Verbrauch** (Lagerbewegung), **Nachschub anfordern** (Bestellung,
+  Büro bucht Glattbrugg → Fahrzeug), Lieferungen für die eigenen Aufträge.
+- **Profil**: Konto, Rolle, Anmeldung, Fahrzeug, Region, Zeitzone; Innendienst wählt «Als Techniker ansehen» (`?als=`); hell/dunkel,
+  «Auf dem Startbildschirm installieren» (`beforeinstallprompt`), Meine Daten, Leitstand, Abmelden.
+- **Zusammenspiel**: Modul «Techniker-App» im Leitstand ist ein Vollseiten-Link in neuem Tab (`extern` im Register – Seitenleiste,
+  Flyout, Palette); Akte «Techniker-App öffnen» / Servicerapporte «In der App erfassen» öffnen `/app/…?als=<Techniker>`;
+  Aussendienst springt nach dem Login auf `/app/`. Ein Stand, eine Sitzung – über denselben Ursprung.
 
 ### Mockdaten
 Alles hängt am echten Datum (`MOCK_HEUTE`). Heute (6 Techniker) und der Eingang sind handverlesen, die
@@ -477,6 +529,14 @@ aus den erledigten Einsätzen. Alle Firmen, Personen, Nummern und E-Mails (`.exa
 31. **Zahlen, die sich an die Module halten** – Die Diagramme des Dashboards rechnen aus denselben Selektoren wie die Listen;
     jede Karte hat Tabelle, Tooltip und Tastatur, Farben folgen der Sache (Kategorie wie in der Plantafel). *Warum:* Ein Diagramm,
     das etwas anderes zeigt als die Liste daneben, ist schlimmer als keines.
+32. **Ein Code, viele Türen** (rev 05) – Der Scanner der App erkennt, was er sieht: Artikel → Verbrauch melden oder Nachschub,
+    Auftragsnummer → Einsatz, Rapport-QR → Rapport, Seriennummer → Typenschild fotografieren. *Warum:* Der Techniker sucht nicht in
+    Listen – er hält das Handy hin, und die App weiss, was zu tun ist.
+33. **Ein Rahmen, drei Geräte** – Dieselben Seiten laufen auf dem Handy (Tabs unten, ein Daumen), auf dem Tablet quer und am Laptop
+    (Rand links, zwei Spalten); nichts ist eine abgespeckte Version. *Warum:* Der Techniker hat morgens das Tablet im Auto und
+    nachmittags das Handy in der Hand – die App muss an beiden Orten dieselbe sein.
+34. **Fotos gehören zum Einsatz** – Die Kamera der App fragt zuerst «welcher Einsatz, welches Motiv» und legt das Bild am Auftrag ab;
+    der Leitstand sieht es in Akte, Gerät und Modul Bilder. *Warum:* Fotos in der Galerie des Handys sind für das Büro verloren.
 
 ---
 
@@ -502,7 +562,7 @@ aus den erledigten Einsätzen. Alle Firmen, Personen, Nummern und E-Mails (`.exa
 18. Stundensatz, Anfahrtspauschale und Rundung (heute CHF 128 / CHF 48, 5 Rappen)? – `core/domain/verrechnung.ts`
 19. Mindestbestände je Artikel und wer sie pflegt? – `core/domain/lager.ts`
 20. Nummernkreis der Bestellungen (`B-26-00123`), Lieferanten je Marke? – `core/domain/lager.ts`
-21. Wird das Fahrzeuglager gezählt oder geschätzt; bucht der Techniker Verbrauch selbst? – `modules/app/LagerSeite.tsx`
+21. Wird das Fahrzeuglager gezählt oder geschätzt; bucht der Techniker Verbrauch selbst? – `app/seiten/FahrzeugSeite.tsx`
 22. Wer bucht den Wareneingang – Büro oder Lager, mit Lieferschein-Scan? – `modules/lager/BestellungDossier.tsx`
 23. Kundenarten vollständig (Verwaltung, Privat, Gewerbe) oder auch Eigentümergemeinschaften? – `core/domain/stammdaten.ts`
 24. Regionen-Zuordnung neuer Liegenschaften nach Ort oder Tourenplan (Ortsliste mit PLZ)? – `core/domain/stammdaten.ts`
@@ -522,9 +582,11 @@ Kein Backend, keine echte Token-Prüfung (Anbieter als Mock-Dialog, `jh# 020`), 
 `localStorage`-Stand desselben Tages (Reload hält ihn, «Demo zurücksetzen» verwirft ihn, ein neuer Tag beginnt frisch).
 Kein echter SMS/Mail-Versand (Vorschau + Protokoll), kein echtes OCR (`jh# 014`), Kamerafotos nur im Fenster (`jh# 012`),
 keine Offline-Warteschlange (`jh# 013`, Stempel `jh# 019`), kein Routing-Dienst (Fahrzeit ist Luftlinie × Faktor), OSM-Kacheln
-nur fürs Mockup (`jh# 007`), keine Geokodierung neuer Liegenschaften (`jh# 016`), Fahrzeuglager in der App nur lesend (`jh# 017`),
-Löschlauf nur für den Browser-Stand (`jh# 021`), tzdata-Abgleich mit der API (`jh# 018`), keine Rechnungsstellung/Mahnwesen
-(Buchhaltung v0.7), keine Lieferanten-Anbindung, keine Lohnschnittstelle (CSV-Export der Zeitkonten ist der Weg).
+nur fürs Mockup (`jh# 007`), keine Geokodierung neuer Liegenschaften (`jh# 016`), Löschlauf nur für den Browser-Stand (`jh# 021`),
+tzdata-Abgleich mit der API (`jh# 018`), keine Rechnungsstellung/Mahnwesen (Buchhaltung v0.7), keine Lieferanten-Anbindung,
+keine Lohnschnittstelle (CSV-Export der Zeitkonten ist der Weg). Die App ist installierbar, läuft aber nur online (kein Service
+Worker); Scanner und Kamera brauchen einen Browser mit `BarcodeDetector` bzw. `capture` – sonst Handeingabe und Dateiwahl.
+Die Website in `webseite/` ist ein Gerüst, kein Inhalt.
 
 ---
 
@@ -541,6 +603,7 @@ Kartenkopf der Akte zu sehen.
 
 rev 03 (Techniker-App im Telefonrahmen, Rapport-Erfassung, Modul Servicerapporte, Akte mit Rapport-Abschnitt), rev 04
 (Dashboard, Aufträge, Kunden, Geräte, Bilder, Lager) und rev 05 (Stempeluhr, Wochen-Chips, Monatsmatrix, Rechte-Matrix,
-Einstellungen, Diagramme) sind noch nicht abgelichtet – die Bilder entstehen mit der zweiten Demo-Tour (`npm run demo:video`).
+Einstellungen, Diagramme, Techniker-App in Handy- und Laptop-Breite) sind noch nicht abgelichtet – die Bilder entstehen mit der
+zweiten Demo-Tour (`npm run demo:video`).
 
 /* ◆ jh · eof */
