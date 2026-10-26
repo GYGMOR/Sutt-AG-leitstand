@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/app/app.model.test.ts                      │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Techniker-Sicht: Sitzung, nächster Schritt, aktiver Einsatz, Plan     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -27,7 +27,7 @@ function speicherStub() {
 }
 
 function benutzer(teil: Partial<Benutzer>): Benutzer {
-  return { id: 'B-T', benutzername: 'tt', vorname: 'Test', nachname: 'Tester', kuerzel: 'TT', rolle: 'disposition', ...teil };
+  return { id: 'B-T', benutzername: 'tt', vorname: 'Test', nachname: 'Tester', kuerzel: 'TT', rolle: 'disposition', aktiv: true, ...teil };
 }
 
 function heuteFuer(technikerId: string): EinsatzView[] {

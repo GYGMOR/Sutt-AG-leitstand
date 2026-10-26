@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/app/HeuteSeite.tsx                         │
-   │  ◆ JH · 2026.10 · rev 03                                               │
-   │  Heute: Tagesleiste, Planänderungen, Einsatzkarten, Status, SMS        │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Heute: Stempelstreifen, Tagesleiste, Planänderungen, Einsatzkarten    │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useEffect, useMemo, useState } from 'react';
@@ -12,6 +12,7 @@ import { formatDauer, formatZeit } from '../../core/format';
 import { Button } from '../../core/ui/Button';
 import { rapportFuerEinsatz } from '../dispo/store/dispo.selectors';
 import type { EinsatzView } from '../dispo/store/dispo.selectors';
+import { StempeluhrStreifen } from '../personal/Stempeluhr';
 import { NachrichtDialog } from '../rapport/NachrichtDialog';
 import { aktiverEinsatz, planAenderungen, planBestaetigen, sortiert, tagesZeileFuer } from './app.model';
 import { useApp } from './AppKontext';
@@ -50,6 +51,7 @@ export function HeuteSeite() {
 
   return (
     <div className={styles.seite}>
+      <StempeluhrStreifen geraet="app" onOeffnen={() => navigate(pfad('/app/zeit'))} />
       <section className={styles.leiste}>
         <div>
           <span className={styles.leisteZahl}>

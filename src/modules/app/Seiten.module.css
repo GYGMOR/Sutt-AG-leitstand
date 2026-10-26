@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/app/Seiten.module.css                      │
-   │  ◆ JH · 2026.10 · rev 04                                               │
-   │  Seiten der App: Tagesleiste, Banner, Listen, Woche, Rapport, Lager    │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Seiten der App: Tagesleiste, Banner, Woche, Rapport, Lager, Zeit      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 /* ── §1 · Grundraster ────────────────────────────────────────── */
@@ -349,6 +349,82 @@
 
 .bord-knapp {
   color: var(--sl-signal-ink);
+}
+
+/* ── §7 · Zeit ───────────────────────────────────────────────── */
+
+.abschnitt-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.abschnitt-kopf h2 {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.zeit-zahlen {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.zeit-zahlen dt {
+  font-size: 10px;
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.zeit-zahlen dd {
+  font-family: var(--sl-font-mono);
+  font-size: 15px;
+  font-weight: var(--sl-fw-semibold);
+}
+
+.zeit-tage {
+  display: flex;
+  flex-direction: column;
+  border-top: var(--sl-hairline);
+}
+
+.zeit-tag {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-12);
+}
+
+.zeit-tag:last-child {
+  border-bottom: 0;
+}
+
+.zeit-tag-heute {
+  box-shadow: inset var(--sl-mark-width) 0 0 var(--sl-signal);
+  padding-left: 8px;
+}
+
+.zeit-tag-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--sl-ink-2);
+}
+
+.zeit-aktionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.zeit-aktionen > * {
+  min-height: 40px;
 }
 
 /* ◆ jh · eof */

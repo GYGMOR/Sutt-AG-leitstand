@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/app/AppPage.tsx                            │
-   │  ◆ JH · 2026.10 · rev 04                                               │
-   │  Modulwurzel Techniker-App: Techniker bestimmen, Routen, Kontext       │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Modulwurzel Techniker-App: Techniker, Routen (mit Zeit), Kontext      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useCallback, useMemo } from 'react';
@@ -11,8 +11,9 @@ import { useBenutzer } from '../../core/auth/authStore';
 import { minutesOfDay } from '../../core/datum';
 import { useNow } from '../../core/hooks/useNow';
 import { MOCK_HEUTE, mockBestand, mockStammdaten } from '../../mock';
-import { initDispoStore, useDispoState } from '../dispo/store/dispoStore';
+import { initDispoStore } from '../dispo/store/dispoStore';
 import { useDispoAktionen } from '../dispo/store/useDispoAktionen';
+import { useStandFuerSicht } from '../personal/rechte';
 import { technikerFuer } from './app.model';
 import { AppKontextProvider } from './AppKontext';
 import type { AppKontextWert } from './AppKontext';
@@ -22,6 +23,7 @@ import { HeuteSeite } from './HeuteSeite';
 import { LagerSeite } from './LagerSeite';
 import { RapportSeite } from './RapportSeite';
 import { WocheSeite } from './WocheSeite';
+import { ZeitSeite } from './ZeitSeite';
 
 // jh› Gleicher Store wie der Leitstand – die App ist eine zweite Sicht, keine zweite Wahrheit (ADR-002).
 initDispoStore(mockStammdaten, mockBestand, MOCK_HEUTE);
@@ -29,7 +31,8 @@ initDispoStore(mockStammdaten, mockBestand, MOCK_HEUTE);
 // ── §1 · Wurzel ──────────────────────────────────────────────────
 
 export function AppPage() {
-  const state = useDispoState();
+  // jh› Die App sieht den Stand durch die Rechte-Sicht: fremde Gesundheitsdaten nur als «Abwesend».
+  const state = useStandFuerSicht();
   const benutzer = useBenutzer();
   const aktionen = useDispoAktionen();
   const [params] = useSearchParams();
@@ -53,6 +56,7 @@ export function AppPage() {
         <Routes>
           <Route index element={<HeuteSeite />} />
           <Route path="woche" element={<WocheSeite />} />
+          <Route path="zeit" element={<ZeitSeite />} />
           <Route path="lager" element={<LagerSeite />} />
           <Route path="einsatz/:einsatzId" element={<EinsatzSeite />} />
           <Route path="rapport/:einsatzId" element={<RapportSeite />} />
