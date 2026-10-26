@@ -1,0 +1,212 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/absenzen/AbsenzenPage.module.css           │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Absenzen: Planer-Raster, Artfarben, Legende, Ferien-Chip              │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Chips & Farben je Art ──────────────────────────────── */
+
+/* jh› Artfarben aus den Kategorie-Kanten: Ferien = Montage-Grün, Krank = Garantie-Violett, Militär = Offerte-Grau,
+       Schulung = Reparatur-Blau, Kompensation = Lieferung-Gelb, Unbezahlt = Maler-Braun, Fahrzeug = Mietgerät-Türkis. */
+.ferien-chip {
+  --sl-edge: var(--sl-kat-montage-edge);
+  --sl-tint: color-mix(in srgb, var(--sl-kat-montage-edge) var(--sl-tint-mix), var(--sl-surface));
+  color: var(--sl-kat-montage-ink);
+}
+
+.art-ferien {
+  --sl-art: var(--sl-kat-montage-edge);
+}
+
+.art-krank,
+.art-unfall {
+  --sl-art: var(--sl-kat-garantie-edge);
+}
+
+.art-abwesend {
+  --sl-art: var(--sl-st-erledigt);
+}
+
+.art-militaer {
+  --sl-art: var(--sl-kat-offerte-edge);
+}
+
+.art-schulung {
+  --sl-art: var(--sl-kat-reparatur-edge);
+}
+
+.art-kompensation {
+  --sl-art: var(--sl-kat-lieferung-edge);
+}
+
+.art-unbezahlt {
+  --sl-art: var(--sl-kat-malerarbeiten-edge);
+}
+
+.art-fahrzeugservice {
+  --sl-art: var(--sl-kat-mietgeraet-edge);
+}
+
+/* ── §2 · Planer ─────────────────────────────────────────────── */
+
+.planer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.planer-kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.monat-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.monat-label {
+  min-width: 140px;
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+  text-align: center;
+}
+
+.legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.legende li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legende-farbe {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--sl-art, var(--sl-line-strong));
+}
+
+.legende-farbe.beantragt {
+  background: repeating-linear-gradient(135deg, var(--sl-line-strong) 0 2px, transparent 2px 4px);
+  border: 1px dashed var(--sl-line-strong);
+}
+
+.raster {
+  overflow-x: auto;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.raster-zeile {
+  display: grid;
+  align-items: stretch;
+  min-height: 32px;
+  border-bottom: 1px solid var(--sl-line-soft);
+}
+
+.raster-zeile:last-child {
+  border-bottom: 0;
+}
+
+.raster-person {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-right: var(--sl-hairline);
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-12);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.raster-zeile:first-child .raster-person {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.raster-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.raster-zaehler {
+  margin-left: auto;
+  font-family: var(--sl-font-mono);
+  color: var(--sl-mute);
+}
+
+.raster-tag-kopf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0;
+  border-right: 1px solid var(--sl-line-soft);
+  font-size: 10px;
+  color: var(--sl-mute);
+}
+
+.raster-tag-nummer {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-ink-2);
+}
+
+.raster-zelle {
+  min-width: 0;
+  border-right: 1px solid var(--sl-line-soft);
+  background: transparent;
+}
+
+.raster-leer:hover {
+  background: var(--sl-hover);
+  cursor: cell;
+}
+
+.raster-absenz {
+  margin: 4px 1px;
+  border-radius: 2px;
+  background: var(--sl-art);
+  cursor: pointer;
+}
+
+.raster-absenz.beantragt {
+  background: repeating-linear-gradient(135deg, var(--sl-art) 0 3px, transparent 3px 6px);
+  outline: 1px dashed var(--sl-art);
+  outline-offset: -1px;
+}
+
+.raster-absenz:hover {
+  filter: brightness(1.1);
+}
+
+.frei {
+  background: var(--sl-paper);
+}
+
+.heute {
+  box-shadow: inset 0 0 0 2px var(--sl-signal);
+}
+
+/* ◆ jh · eof */
