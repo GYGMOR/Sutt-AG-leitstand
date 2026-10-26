@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/layout/Topbar.tsx                             │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Topbar 56 px: Wortmarke, Modul, Datum, Palette, Extras, Benutzer      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -15,6 +15,7 @@ import { Kbd } from '../ui/Kbd';
 import { BenutzerMenu } from './BenutzerMenu';
 import type { MenueEintrag } from './BenutzerMenu';
 import { DateNav } from './DateNav';
+import { useTopbarExtra } from './slots';
 import styles from './Topbar.module.css';
 
 // ── §1 · Wortmarke ───────────────────────────────────────────────
@@ -45,6 +46,8 @@ interface TopbarProps {
 
 export function Topbar({ modul, extras, menueEintraege, onOpenPalette, onHilfe, onAbmelden }: TopbarProps) {
   const benutzer = useBenutzer();
+  // jh› Eingehängter Baustein aus main.tsx (rev 05: Stempeluhr) – core kennt das Modul nicht.
+  const Extra = useTopbarExtra();
   const gruppe = modul ? MODUL_GRUPPEN.find((eintrag) => eintrag.id === modul.gruppe)?.label : undefined;
 
   return (
@@ -65,6 +68,7 @@ export function Topbar({ modul, extras, menueEintraege, onOpenPalette, onHilfe, 
       </button>
 
       <div className={styles.rechts}>
+        {Extra && <Extra />}
         {extras}
         <span className={styles.mockup} title="Klickbares Mockup – alle Daten sind erfunden">
           Mockup · Testdaten

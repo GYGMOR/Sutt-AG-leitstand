@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/layout/Sidebar.tsx                            │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Seitenleiste: Gruppen, Schlösser, Minikalender, ein-/ausklappbar      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
 import { ChevronDown, CircleQuestionMark, Lock, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { NavLink } from 'react-router';
 import { useBenutzer } from '../auth/authStore';
+import { useMandant } from '../mandant/mandantStore';
 import { MODULE, MODUL_GRUPPEN, pruefeFreigabe } from '../modules.config';
 import type { Modul, ModulGruppe } from '../modules.config';
 import { cx } from '../ui/cx';
@@ -42,7 +43,8 @@ interface EintragProps {
 
 function Eintrag({ modul, eingeklappt, onGesperrt, onHover }: EintragProps) {
   const benutzer = useBenutzer();
-  const freigabe = pruefeFreigabe(modul, benutzer?.rolle ?? null);
+  const { modulFreigaben } = useMandant();
+  const freigabe = pruefeFreigabe(modul, benutzer?.rolle ?? null, modulFreigaben);
   const Icon = modul.icon;
   const inhalt: ReactNode = (
     <>
@@ -93,13 +95,14 @@ interface FlyoutProps {
 
 function Flyout({ gruppe, anker, onClose, onEnter, onGesperrt }: FlyoutProps) {
   const benutzer = useBenutzer();
+  const { modulFreigaben } = useMandant();
   const label = MODUL_GRUPPEN.find((eintrag) => eintrag.id === gruppe)?.label ?? '';
   return (
     <Popover anchor={anker} open onClose={onClose} placement="right-start" abstand={4} label={label}>
       <div className={styles.flyout} onPointerEnter={onEnter} onPointerLeave={onClose}>
         <span className={styles.flyoutTitel}>{label}</span>
         {MODULE.filter((modul) => modul.gruppe === gruppe).map((modul) => {
-          const freigabe = pruefeFreigabe(modul, benutzer?.rolle ?? null);
+          const freigabe = pruefeFreigabe(modul, benutzer?.rolle ?? null, modulFreigaben);
           const Icon = modul.icon;
           if (!freigabe.ok) {
             return (

@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/ui/Verweis.tsx                                │
-   │  ◆ JH · 2026.10 · rev 04                                               │
-   │  Verweis: Sprung zu Auftrag, Kunde, Gerät, Rapport – als Typenschild   │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Verweis: Sprung zu Auftrag, Kunde, Gerät, Rapport, Person – Schild    │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import type { ReactNode } from 'react';
@@ -22,6 +22,11 @@ export const ZIEL = {
   artikel: (artikelNummer: string) => `/lager/artikel?artikel=${encodeURIComponent(artikelNummer)}`,
   bestellung: (id: string) => `/lager/bestellungen?bestellung=${encodeURIComponent(id)}`,
   bilder: (filter: string) => `/bilder?${filter}`,
+  zeitkonto: (mitarbeiterId: string, monat?: string) => `/zeiterfassung/${mitarbeiterId}${monat ? `?monat=${monat}` : ''}`,
+  absenz: (id: string) => `/absenzen/${id}`,
+  absenzenVon: (mitarbeiterId: string) => `/absenzen?mitarbeiter=${encodeURIComponent(mitarbeiterId)}`,
+  konto: (benutzerId: string) => `/benutzer/konten?konto=${encodeURIComponent(benutzerId)}`,
+  mitarbeiter: (mitarbeiterId: string) => `/benutzer/mitarbeitende?mitarbeiter=${encodeURIComponent(mitarbeiterId)}`,
 } as const;
 
 // ── §2 · Komponente ──────────────────────────────────────────────

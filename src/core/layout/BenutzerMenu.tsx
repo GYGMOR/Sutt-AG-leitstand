@@ -1,12 +1,13 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/layout/BenutzerMenu.tsx                       │
-   │  ◆ JH · 2026.10 · rev 03                                               │
-   │  Benutzermenü: Name, Rolle, Moduleinträge, Dark Mode, Abmelden         │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Benutzermenü: Name, Rolle, Meine Daten, Moduleinträge, Abmelden       │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useRef, useState } from 'react';
-import { Keyboard, LogOut, Moon, Sun } from 'lucide-react';
+import { Keyboard, LogOut, Moon, ShieldCheck, Sun } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { ROLLEN, ROLLE_LABEL } from '../auth/auth.types';
 import type { Benutzer, Rolle } from '../auth/auth.types';
 import { rolleWechseln } from '../auth/authStore';
@@ -39,6 +40,7 @@ export function BenutzerMenu({ benutzer, eintraege = [], onHilfe, onAbmelden }: 
   const [offen, setOffen] = useState(false);
   const ankerRef = useRef<HTMLButtonElement>(null);
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -75,6 +77,19 @@ export function BenutzerMenu({ benutzer, eintraege = [], onHilfe, onAbmelden }: 
             </Auswahl>
           </label>
 
+          {/* jh› Auskunftsrecht (DSG Art. 25) ist einen Klick entfernt – in jedem Modul, nicht nur im Personalbereich. */}
+          <button
+            type="button"
+            role="menuitem"
+            className={styles.eintrag}
+            onClick={() => {
+              setOffen(false);
+              navigate('/meine-daten');
+            }}
+          >
+            <ShieldCheck size={16} strokeWidth={1.5} aria-hidden />
+            <span>Meine Daten & Datenschutz</span>
+          </button>
           {eintraege.map((eintrag) => (
             <button
               key={eintrag.id}

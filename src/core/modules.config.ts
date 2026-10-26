@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/modules.config.ts                             │
-   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Modul-Register: einzige Quelle für Leiste, Palette und Routing        │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -150,13 +150,13 @@ export const MODULE: readonly Modul[] = [
   },
   {
     id: 'zeiterfassung', label: 'Zeiterfassung', icon: Clock, gruppe: 'personal', pfad: '/zeiterfassung',
-    freigeschaltet: false, version: 'v0.5', rollen: ['buero', 'aussendienst', 'administration'],
-    beschreibung: 'Arbeits-, Fahr- und Pausenzeiten aus dem Einsatzplan, Monatsabschluss pro Mitarbeitenden.',
+    freigeschaltet: true, rollen: ALLE,
+    beschreibung: 'Kommen, Gehen, Pause – Zeitkonto mit Soll, Ist und Saldo, Arbeits- und Fahrzeiten aus dem Einsatzplan, Monatsabschluss pro Mitarbeitenden.',
   },
   {
     id: 'absenzen', label: 'Ferien & Absenzen', icon: TreePalm, gruppe: 'personal', pfad: '/absenzen',
-    freigeschaltet: false, version: 'v0.5', rollen: ALLE,
-    beschreibung: 'Ferien, Krankheit, Schulung und Militär – erscheinen direkt als Ganztag im Plan.',
+    freigeschaltet: true, rollen: ALLE,
+    beschreibung: 'Ferien, Krankheit, Schulung und Militär beantragen und genehmigen, Ferienkonto, Planer – erscheinen direkt als Ganztag im Plan.',
   },
   {
     id: 'rapporte', label: 'Servicerapporte', icon: FileText, gruppe: 'administration', pfad: '/rapporte',
@@ -180,13 +180,13 @@ export const MODULE: readonly Modul[] = [
   },
   {
     id: 'benutzer', label: 'Benutzer & Rollen', icon: ShieldCheck, gruppe: 'administration', pfad: '/benutzer',
-    freigeschaltet: false, version: 'v0.8', rollen: ['administration'],
-    beschreibung: 'Benutzerkonten, Rollen Büro / Disposition / Aussendienst / Administration, Freischaltung der Module.',
+    freigeschaltet: true, rollen: ['buero', 'administration'],
+    beschreibung: 'Konten mit Rolle, Zusatzrechten und Umfang, Mitarbeitende mit Hierarchie, Anbieter-Verknüpfung, Sperren.',
   },
   {
     id: 'einstellungen', label: 'Einstellungen', icon: Settings, gruppe: 'administration', pfad: '/einstellungen',
-    freigeschaltet: false, version: 'v0.8', rollen: ['administration'],
-    beschreibung: 'Arbeitszeiten, Regionen, Kategorien, Nummernkreise, Vorlagen.',
+    freigeschaltet: true, rollen: ['administration'],
+    beschreibung: 'Betrieb und Arbeitszeit, Feiertage, Anmeldung über Microsoft und Google, Datenschutz und Aufbewahrung, Protokoll, Module.',
   },
 ];
 
@@ -202,8 +202,12 @@ export function modulByPfad(pathname: string): Modul | undefined {
   return MODULE.find((modul) => pathname === modul.pfad || pathname.startsWith(`${modul.pfad}/`));
 }
 
-export function pruefeFreigabe(modul: Modul, rolle: Rolle | null): Freigabe {
-  if (!modul.freigeschaltet) return { ok: false, grund: 'nicht-freigeschaltet' };
+export type ModulFreigaben = Readonly<Partial<Record<ModulId, boolean>>>;
+
+// jh› Drei Stufen: Register (gebaut?), Mandant (freigeschaltet?), Rolle (erlaubt?) – Rechte je Aktion prüft dann das Modul.
+export function pruefeFreigabe(modul: Modul, rolle: Rolle | null, freigaben?: ModulFreigaben): Freigabe {
+  const frei = freigaben?.[modul.id] ?? modul.freigeschaltet;
+  if (!frei) return { ok: false, grund: 'nicht-freigeschaltet' };
   if (rolle && !modul.rollen.includes(rolle)) return { ok: false, grund: 'keine-berechtigung' };
   return { ok: true };
 }

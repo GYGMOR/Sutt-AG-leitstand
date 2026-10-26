@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/layout/FolgtPage.tsx                          │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Saubere «Folgt»-Seite für noch gesperrte Module                       │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -8,6 +8,7 @@ import { ArrowLeft, Lock } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router';
 import { ROLLE_LABEL } from '../auth/auth.types';
 import { useBenutzer } from '../auth/authStore';
+import { useMandant } from '../mandant/mandantStore';
 import { MODUL_GRUPPEN, modulByPfad, pruefeFreigabe } from '../modules.config';
 import { Button } from '../ui/Button';
 import { CapsLabel } from '../ui/CapsLabel';
@@ -21,6 +22,7 @@ export function FolgtPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const benutzer = useBenutzer();
+  const { modulFreigaben } = useMandant();
   const modul = modulByPfad(location.pathname);
 
   if (!modul) {
@@ -37,7 +39,7 @@ export function FolgtPage() {
     );
   }
 
-  const freigabe = pruefeFreigabe(modul, benutzer?.rolle ?? null);
+  const freigabe = pruefeFreigabe(modul, benutzer?.rolle ?? null, modulFreigaben);
   const gruppe = MODUL_GRUPPEN.find((eintrag) => eintrag.id === modul.gruppe)?.label ?? '';
   const Icon = modul.icon;
 
@@ -61,7 +63,7 @@ export function FolgtPage() {
               Für die Rolle <strong>{ROLLE_LABEL[benutzer?.rolle ?? 'buero']}</strong> nicht freigegeben. Freigabe über Benutzer &amp; Rollen.
             </span>
           ) : (
-            <span>Dieses Modul ist noch nicht freigeschaltet. Die Freischaltung erfolgt pro Mandant in den Einstellungen.</span>
+            <span>Dieses Modul ist {modul.version ? 'noch nicht gebaut' : 'für diesen Mandanten abgeschaltet'}. Die Freischaltung erfolgt in den Einstellungen unter «Module».</span>
           )}
         </div>
 

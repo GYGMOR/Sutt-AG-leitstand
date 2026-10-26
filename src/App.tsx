@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  App.tsx                                            │
-   │  ◆ JH · 2026.10 · rev 04                                               │
-   │  Routing: Login, Dashboard, Dispo, Module, App, Druck, Folgt           │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Routing: Login, Dashboard, Dispo, Module, Personal, Meine Daten, App  │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { lazy, Suspense } from 'react';
@@ -30,6 +30,11 @@ const KundenPage = lazy(() => import('./modules/kunden/KundenPage').then((m) => 
 const GeraetePage = lazy(() => import('./modules/geraete/GeraetePage').then((m) => ({ default: m.GeraetePage })));
 const BilderPage = lazy(() => import('./modules/bilder/BilderPage').then((m) => ({ default: m.BilderPage })));
 const LagerPage = lazy(() => import('./modules/lager/LagerPage').then((m) => ({ default: m.LagerPage })));
+const ZeiterfassungPage = lazy(() => import('./modules/zeiterfassung/ZeiterfassungPage').then((m) => ({ default: m.ZeiterfassungPage })));
+const AbsenzenPage = lazy(() => import('./modules/absenzen/AbsenzenPage').then((m) => ({ default: m.AbsenzenPage })));
+const BenutzerPage = lazy(() => import('./modules/benutzer/BenutzerPage').then((m) => ({ default: m.BenutzerPage })));
+const EinstellungenPage = lazy(() => import('./modules/einstellungen/EinstellungenPage').then((m) => ({ default: m.EinstellungenPage })));
+const MeineDatenPage = lazy(() => import('./modules/personal/MeineDatenPage').then((m) => ({ default: m.MeineDatenPage })));
 
 function modul(id: ModulId, element: ReactNode): ReactNode {
   return (
@@ -56,6 +61,11 @@ const router = createBrowserRouter([
       { path: '/geraete/:geraetId?', element: modul('geraete', <GeraetePage />) },
       { path: '/bilder', element: modul('bilder', <BilderPage />) },
       { path: '/lager/:bereich?', element: modul('lager', <LagerPage />) },
+      { path: '/zeiterfassung/:mitarbeiterId?', element: modul('zeiterfassung', <ZeiterfassungPage />) },
+      { path: '/absenzen/:absenzId?', element: modul('absenzen', <AbsenzenPage />) },
+      { path: '/benutzer/:bereich?', element: modul('benutzer', <BenutzerPage />) },
+      { path: '/einstellungen/:bereich?', element: modul('einstellungen', <EinstellungenPage />) },
+      { path: '/meine-daten', element: <Suspense fallback={null}><MeineDatenPage /></Suspense> },
       { path: '/rapporte/:rapportId/druck', element: <Suspense fallback={null}><RapportDruck /></Suspense> },
       { path: '/rapporte/:rapportId?', element: <Suspense fallback={null}><RapportePage /></Suspense> },
       { path: '*', element: <FolgtPage /> },

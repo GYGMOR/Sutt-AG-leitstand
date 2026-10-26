@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/layout/AppShell.tsx                           │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Layout-Shell: Topbar, Seitenleiste, Palette, Hilfe, Abmelden          │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -14,6 +14,7 @@ import { useHotkey } from '../hooks/useHotkey';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { useRegisterKommandos } from '../kommando';
 import type { Kommando } from '../kommando';
+import { useMandant } from '../mandant/mandantStore';
 import { MODULE, pruefeFreigabe } from '../modules.config';
 import type { Modul } from '../modules.config';
 import { useTheme } from '../theme';
@@ -41,6 +42,7 @@ interface AppShellProps {
 export function AppShell({ modul, topbarExtras, menueEintraege, children }: AppShellProps) {
   const navigate = useNavigate();
   const benutzer = useBenutzer();
+  const { modulFreigaben } = useMandant();
   const offeneAenderungen = useOffeneAenderungen();
   const { theme, toggleTheme } = useTheme();
   const { eingeklapptManuell } = useSidebarState();
@@ -77,7 +79,7 @@ export function AppShell({ modul, topbarExtras, menueEintraege, children }: AppS
   // ·· Systembefehle für die Palette
   const kommandos = useMemo<Kommando[]>(() => {
     const module: Kommando[] = MODULE.map((eintrag) => {
-      const freigabe = pruefeFreigabe(eintrag, benutzer?.rolle ?? null);
+      const freigabe = pruefeFreigabe(eintrag, benutzer?.rolle ?? null, modulFreigaben);
       const gesperrt = freigabe.ok
         ? undefined
         : freigabe.grund === 'keine-berechtigung'
@@ -106,7 +108,7 @@ export function AppShell({ modul, topbarExtras, menueEintraege, children }: AppS
       { id: 'system:abmelden', label: 'Abmelden', gruppe: 'system', icon: LogOut, stichworte: 'logout ausloggen', run: abmeldenAnfragen },
       ...module,
     ];
-  }, [benutzer?.rolle, navigate, theme, toggleTheme, openHilfe, abmeldenAnfragen]);
+  }, [benutzer?.rolle, modulFreigaben, navigate, theme, toggleTheme, openHilfe, abmeldenAnfragen]);
   useRegisterKommandos('system', kommandos);
 
   return (
