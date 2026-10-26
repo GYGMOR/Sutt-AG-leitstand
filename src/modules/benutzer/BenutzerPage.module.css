@@ -1,0 +1,249 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/benutzer/BenutzerPage.module.css           │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Benutzer: Rechte-Matrix, Rollenkarten, Umfang, Organigramm            │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rechte-Matrix ──────────────────────────────────────── */
+
+.matrix {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.matrix-bereich {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--sl-line-soft);
+}
+
+.matrix-bereich:last-of-type {
+  border-bottom: 0;
+}
+
+.matrix-label {
+  padding-top: 3px;
+  font-size: var(--sl-fs-12);
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-ink-2);
+}
+
+.matrix-rechte {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* jh› Vier Zustände, vier Formen: Rolle = gefüllt, Zusatz = Signal-Rand, entzogen = durchgestrichen, keine = blass. */
+.recht {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--sl-line);
+  border-radius: 12px;
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink);
+  white-space: nowrap;
+}
+
+.recht:disabled {
+  cursor: default;
+}
+
+.recht:not(:disabled):hover {
+  border-color: var(--sl-line-strong);
+  background: var(--sl-hover);
+}
+
+.rolle {
+  border-color: transparent;
+  background: var(--sl-chrome-2);
+  color: var(--sl-chrome-ink);
+}
+
+.zusatz {
+  border-color: var(--sl-signal);
+  background: var(--sl-signal-wash);
+  color: var(--sl-signal-ink);
+}
+
+.entzogen {
+  border-style: dashed;
+  border-color: var(--sl-danger);
+  color: var(--sl-danger-ink);
+  text-decoration: line-through;
+}
+
+.keine {
+  color: var(--sl-mute);
+}
+
+.recht-inaktiv {
+  background: var(--sl-paper);
+}
+
+.matrix-legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 4px;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Umfang ─────────────────────────────────────────────── */
+
+.umfang {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.umfang-feld {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.umfang-label {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+/* ── §3 · Rollen ─────────────────────────────────────────────── */
+
+.rollen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  padding: 4px 0 12px;
+}
+
+.rolle-karte {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: var(--sl-hairline);
+  border-left: var(--sl-mark-width) solid var(--sl-chrome-2);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.rolle-titel {
+  font-size: var(--sl-fs-16);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.rolle-text {
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+}
+
+.rolle-zahlen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.matrix-tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sl-fs-12);
+}
+
+.matrix-tabelle th,
+.matrix-tabelle td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--sl-line-soft);
+  text-align: left;
+}
+
+.matrix-tabelle th {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.matrix-tabelle td + td {
+  text-align: center;
+}
+
+.matrix-tabelle .bereich-zeile td {
+  padding-top: 10px;
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-ink-2);
+}
+
+.haken {
+  color: var(--sl-ok);
+}
+
+.hierarchie-hinweis {
+  padding: 8px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-line-strong);
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+/* ── §4 · Organigramm ────────────────────────────────────────── */
+
+.organigramm {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 0;
+}
+
+.organigramm ul {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 24px;
+  padding-left: 12px;
+  border-left: 1px solid var(--sl-line);
+}
+
+.knoten {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-13);
+  text-align: left;
+}
+
+.knoten:hover {
+  background: var(--sl-hover);
+}
+
+.knoten-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ── §5 · Zellen ─────────────────────────────────────────────── */
+
+.anbieter-zelle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ◆ jh · eof */
