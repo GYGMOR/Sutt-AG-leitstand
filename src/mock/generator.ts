@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  mock/generator.ts                                  │
-   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Deterministischer Füller: drei Wochen, neun Techniker, Kategorien     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -20,7 +20,7 @@ import type { KatalogKey } from './katalog';
 
 // jh› Saat aus Datum + Techniker: derselbe Tag sieht bei jedem Neuladen
 //     gleich aus – Screenshots und Abnahmen bleiben vergleichbar.
-type Zufall = () => number;
+export type Zufall = () => number;
 
 export function seedFrom(text: string): number {
   let hash = 2166136261;

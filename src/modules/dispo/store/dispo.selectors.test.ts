@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/dispo.selectors.test.ts        │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Selektoren: Verknüpfungen, Wartet-Views, Rapport-Zähler, Live-Puls    │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -108,7 +108,7 @@ describe('pulsFor', () => {
   });
 
   it('zeigt die Absenz vor allem anderen', () => {
-    const absenz = { id: 'AB-T', technikerId: 'T-MB', art: 'krank' as const, von: HEUTE, bis: HEUTE };
+    const absenz = { id: 'AB-T', mitarbeiterId: 'M-MB', technikerId: 'T-MB', art: 'krank' as const, status: 'genehmigt' as const, von: HEUTE, bis: HEUTE };
     expect(pulsFor([{ ...basis, status: 'vor-ort' }], 9 * 60, absenz).art).toBe('abwesend');
   });
 });

@@ -1,17 +1,21 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/dispo.types.ts                       │
-   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Dispo-Typen: Ansicht, Farbe-nach, Zoom, Filter, Auswahl, Bestand      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
+import type { Benutzer } from '../../core/auth/auth.types';
 import type { IsoDatum, Minuten } from '../../core/datum';
 import type { Auftrag } from '../../core/domain/auftrag';
 import type { Einsatz, EinsatzStatus, Pendenz } from '../../core/domain/einsatz';
+import type { JournalEintrag } from '../../core/domain/journal';
 import type { Kategorie } from '../../core/domain/kategorie';
 import type { Artikel, Bestellung, Lagerbestand, Lagerbewegung } from '../../core/domain/lager';
 import type { Nachricht } from '../../core/domain/nachricht';
+import type { Mitarbeiter } from '../../core/domain/personal';
 import type { Rapport } from '../../core/domain/rapport';
 import type { Absenz, Geraet, Kunde, Liegenschaft, Region, Techniker } from '../../core/domain/stammdaten';
+import type { Monatsabschluss, ZeitEintrag } from '../../core/domain/zeit';
 
 export type { Einsatz, EinsatzStatus, Pendenz };
 
@@ -55,7 +59,10 @@ export interface DispoStammdaten {
   liegenschaften: ReadonlyMap<string, Liegenschaft>;
   geraete: ReadonlyMap<string, Geraet>;
   artikel: ReadonlyMap<string, Artikel>;
+  /** Genehmigte und beantragte Absenzen – die Dispo liest nur genehmigte (isAbwesend). */
   absenzen: readonly Absenz[];
+  mitarbeiter: ReadonlyMap<string, Mitarbeiter>;
+  benutzer: ReadonlyMap<string, Benutzer>;
 }
 
 export interface DispoBestand {
@@ -66,6 +73,9 @@ export interface DispoBestand {
   bestaende: readonly Lagerbestand[];
   bestellungen: readonly Bestellung[];
   bewegungen: readonly Lagerbewegung[];
+  zeiteintraege: readonly ZeitEintrag[];
+  monatsabschluesse: readonly Monatsabschluss[];
+  journal: readonly JournalEintrag[];
 }
 
 // ── §3 · Filter, Auswahl, Ziel ───────────────────────────────────

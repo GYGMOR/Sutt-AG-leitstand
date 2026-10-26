@@ -1,27 +1,36 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/useDispoAktionen.ts            │
-   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Aktionen mit Protokolltext, IDs, Zeitstempel – Klebstoff zum Store    │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useMemo } from 'react';
+import type { Benutzer } from '../../../core/auth/auth.types';
 import { useBenutzer } from '../../../core/auth/authStore';
 import { nowZeitpunkt, splitZeitpunkt } from '../../../core/datum';
-import type { IsoDatum } from '../../../core/datum';
+import type { IsoDatum, Minuten } from '../../../core/datum';
+import { ABSENZ_LABEL } from '../../../core/domain/absenz';
+import type { Absenz, AbsenzStatus } from '../../../core/domain/absenz';
 import { isTeilOffen } from '../../../core/domain/auftrag';
 import type { Auftrag, Ersatzteil } from '../../../core/domain/auftrag';
 import { STATUS_LABEL } from '../../../core/domain/einsatz';
 import type { Einsatz, EinsatzStatus, Pendenz, StatusQuelle } from '../../../core/domain/einsatz';
+import type { JournalBereich, JournalEintrag } from '../../../core/domain/journal';
 import { LAGER_GLATTBRUGG, bestandVon, fahrzeugOrt, liefertermin, nextBestellNummer, technikerIdVon } from '../../../core/domain/lager';
 import type { Artikel, Bestellung, LagerOrt, Lagerbewegung } from '../../../core/domain/lager';
 import { NACHRICHT_KANAL, NACHRICHT_LABEL } from '../../../core/domain/nachricht';
 import type { Nachricht, NachrichtArt } from '../../../core/domain/nachricht';
+import { mitarbeiterName } from '../../../core/domain/personal';
+import type { Mitarbeiter } from '../../../core/domain/personal';
 import { ABSCHLUSS_LABEL, nextRapportNummer } from '../../../core/domain/rapport';
 import type { Rapport, Unterschrift } from '../../../core/domain/rapport';
 import type { Geraet, Kunde, Liegenschaft } from '../../../core/domain/stammdaten';
+import { STEMPEL_LABEL } from '../../../core/domain/zeit';
+import type { Monatsabschluss, StempelArt, ZeitArt, ZeitEintrag, ZeitGeraet } from '../../../core/domain/zeit';
 import { formatDatumKurz, formatWochentag, formatZeit } from '../../../core/format';
+import { ZEITZONE_STANDARD, jetztInZone, zeitpunktInZone } from '../../../core/zeitzone';
 import type { DispoAuswahl, PlanZiel } from '../dispo.types';
-import type { AktionsMeta, EinsatzAenderung } from './dispo.reducer';
+import type { AktionsMeta, EinsatzAenderung, Loeschgrenzen } from './dispo.reducer';
 import { resolveAuftrag, technikerOf } from './dispo.selectors';
 import { getDispoStore, resetDispoStore } from './dispoStore';
 
@@ -64,6 +73,24 @@ export interface NachrichtEntwurf {
   text: string;
 }
 
+/** Manuell erfasster Zeiteintrag – ID, Zeitstempel und Erfasser vergibt die Aktion. */
+export interface ZeitEintragEntwurf {
+  mitarbeiterId: string;
+  datum: IsoDatum;
+  art: ZeitArt;
+  vonMin: Minuten;
+  bisMin: Minuten | null;
+  quelle: 'manuell' | 'einsatz';
+  einsatzId?: string;
+  bemerkung?: string;
+}
+
+export type AbsenzEntwurf = Omit<Absenz, 'id' | 'beantragtAm' | 'beantragtVon' | 'entschiedenAm' | 'entschiedenVon'>;
+
+export type MonatsabschlussEntwurf = Omit<Monatsabschluss, 'id' | 'status' | 'eingereichtAm' | 'eingereichtVon' | 'entschiedenAm' | 'entschiedenVon'>;
+
+export type JournalEntwurf = Omit<JournalEintrag, 'id' | 'zeitpunkt' | 'benutzer'> & { benutzer?: string };
+
 // ── §2 · Hook ────────────────────────────────────────────────────
 
 export function useDispoAktionen() {
@@ -78,6 +105,10 @@ export function useDispoAktionen() {
     const ortLabel = (ort: LagerOrt) => {
       const technikerId = technikerIdVon(ort);
       return technikerId ? `Fahrzeug ${kuerzelOf(technikerId)}` : 'Glattbrugg';
+    };
+    const nameOf = (mitarbeiterId: string) => {
+      const person = store.getState().stammdaten.mitarbeiter.get(mitarbeiterId);
+      return person ? mitarbeiterName(person) : mitarbeiterId;
     };
 
     // jh› Rapport aus dem Entwurf vervollständigen: bestehende ID/Nummer behalten, sonst neu.
@@ -398,6 +429,93 @@ export function useDispoAktionen() {
         store.dispatch({ kind: 'stornierenBestellung', bestellungId, meta: meta(`${bestellung.nummer} · ${bestellung.bezeichnung} storniert`) });
       },
 
+      // ·· Zeiterfassung (rev 05)
+      /** Kommen, Gehen, Pause, Weiter – immer für «jetzt» in der Zone des Betriebs; die Reihenfolge prüft die Domäne. */
+      stempeln(mitarbeiterId: string, art: StempelArt, geraet: ZeitGeraet = 'leitstand', zone: string = ZEITZONE_STANDARD) {
+        const { datum, minuten } = jetztInZone(zone);
+        const zeit = zeitpunktInZone(zone);
+        store.dispatch({ kind: 'stempeln', mitarbeiterId, datum, jetztMin: minuten, art, geraet, eintragId: nextId('Z'), meta: { text: `${nameOf(mitarbeiterId)} · ${STEMPEL_LABEL[art]} ${formatZeit(minuten)}`, zeit, benutzer: kuerzel } });
+      },
+      /** Notiz oder Einsatz am (laufenden) Eintrag – ohne Korrekturspur, mit Journal. */
+      zeitEintragErgaenzen(eintragId: string, ergaenzung: { bemerkung?: string; einsatzId?: string | null }) {
+        const eintrag = store.getState().zeiteintraege.find((kandidat) => kandidat.id === eintragId);
+        if (!eintrag) return;
+        const was = ergaenzung.einsatzId !== undefined ? (ergaenzung.einsatzId ? `Einsatz ${nummerOf(store.getState().einsaetze.find((einsatz) => einsatz.id === ergaenzung.einsatzId)?.auftragId ?? '')} zugeordnet` : 'Einsatz entfernt') : 'Notiz ergänzt';
+        store.dispatch({ kind: 'zeitEintragErgaenzen', eintragId, ...ergaenzung, meta: meta(`${nameOf(eintrag.mitarbeiterId)} · Zeit ${formatDatumKurz(eintrag.datum)} ${formatZeit(eintrag.vonMin)}: ${was}`) });
+      },
+      zeitEintraegeAnlegen(entwuerfe: readonly ZeitEintragEntwurf[]): ZeitEintrag[] {
+        const jetzt = nowZeitpunkt();
+        const eintraege: ZeitEintrag[] = entwuerfe.map((entwurf) => ({ ...entwurf, id: nextId('Z'), erfasstAm: jetzt, erfasstVon: kuerzel, korrekturen: [] }));
+        const erster = eintraege[0];
+        if (!erster) return [];
+        const was = eintraege.length === 1 ? 'Zeiteintrag' : `${eintraege.length} Zeiteinträge`;
+        store.dispatch({ kind: 'zeitEintraegeAnlegen', eintraege, meta: meta(`${nameOf(erster.mitarbeiterId)} · ${was} ${formatDatumKurz(erster.datum)} ${erster.quelle === 'einsatz' ? 'aus dem Einsatzplan übernommen' : 'manuell erfasst'}`) });
+        return eintraege;
+      },
+      zeitEintragKorrigieren(eintragId: string, aenderung: { art?: ZeitArt; vonMin: Minuten; bisMin: Minuten | null }, grund: string) {
+        const eintrag = store.getState().zeiteintraege.find((kandidat) => kandidat.id === eintragId);
+        if (!eintrag) return;
+        store.dispatch({ kind: 'zeitEintragKorrigieren', eintragId, aenderung, grund, meta: meta(`${nameOf(eintrag.mitarbeiterId)} · Zeit ${formatDatumKurz(eintrag.datum)} korrigiert auf ${formatZeit(aenderung.vonMin)}–${aenderung.bisMin === null ? 'offen' : formatZeit(aenderung.bisMin)}: ${grund}`) });
+      },
+      zeitEintragLoeschen(eintragId: string, grund: string) {
+        const eintrag = store.getState().zeiteintraege.find((kandidat) => kandidat.id === eintragId);
+        if (!eintrag) return;
+        store.dispatch({ kind: 'zeitEintragLoeschen', eintragId, grund, meta: meta(`${nameOf(eintrag.mitarbeiterId)} · Zeit ${formatDatumKurz(eintrag.datum)} ${formatZeit(eintrag.vonMin)} gelöscht: ${grund}`) });
+      },
+      monatEinreichen(entwurf: MonatsabschlussEntwurf): Monatsabschluss {
+        const abschluss: Monatsabschluss = { ...entwurf, id: nextId('MA'), status: 'eingereicht', eingereichtAm: nowZeitpunkt(), eingereichtVon: kuerzel };
+        store.dispatch({ kind: 'monatEinreichen', abschluss, meta: meta(`${nameOf(abschluss.mitarbeiterId)} · Monat ${abschluss.monat} eingereicht`) });
+        return abschluss;
+      },
+      monatEntscheiden(abschlussId: string, status: 'genehmigt' | 'zurueckgewiesen', bemerkung?: string) {
+        const abschluss = store.getState().monatsabschluesse.find((kandidat) => kandidat.id === abschlussId);
+        if (!abschluss) return;
+        store.dispatch({ kind: 'monatEntscheiden', abschlussId, status, ...(bemerkung ? { bemerkung } : {}), meta: meta(`${nameOf(abschluss.mitarbeiterId)} · Monat ${abschluss.monat} ${status === 'genehmigt' ? 'genehmigt' : 'zurückgewiesen'}${bemerkung ? `: ${bemerkung}` : ''}`) });
+      },
+
+      // ·· Absenzen (rev 05)
+      absenzBeantragen(entwurf: AbsenzEntwurf): Absenz {
+        const jetzt = nowZeitpunkt();
+        const absenz: Absenz = { ...entwurf, id: nextId('AB'), beantragtAm: jetzt, beantragtVon: kuerzel, ...(entwurf.status === 'genehmigt' ? { entschiedenAm: jetzt, entschiedenVon: kuerzel } : {}) };
+        const zeitraum = absenz.von === absenz.bis ? formatDatumKurz(absenz.von) : `${formatDatumKurz(absenz.von)}–${formatDatumKurz(absenz.bis)}`;
+        store.dispatch({ kind: 'absenzBeantragen', absenz, meta: meta(`${nameOf(absenz.mitarbeiterId)} · ${ABSENZ_LABEL[absenz.art]} ${zeitraum} ${absenz.status === 'genehmigt' ? 'eingetragen' : 'beantragt'}`) });
+        return absenz;
+      },
+      absenzEntscheiden(absenzId: string, status: AbsenzStatus, grund?: string) {
+        const absenz = store.getState().stammdaten.absenzen.find((kandidat) => kandidat.id === absenzId);
+        if (!absenz) return;
+        const wort = status === 'genehmigt' ? 'genehmigt' : status === 'abgelehnt' ? 'abgelehnt' : 'zurück auf beantragt';
+        store.dispatch({ kind: 'absenzEntscheiden', absenzId, status, ...(grund ? { grund } : {}), meta: meta(`${nameOf(absenz.mitarbeiterId)} · ${ABSENZ_LABEL[absenz.art]} ${formatDatumKurz(absenz.von)} ${wort}${grund ? `: ${grund}` : ''}`) });
+      },
+      absenzAendern(absenz: Absenz) {
+        store.dispatch({ kind: 'absenzAendern', absenz, meta: meta(`${nameOf(absenz.mitarbeiterId)} · ${ABSENZ_LABEL[absenz.art]} ${formatDatumKurz(absenz.von)} geändert`) });
+      },
+      absenzLoeschen(absenzId: string) {
+        const absenz = store.getState().stammdaten.absenzen.find((kandidat) => kandidat.id === absenzId);
+        if (!absenz) return;
+        store.dispatch({ kind: 'absenzLoeschen', absenzId, meta: meta(`${nameOf(absenz.mitarbeiterId)} · ${ABSENZ_LABEL[absenz.art]} ${formatDatumKurz(absenz.von)} gelöscht`) });
+      },
+
+      // ·· Personal & Konten (rev 05)
+      mitarbeiterSpeichern(mitarbeiter: Mitarbeiter) {
+        const neu = !store.getState().stammdaten.mitarbeiter.has(mitarbeiter.id);
+        store.dispatch({ kind: 'mitarbeiterSpeichern', mitarbeiter, meta: meta(`Personalakte ${mitarbeiterName(mitarbeiter)} ${neu ? 'angelegt' : 'bearbeitet'}`) });
+      },
+      benutzerSpeichern(benutzer: Benutzer) {
+        const neu = !store.getState().stammdaten.benutzer.has(benutzer.id);
+        store.dispatch({ kind: 'benutzerSpeichern', benutzer, meta: meta(`Konto ${benutzer.benutzername} ${neu ? 'angelegt' : 'bearbeitet'}`) });
+      },
+      loeschlauf(vor: Loeschgrenzen, text: string) {
+        store.dispatch({ kind: 'loeschlauf', vor, meta: meta(text) });
+      },
+      /** Journal ohne Undo – Einsicht, Export, Verbindungstest, Einstellungen. */
+      protokolliere(entwurf: JournalEntwurf) {
+        store.dispatch({ kind: 'protokolliere', eintrag: { ...entwurf, id: nextId('J'), zeitpunkt: nowZeitpunkt(), benutzer: entwurf.benutzer ?? kuerzel } });
+      },
+      einsichtProtokollieren(bereich: JournalBereich, mitarbeiterId: string, text: string) {
+        store.dispatch({ kind: 'protokolliere', eintrag: { id: nextId('J'), zeitpunkt: nowZeitpunkt(), benutzer: kuerzel, bereich, art: 'einsicht', text, mitarbeiterId } });
+      },
+
       select(auswahl: DispoAuswahl) {
         store.dispatch({ kind: 'select', auswahl });
       },
@@ -408,10 +526,10 @@ export function useDispoAktionen() {
         store.dispatch({ kind: 'setMehrfach', einsatzIds });
       },
       undo() {
-        store.dispatch({ kind: 'undo' });
+        store.dispatch({ kind: 'undo', meta: meta('Rückgängig') });
       },
       redo() {
-        store.dispatch({ kind: 'redo' });
+        store.dispatch({ kind: 'redo', meta: meta('Wiederherstellen') });
       },
       /** Ausgangsbestand des Mocks herstellen, gespeicherten Stand löschen. */
       resetDemo() {

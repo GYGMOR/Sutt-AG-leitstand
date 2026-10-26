@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/useDemoReset.tsx               │
-   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  «Demo zurücksetzen» in jedem Büro-Modul: Menü, Befehl, Bestätigung    │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
 import { RotateCcw } from 'lucide-react';
 import type { Kommando } from '../../../core/kommando';
 import type { MenueEintrag } from '../../../core/layout/BenutzerMenu';
+import { resetMandant } from '../../../core/mandant/mandantStore';
 import { ConfirmDialog } from '../../../core/ui/Dialog';
 import { useDispoAktionen } from './useDispoAktionen';
 
@@ -40,11 +41,12 @@ export function useDemoReset(): DemoReset {
     <ConfirmDialog
       open={offen}
       titel="Demo zurücksetzen?"
-      text="Alle Änderungen dieser Sitzung – Verschiebungen, Status, Rapporte, Nachrichten, Lager, Stammdaten – werden verworfen und der Ausgangsbestand geladen. Ein zweites Fenster folgt automatisch."
+      text="Alle Änderungen dieser Sitzung – Plan, Rapporte, Lager, Stammdaten, Zeiten, Absenzen, Konten, Einstellungen – werden verworfen und der Ausgangsbestand geladen. Ein zweites Fenster folgt automatisch."
       bestaetigen="Zurücksetzen"
       gefaehrlich
       onConfirm={() => {
         setOffen(false);
+        resetMandant();
         aktionen.resetDemo();
       }}
       onClose={() => setOffen(false)}

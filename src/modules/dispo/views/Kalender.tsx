@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/views/Kalender.tsx                   │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Outlook-Kalender: Techniker-Kalender, Tag/AW/Woche/Monat, Split       │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -288,7 +288,7 @@ function Zeitraster({ spalten, split, proTag, aktiv, verwandteIds, views, tage, 
             <div key={spalte.schluessel} className={styles.ganztagZelle}>
               {liste.map((absenz) => (
                 <span key={absenz.id} className={styles.ganztagChip} title={absenz.notiz}>
-                  {!spalte.techniker && <strong>{views.find((view) => view.techniker.id === absenz.technikerId)?.techniker.kuerzel ?? absenz.technikerId.replace('T-', '')}</strong>} {ABSENZ_LABEL[absenz.art]}
+                  {!spalte.techniker && <strong>{views.find((view) => view.techniker.id === absenz.technikerId)?.techniker.kuerzel ?? (absenz.technikerId ?? absenz.mitarbeiterId).replace(/^[TM]-/, '')}</strong>} {ABSENZ_LABEL[absenz.art]}
                 </span>
               ))}
             </div>

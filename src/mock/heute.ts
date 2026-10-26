@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  mock/heute.ts                                      │
-   │  ◆ JH · 2026.10 · rev 01                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Zeitanker der Mockdaten: alles relativ zu «heute»                     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -18,7 +18,8 @@ export const MOCK_HEUTE: IsoDatum = todayIso();
  * jh! Bewusst nicht «geschönt»: Status und Jetzt-Linie müssen übereinstimmen,
  *     auch wenn der Plan am Abend dann fast nur «erledigt» zeigt.
  */
-export const MOCK_REFERENZ_MIN: Minuten = minutesOfDay(new Date());
+// jh› Unter vitest steht die Uhr auf 11:00 – sonst hängen Statusfolgen und Stempel der Saat an der Tageszeit des Testlaufs.
+export const MOCK_REFERENZ_MIN: Minuten = import.meta.env.MODE === 'test' ? 11 * 60 : minutesOfDay(new Date());
 
 // ── §2 · Helfer ──────────────────────────────────────────────────
 

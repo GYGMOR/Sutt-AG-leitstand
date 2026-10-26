@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/dispo.reducer.test.ts          │
-   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Reducer: planen, Status, Rapport, Stammdaten, Lager, Undo, Stand      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -10,6 +10,13 @@ import { LAGER_GLATTBRUGG, bestandVon, fahrzeugOrt } from '../../../core/domain/
 import type { Bestellung, Lagerbewegung } from '../../../core/domain/lager';
 import { HEUTE, einsatzMitId, meta, rapportEntwurf, testState } from '../../../test/testdaten';
 import { dispoReducer, schnappschuss } from './dispo.reducer';
+import type { DispoState } from './dispo.reducer';
+
+// jh› Das Journal wächst auch bei Undo (append-only) – Schnappschuss-Vergleiche lassen es weg.
+function standOhneJournal(state: DispoState) {
+  const { journal: _journal, ...rest } = schnappschuss(state);
+  return rest;
+}
 
 // ── §1 · Planen ──────────────────────────────────────────────────
 
@@ -262,7 +269,7 @@ describe('Lager', () => {
     expect(bestandVon(state.bestaende, '10780350', fahrzeugOrt(einsatz.technikerId))).toBe(Math.max(0, vorher - 1));
     expect(state.bewegungen[0]).toBe(verbrauch);
     expect(state.bestellungen.some((kandidat) => kandidat.id === 'B-T7')).toBe(true);
-    expect(schnappschuss(dispoReducer(state, { kind: 'undo' }))).toEqual(schnappschuss(start));
+    expect(standOhneJournal(dispoReducer(state, { kind: 'undo' }))).toEqual(standOhneJournal(start));
   });
 });
 
@@ -275,10 +282,10 @@ describe('undo / redo', () => {
     if (!pendenz) throw new Error('Mock ohne Pendenz');
     const geplant = dispoReducer(start, { kind: 'planPendenz', pendenzId: pendenz.id, einsatzId: 'E-T3', ziel: { technikerId: 'T-RH', datum: HEUTE, startMin: 960 }, meta: meta() });
     const zurueck = dispoReducer(geplant, { kind: 'undo' });
-    expect(schnappschuss(zurueck)).toEqual(schnappschuss(start));
+    expect(standOhneJournal(zurueck)).toEqual(standOhneJournal(start));
     expect(zurueck.zukunft).toHaveLength(1);
     const wieder = dispoReducer(zurueck, { kind: 'redo' });
-    expect(schnappschuss(wieder)).toEqual(schnappschuss(geplant));
+    expect(standOhneJournal(wieder)).toEqual(standOhneJournal(geplant));
   });
 
   it('macht auch Rapport-Aktionen rückgängig', () => {

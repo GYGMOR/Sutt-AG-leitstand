@@ -4,22 +4,32 @@
    │  Mock-Bestand zusammenstellen, veredeln (Verlauf, Rapport, Lager)      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
+import type { Benutzer } from '../core/auth/auth.types';
 import { addDays } from '../core/datum';
 import type { Auftrag, RechnungStatus } from '../core/domain/auftrag';
 import type { Einsatz, Pendenz } from '../core/domain/einsatz';
+import { BETRIEBLICHE_FEIERTAGE_STANDARD } from '../core/domain/feiertage';
+import type { JournalEintrag } from '../core/domain/journal';
 import type { Artikel, Bestellung, Lagerbestand, Lagerbewegung } from '../core/domain/lager';
 import type { Nachricht } from '../core/domain/nachricht';
+import type { Mitarbeiter } from '../core/domain/personal';
 import type { Rapport } from '../core/domain/rapport';
 import type { Absenz, Geraet, GeraetEreignis, Kunde, Liegenschaft, Techniker } from '../core/domain/stammdaten';
+import { ARBEITSZEIT_STANDARD } from '../core/domain/zeit';
+import type { Monatsabschluss, ZeitEintrag } from '../core/domain/zeit';
 import { ABSENZEN } from './absenzen';
 import { HAND_AUFTRAEGE, HAND_GERAETE } from './auftraege';
+import { BENUTZER } from './benutzer';
 import { HAND_EINSAETZE, HAND_PENDENZEN, HAND_TECHNIKER_HEUTE } from './einsaetze';
 import { between, generateFill, mulberry32, pick, seedFrom } from './generator';
 import { MOCK_HEUTE, MOCK_REFERENZ_MIN } from './heute';
+import { JOURNAL } from './journal';
 import { KUNDEN, LIEGENSCHAFTEN } from './kunden';
 import { buildLager } from './lager';
+import { MITARBEITER } from './personal';
 import { buildRapporte } from './rapporte';
 import { TECHNIKER } from './techniker';
+import { buildZeit } from './zeit';
 
 // ── §1 · Typen ───────────────────────────────────────────────────
 
@@ -31,6 +41,8 @@ export interface Stammdaten {
   geraete: ReadonlyMap<string, Geraet>;
   artikel: ReadonlyMap<string, Artikel>;
   absenzen: readonly Absenz[];
+  mitarbeiter: ReadonlyMap<string, Mitarbeiter>;
+  benutzer: ReadonlyMap<string, Benutzer>;
 }
 
 export interface Bestand {
@@ -41,6 +53,9 @@ export interface Bestand {
   bestaende: readonly Lagerbestand[];
   bestellungen: readonly Bestellung[];
   bewegungen: readonly Lagerbewegung[];
+  zeiteintraege: readonly ZeitEintrag[];
+  monatsabschluesse: readonly Monatsabschluss[];
+  journal: readonly JournalEintrag[];
 }
 
 /** Telefonbuch für die Schnellerfassung: normalisierte Nummer → wer ruft an. */
@@ -140,6 +155,19 @@ const geraete: readonly Geraet[] = rohGeraete.map((geraet) => ({
 //     erledigten Einsätzen – Lagerzahlen passen damit zur Plantafel (ADR-004).
 const lager = buildLager({ heute: MOCK_HEUTE, techniker: TECHNIKER, auftraege, einsaetze: alleEinsaetze });
 
+// jh› Zeiterfassung aus demselben Plan: Stempel rund um Abfahrt und Feierabend, Büro in Gleitzeit,
+//     Vormonat abgeschlossen – Kundenwunsch «Arbeits- und Fahrzeiten aus dem Einsatzplan».
+const zeit = buildZeit({
+  heute: MOCK_HEUTE,
+  jetztMin: MOCK_REFERENZ_MIN,
+  mitarbeiter: MITARBEITER,
+  einsaetze: alleEinsaetze,
+  absenzen: ABSENZEN,
+  kanton: 'ZH',
+  betrieblich: BETRIEBLICHE_FEIERTAGE_STANDARD,
+  modell: ARBEITSZEIT_STANDARD,
+});
+
 // ── §5 · Export ──────────────────────────────────────────────────
 
 export const mockStammdaten: Stammdaten = {
@@ -150,6 +178,8 @@ export const mockStammdaten: Stammdaten = {
   geraete: byId(geraete),
   artikel: new Map(lager.artikel.map((artikel) => [artikel.artikelNummer, artikel])),
   absenzen: ABSENZEN,
+  mitarbeiter: byId(MITARBEITER),
+  benutzer: byId(BENUTZER),
 };
 
 export const mockBestand: Bestand = {
@@ -160,6 +190,9 @@ export const mockBestand: Bestand = {
   bestaende: lager.bestaende,
   bestellungen: lager.bestellungen,
   bewegungen: lager.bewegungen,
+  zeiteintraege: zeit.zeiteintraege,
+  monatsabschluesse: zeit.monatsabschluesse,
+  journal: [...JOURNAL, ...zeit.journal].sort((a, b) => b.zeitpunkt.localeCompare(a.zeitpunkt)),
 };
 
 export { MOCK_HEUTE };
@@ -219,7 +252,18 @@ function assertConsistent(stammdaten: Stammdaten, bestand: Bestand): void {
     if (!einsatzIds.has(rapport.einsatzId)) fehler.push(`${rapport.id}: Einsatz ${rapport.einsatzId}`);
   }
   for (const absenz of stammdaten.absenzen) {
-    if (!technikerIds.has(absenz.technikerId)) fehler.push(`${absenz.id}: Techniker ${absenz.technikerId}`);
+    if (absenz.technikerId && !technikerIds.has(absenz.technikerId)) fehler.push(`${absenz.id}: Techniker ${absenz.technikerId}`);
+    if (!stammdaten.mitarbeiter.has(absenz.mitarbeiterId)) fehler.push(`${absenz.id}: Mitarbeiter ${absenz.mitarbeiterId}`);
+  }
+  for (const benutzer of stammdaten.benutzer.values()) {
+    if (benutzer.mitarbeiterId && !stammdaten.mitarbeiter.has(benutzer.mitarbeiterId)) fehler.push(`${benutzer.id}: Mitarbeiter ${benutzer.mitarbeiterId}`);
+    if (benutzer.technikerId && !technikerIds.has(benutzer.technikerId)) fehler.push(`${benutzer.id}: Techniker ${benutzer.technikerId}`);
+  }
+  for (const eintrag of bestand.zeiteintraege) {
+    if (!stammdaten.mitarbeiter.has(eintrag.mitarbeiterId)) fehler.push(`${eintrag.id}: Mitarbeiter ${eintrag.mitarbeiterId}`);
+  }
+  for (const abschluss of bestand.monatsabschluesse) {
+    if (!stammdaten.mitarbeiter.has(abschluss.mitarbeiterId)) fehler.push(`${abschluss.id}: Mitarbeiter ${abschluss.mitarbeiterId}`);
   }
   for (const bestellung of bestand.bestellungen) {
     if (!stammdaten.artikel.has(bestellung.artikelNummer)) fehler.push(`${bestellung.id}: Artikel ${bestellung.artikelNummer}`);

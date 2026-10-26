@@ -54,7 +54,8 @@ import {
   visibleTechniker,
 } from './store/dispo.selectors';
 import type { Puls } from './store/dispo.selectors';
-import { initDispoStore, setAnsicht, useAnsichtEinstellungen, useDispoState } from './store/dispoStore';
+import { useStandFuerSicht } from '../personal/rechte';
+import { initDispoStore, setAnsicht, useAnsichtEinstellungen } from './store/dispoStore';
 import { useDispoAktionen } from './store/useDispoAktionen';
 import { useDemoReset } from './store/useDemoReset';
 import { Kalender } from './views/Kalender';
@@ -103,7 +104,7 @@ function DispoInhalt({ ansicht }: { ansicht: Ansicht }) {
   const location = useLocation();
   const arbeitstag = useArbeitstag();
   const { datum, heute, tage, setDatum, setZeitraum } = arbeitstag;
-  const state = useDispoState();
+  const state = useStandFuerSicht();
   const einstellungen = useAnsichtEinstellungen();
   const aktionen = useDispoAktionen();
   const jetzt = useNow();
