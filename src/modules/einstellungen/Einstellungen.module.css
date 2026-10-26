@@ -1,0 +1,237 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/einstellungen/Einstellungen.module.css     │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Einstellungen: Kopf, Karten, Formulare, Tabellen, Modulzeilen         │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Seite ──────────────────────────────────────────────── */
+
+.seite {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  min-height: 0;
+  padding: 16px 24px 32px;
+  overflow-y: auto;
+  background: var(--sl-paper);
+}
+
+.kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.titel {
+  font-size: var(--sl-fs-28);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+}
+
+.bereich {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 1120px;
+}
+
+/* ── §2 · Karten & Formulare ─────────────────────────────────── */
+
+.karte {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.karte-kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.karte-text {
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+}
+
+.formular {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.formular-breit {
+  grid-column: 1 / -1;
+}
+
+.aktionen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.fussnote {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.hinweis {
+  padding: 8px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-line-strong);
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.warnung {
+  padding: 8px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-signal);
+  border-radius: var(--sl-radius-1);
+  background: color-mix(in srgb, var(--sl-signal) 8%, var(--sl-surface));
+  font-size: var(--sl-fs-12);
+}
+
+.fehler {
+  padding: 8px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-danger);
+  background: var(--sl-danger-wash);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-danger-ink);
+}
+
+.zone-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.schritte {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 18px;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+  list-style: decimal;
+}
+
+.zuordnung {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+/* ── §3 · Tabellen ───────────────────────────────────────────── */
+
+.tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sl-fs-12);
+}
+
+.tabelle th,
+.tabelle td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--sl-line-soft);
+  text-align: left;
+  vertical-align: top;
+}
+
+.tabelle th {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+  white-space: nowrap;
+}
+
+.tabelle tr:last-child td {
+  border-bottom: 0;
+}
+
+.tabelle .zahl {
+  font-family: var(--sl-font-mono);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tabelle .frist-eingabe {
+  width: 72px;
+}
+
+.frei {
+  color: var(--sl-mute);
+}
+
+/* ── §4 · Module ─────────────────────────────────────────────── */
+
+.gruppe-titel {
+  padding-top: 8px;
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.modul-zeile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+}
+
+.modul-zeile:last-child {
+  border-bottom: 0;
+}
+
+.modul-icon {
+  color: var(--sl-mute);
+}
+
+.modul-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.modul-name {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+}
+
+.modul-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.modul-rollen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* ◆ jh · eof */
