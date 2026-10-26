@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dashboard/DashboardPage.module.css         │
-   │  ◆ JH · 2026.10 · rev 04                                               │
-   │  Dashboard: Kopf, Kachelwand, Kartenraster, Listen                     │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Dashboard: Kopf, Kachelwand, Diagramme, Kartenraster, Listen          │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 /* ── §1 · Seite ──────────────────────────────────────────────── */
@@ -88,7 +88,27 @@
   color: var(--sl-mute);
 }
 
-/* ── §3 · Feld ───────────────────────────────────────────────── */
+/* ── §3 · Auswertung ─────────────────────────────────────────── */
+
+.auswertung {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.diagramme {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+.diagramm-fuss {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+/* ── §4 · Feld ───────────────────────────────────────────────── */
 
 .feld {
   display: flex;
@@ -139,7 +159,7 @@
   background: var(--sl-hover);
 }
 
-/* ── §4 · Listen ─────────────────────────────────────────────── */
+/* ── §5 · Listen ─────────────────────────────────────────────── */
 
 .liste {
   display: flex;

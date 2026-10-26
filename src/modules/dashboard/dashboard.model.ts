@@ -1,22 +1,28 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dashboard/dashboard.model.ts               │
-   │  ◆ JH · 2026.10 · rev 04                                               │
-   │  Tagesbild: Feld, Eingang, Konflikte, Rapporte, Rechnungen, Lager      │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Tagesbild: Feld, Eingang, Konflikte, Rapporte, Lager · Auswertung     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
+import { addDays, isoWeek, rangeDays, startOfWeek } from '../../core/datum';
 import type { IsoDatum, Minuten } from '../../core/datum';
 import { isDringend } from '../../core/domain/auftrag';
+import { KATEGORIEN } from '../../core/domain/kategorie';
+import type { Kategorie } from '../../core/domain/kategorie';
+import { istAngestellt } from '../../core/domain/personal';
 import { isAbwesend } from '../../core/domain/stammdaten';
 import type { Absenz, Techniker } from '../../core/domain/stammdaten';
 import { rapportBetrag, summeBetraege } from '../../core/domain/verrechnung';
 import type { Betrag } from '../../core/domain/verrechnung';
+import type { Mandant } from '../../core/mandant/mandant.types';
 import { LEERER_FILTER } from '../dispo/dispo.types';
 import type { DispoState } from '../dispo/store/dispo.reducer';
-import { buildFehlendeRapporte, buildPendenzViews, buildRapportViews, buildTagesZeilen, pulsFor, zaehleRapporte } from '../dispo/store/dispo.selectors';
+import { buildFehlendeRapporte, buildPendenzViews, buildRapportViews, buildTagesZeilen, kapazitaetFor, pulsFor, zaehleRapporte } from '../dispo/store/dispo.selectors';
 import type { EinsatzView, ErledigtView, PendenzView, Puls, RapportView, TagesZeile } from '../dispo/store/dispo.selectors';
 import { preisVonFuer } from '../auftraege/auftraege.model';
 import { buildArtikelViews, buildBestellungViews } from '../lager/lager.model';
 import type { BestellungView } from '../lager/lager.model';
+import { stempelLage } from '../personal/personal.model';
 
 // ── §1 · Typen ───────────────────────────────────────────────────
 
@@ -107,6 +113,112 @@ export function buildTagesbild(state: DispoState, heute: IsoDatum, jetztMin: Min
     zuPruefen: rapportViews.filter((view) => view.rapport.status === 'erstellt' || view.rapport.status === 'unterschrieben').slice(0, LISTEN_LAENGE),
     lieferungen: lieferungen.slice(0, LISTEN_LAENGE),
   };
+}
+
+// ── §3 · Auswertung (Diagramme) ──────────────────────────────────
+
+export interface DienstStand {
+  eingestempelt: number;
+  pause: number;
+  draussen: number;
+  gesamt: number;
+}
+
+export interface AuslastungZeile {
+  techniker: Techniker;
+  /** Verplant inklusive Fahrzeit im Verhältnis zum Soll, 0–1 (kann über 1 liegen). */
+  anteil: number;
+  verplantMin: Minuten;
+  fahrzeitMin: Minuten;
+  sollMin: Minuten;
+}
+
+export interface TagesWert {
+  datum: IsoDatum;
+  anzahl: number;
+}
+
+export interface WochenRapporte {
+  montag: IsoDatum;
+  label: string;
+  /** erstellt oder unterschrieben – noch nicht freigegeben. */
+  pruefen: number;
+  freigegeben: number;
+  verrechnet: number;
+}
+
+export interface KategorieAnteil {
+  id: Kategorie | 'andere';
+  label: string;
+  anzahl: number;
+}
+
+export interface Auswertung {
+  tage: number;
+  von: IsoDatum;
+  dienst: DienstStand;
+  auslastung: AuslastungZeile[];
+  erledigt: TagesWert[];
+  rapporte: WochenRapporte[];
+  kategorien: KategorieAnteil[];
+}
+
+const KATEGORIEN_MAX = 4;
+const WOCHEN = 8;
+
+// jh› Dieselben Quellen wie die Module (Selektoren, Stempellage) – ein Diagramm darf nie etwas anderes
+//     behaupten als die Liste daneben. Mehr als vier Kategorien falten sich in «Andere» (Farben bleiben lesbar).
+export function buildAuswertung(state: DispoState, mandant: Mandant, heute: IsoDatum, jetztMin: Minuten, tage = 28): Auswertung {
+  const von = addDays(heute, -(tage - 1));
+  const imZeitraum = state.einsaetze.filter((einsatz) => einsatz.datum >= von && einsatz.datum <= heute);
+
+  const angestellte = [...state.stammdaten.mitarbeiter.values()].filter((mitarbeiter) => istAngestellt(mitarbeiter, heute));
+  const dienst: DienstStand = { eingestempelt: 0, pause: 0, draussen: 0, gesamt: angestellte.length };
+  for (const mitarbeiter of angestellte) {
+    const lage = stempelLage(mitarbeiter, state, mandant, heute, jetztMin);
+    if (lage.status === 'arbeitet') dienst.eingestempelt += 1;
+    else if (lage.status === 'pause') dienst.pause += 1;
+    else dienst.draussen += 1;
+  }
+
+  const auslastung = buildTagesZeilen(state.stammdaten, state.einsaetze, heute, LEERER_FILTER, jetztMin)
+    .map<AuslastungZeile>((zeile) => {
+      const kapazitaet = kapazitaetFor(zeile);
+      return { techniker: zeile.techniker, anteil: kapazitaet.anteil, verplantMin: kapazitaet.verplantMin, fahrzeitMin: kapazitaet.fahrzeitMin, sollMin: kapazitaet.sollMin };
+    })
+    .sort((a, b) => b.anteil - a.anteil || a.techniker.nachname.localeCompare(b.techniker.nachname, 'de-CH'));
+
+  const erledigt = rangeDays(von, heute).map<TagesWert>((datum) => ({ datum, anzahl: imZeitraum.filter((einsatz) => einsatz.datum === datum && (einsatz.status === 'erledigt' || einsatz.status === 'wartet-teil')).length }));
+
+  const ersterMontag = startOfWeek(addDays(heute, -7 * (WOCHEN - 1)));
+  const rapporte = Array.from({ length: WOCHEN }, (_, index): WochenRapporte => {
+    const montag = addDays(ersterMontag, index * 7);
+    const sonntag = addDays(montag, 6);
+    const dieserWoche = state.rapporte.filter((rapport) => {
+      const datum = rapport.erstelltAm.slice(0, 10);
+      return datum >= montag && datum <= sonntag;
+    });
+    return {
+      montag,
+      label: `KW ${isoWeek(montag)}`,
+      pruefen: dieserWoche.filter((rapport) => rapport.status === 'erstellt' || rapport.status === 'unterschrieben').length,
+      freigegeben: dieserWoche.filter((rapport) => rapport.status === 'freigegeben').length,
+      verrechnet: dieserWoche.filter((rapport) => rapport.status === 'verrechnet').length,
+    };
+  });
+
+  const zaehler = new Map<Kategorie, number>();
+  for (const einsatz of imZeitraum) {
+    const auftrag = state.stammdaten.auftraege.get(einsatz.auftragId);
+    if (!auftrag) continue;
+    zaehler.set(auftrag.kategorie, (zaehler.get(auftrag.kategorie) ?? 0) + 1);
+  }
+  const sortiert = [...zaehler.entries()].sort((a, b) => b[1] - a[1]);
+  const kategorien: KategorieAnteil[] = sortiert.slice(0, KATEGORIEN_MAX).map(([id, anzahl]) => ({ id, label: KATEGORIEN.find((meta) => meta.id === id)?.label ?? id, anzahl }));
+  const rest = sortiert.slice(KATEGORIEN_MAX).reduce((summe, [, anzahl]) => summe + anzahl, 0);
+  if (rest > 0) kategorien.push({ id: 'andere', label: 'Andere', anzahl: rest });
+
+  return { tage, von, dienst, auslastung, erledigt, rapporte, kategorien };
 }
 
 /* ◆ jh · eof */

@@ -1,0 +1,408 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  core/ui/Diagramm.module.css                        │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Diagramme: dünne Marken, leise Gitter, Tooltip, Legende, Tabelle      │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Karte ──────────────────────────────────────────────── */
+
+.karte {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px 14px 12px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.kopf {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.kopf-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.titel {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.untertitel {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.leer {
+  padding: 24px 0;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+  text-align: center;
+}
+
+.legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-ink-2);
+}
+
+.legende li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  display: inline-block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.swatch-linie {
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sl-fs-12);
+}
+
+.tabelle th,
+.tabelle td {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--sl-line-soft);
+  text-align: left;
+}
+
+.tabelle th {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.tabelle tr:last-child td {
+  border-bottom: 0;
+}
+
+.zahl {
+  font-family: var(--sl-font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* ── §2 · Tooltip ────────────────────────────────────────────── */
+
+.wrapper {
+  position: relative;
+  min-width: 0;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 120px;
+  max-width: 190px;
+  padding: 6px 8px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  box-shadow: var(--sl-shadow-float);
+  font-size: var(--sl-fs-12);
+  pointer-events: none;
+  transform: translateY(-100%);
+}
+
+.tooltip-titel {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.tooltip-zeile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--sl-ink-2);
+}
+
+.tooltip-zeile strong {
+  font-family: var(--sl-font-mono);
+  color: var(--sl-ink);
+}
+
+.schluessel {
+  display: inline-block;
+  flex: none;
+  width: 12px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+/* ── §3 · SVG-Furnitur ───────────────────────────────────────── */
+
+.svg {
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+  outline: none;
+}
+
+.svg:focus-visible {
+  outline: 2px solid var(--sl-ink);
+  outline-offset: 2px;
+}
+
+.gitter {
+  stroke: var(--sl-line-soft);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.achsen-text {
+  font-family: var(--sl-font-mono);
+  font-size: 10px;
+  fill: var(--sl-mute);
+}
+
+.flaeche {
+  opacity: 0.1;
+}
+
+.linie {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.marker {
+  stroke: var(--sl-surface);
+  stroke-width: 2;
+}
+
+.end-label {
+  font-family: var(--sl-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--sl-ink);
+}
+
+.fadenkreuz {
+  stroke: var(--sl-line-strong);
+  stroke-width: 1;
+}
+
+.treffer {
+  fill: transparent;
+  outline: none;
+  cursor: crosshair;
+}
+
+.treffer:focus-visible {
+  stroke: var(--sl-ink);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+
+.segment-rect {
+  transition: filter 120ms ease;
+}
+
+.gruppe-aktiv .segment-rect {
+  filter: brightness(1.08);
+}
+
+.kappen-label {
+  font-family: var(--sl-font-mono);
+  font-size: 10px;
+  fill: var(--sl-ink-2);
+}
+
+/* ── §4 · Donut ──────────────────────────────────────────────── */
+
+.donut-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.donut {
+  width: 176px;
+  height: 176px;
+}
+
+.donut-spur {
+  fill: none;
+  stroke: var(--sl-paper);
+  stroke-width: 18;
+}
+
+.segment {
+  fill: none;
+  stroke-width: 18;
+  outline: none;
+  cursor: pointer;
+  transition: stroke-width 120ms ease;
+}
+
+.segment-aktiv,
+.segment:focus-visible {
+  stroke-width: 22;
+}
+
+.donut-mitte {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.donut-wert {
+  font-size: 36px;
+  font-weight: var(--sl-fw-semibold);
+  line-height: 1;
+}
+
+.donut-label {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ── §5 · Balken (waagrecht) ─────────────────────────────────── */
+
+.balken {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.balken-zeile {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) 48px;
+  align-items: center;
+  gap: 8px;
+  padding: 1px 0;
+  border-radius: var(--sl-radius-1);
+  outline: none;
+}
+
+.balken-zeile:hover,
+.balken-zeile:focus-visible {
+  background: var(--sl-hover);
+}
+
+.balken-label {
+  font-size: var(--sl-fs-12);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spur {
+  position: relative;
+  display: block;
+  height: 14px;
+  border-radius: 0 4px 4px 0;
+  background: var(--sl-paper);
+  overflow: hidden;
+}
+
+.fuellung {
+  display: block;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  transition: width 240ms ease;
+}
+
+.marke {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 1px;
+  background: var(--sl-line-strong);
+}
+
+.balken-wert {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ── §6 · Anteile ────────────────────────────────────────────── */
+
+.anteil-balken {
+  display: flex;
+  gap: 2px;
+  height: 16px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.anteil {
+  display: block;
+  min-width: 3px;
+  outline: none;
+  cursor: pointer;
+  transition: filter 120ms ease;
+}
+
+.anteil:hover,
+.anteil:focus-visible {
+  filter: brightness(1.08);
+}
+
+.anteil-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 8px;
+}
+
+.anteil-liste li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto 44px;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--sl-fs-12);
+}
+
+.anteil-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.anteil-wert {
+  font-family: var(--sl-font-mono);
+}
+
+.anteil-prozent {
+  font-family: var(--sl-font-mono);
+  color: var(--sl-mute);
+  text-align: right;
+}
+
+/* ◆ jh · eof */

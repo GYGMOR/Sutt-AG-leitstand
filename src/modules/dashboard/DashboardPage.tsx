@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dashboard/DashboardPage.tsx                │
-   │  ◆ JH · 2026.10 · rev 04                                               │
-   │  Dashboard: Kennzahlen als Sprungmarken, Feld, Eingang, Fälliges       │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Dashboard: Kennzahlen, Auswertung (Diagramme), Feld, Eingang          │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useMemo } from 'react';
@@ -15,6 +15,7 @@ import { formatChf, formatDatum, formatDatumKurz, formatSeit, formatWochentag, f
 import { useNow } from '../../core/hooks/useNow';
 import { useRegisterKommandos } from '../../core/kommando';
 import { AppShell } from '../../core/layout/AppShell';
+import { useMandant } from '../../core/mandant/mandantStore';
 import { findModul } from '../../core/modules.config';
 import { Avatar } from '../../core/ui/Avatar';
 import { Button } from '../../core/ui/Button';
@@ -29,11 +30,13 @@ import { MOCK_HEUTE, mockBestand, mockStammdaten } from '../../mock';
 import { KapazitaetsBand } from '../dispo/KapazitaetsBand';
 import { findKonflikte } from '../dispo/konflikte';
 import { LivePuls } from '../dispo/LivePuls';
-import { initDispoStore, setAnsicht, useDispoState } from '../dispo/store/dispoStore';
+import { initDispoStore, setAnsicht } from '../dispo/store/dispoStore';
 import { useDispoAktionen } from '../dispo/store/useDispoAktionen';
 import { useDemoReset } from '../dispo/store/useDemoReset';
+import { useStandFuerSicht } from '../personal/rechte';
 import { useGlobaleSuchquellen } from '../suche/globaleSuche';
-import { buildTagesbild } from './dashboard.model';
+import { Auswertung } from './Auswertung';
+import { buildAuswertung, buildTagesbild } from './dashboard.model';
 import type { FeldZeile } from './dashboard.model';
 import styles from './DashboardPage.module.css';
 
@@ -56,12 +59,14 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const { heute, setDatum } = useArbeitstag();
   const jetztMin = minutesOfDay(useNow());
-  const state = useDispoState();
+  const state = useStandFuerSicht();
   const aktionen = useDispoAktionen();
   const { stammdaten, einsaetze, rapporte } = state;
 
+  const mandant = useMandant();
   const konflikte = useMemo(() => findKonflikte(stammdaten, einsaetze, heute, rapporte), [stammdaten, einsaetze, heute, rapporte]);
   const bild = useMemo(() => buildTagesbild(state, heute, jetztMin, konflikte.length), [state, heute, jetztMin, konflikte.length]);
+  const auswertung = useMemo(() => buildAuswertung(state, mandant, heute, jetztMin), [state, mandant, heute, jetztMin]);
   const feld = useMemo(() => [...bild.feld].sort((a, b) => PULS_RANG[a.puls.art] - PULS_RANG[b.puls.art] || a.techniker.nachname.localeCompare(b.techniker.nachname)), [bild.feld]);
 
   useGlobaleSuchquellen();
@@ -123,6 +128,8 @@ export function DashboardPage() {
         </header>
 
         <Kacheln kacheln={kacheln} onWahl={kachelWahl} label="Kennzahlen" gross />
+
+        <Auswertung auswertung={auswertung} heute={heute} jetztMin={jetztMin} onPerson={(mitarbeiterId) => navigate(`/zeiterfassung/${mitarbeiterId}`)} onZeit={() => navigate('/zeiterfassung?ansicht=tag')} onRapporte={() => navigate('/rapporte')} />
 
         <div className={styles.raster}>
           <section className={cx(styles.karte, styles.karteFeld)} aria-label="Im Feld">

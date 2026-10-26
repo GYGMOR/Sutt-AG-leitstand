@@ -219,4 +219,16 @@
   }
 }
 
+/* ── §9 · Diagramme ──────────────────────────────────────────── */
+
+/* jh› Vier Kategorienplätze in fester Reihenfolge – geprüft mit dem Palettenvalidator (Helligkeitsband,
+       Chroma, Farbfehlsicht ΔE ≥ 8 je Nachbarpaar, Kontrast). «rest» ist die De-Emphasis für «Andere». */
+:root {
+  --sl-dv-1: #2f6fb2;
+  --sl-dv-2: #2e8b57;
+  --sl-dv-3: #c98a00;
+  --sl-dv-4: #7b4fa6;
+  --sl-dv-rest: #9c978f;
+}
+
 /* ◆ jh · eof */

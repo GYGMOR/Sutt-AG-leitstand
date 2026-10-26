@@ -126,4 +126,15 @@
   --sl-focus-ring: 0 0 0 2px var(--sl-paper), 0 0 0 4px var(--sl-signal);
 }
 
+/* ── §6 · Diagramme ──────────────────────────────────────────── */
+
+/* jh› Dunkle Stufen derselben Töne – gegen die dunkle Fläche geprüft, kein automatisches Aufhellen. */
+:root[data-theme='dark'] {
+  --sl-dv-1: #5a95d6;
+  --sl-dv-2: #3f9e70;
+  --sl-dv-3: #b8870f;
+  --sl-dv-4: #a07cc8;
+  --sl-dv-rest: #8b857d;
+}
+
 /* ◆ jh · eof */
