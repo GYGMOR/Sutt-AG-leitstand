@@ -1,0 +1,521 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/zeiterfassung/Zeitraster.module.css        │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Woche als Chips, Monat und Jahr als Matrix, Tag als Zeitstrahl        │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Werkzeuge ──────────────────────────────────────────── */
+
+.ansicht {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.periode-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.periode-label {
+  min-width: 150px;
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── §2 · Töne ───────────────────────────────────────────────── */
+
+/* jh› Ein Ton = Fläche und Schrift als Variablen. Chips, Matrixzellen und Legende teilen sie;
+       die Absenzfarbe kommt per --sl-art aus dem Absenzen-Modul, damit Ferien überall gleich aussehen. */
+.ton-ok {
+  --ton-bg: color-mix(in srgb, var(--sl-ok) 16%, var(--sl-surface));
+  --ton-ink: color-mix(in srgb, var(--sl-ok) 70%, var(--sl-ink));
+}
+
+.ton-laeuft {
+  --ton-bg: color-mix(in srgb, var(--sl-ok) 26%, var(--sl-surface));
+  --ton-ink: color-mix(in srgb, var(--sl-ok) 70%, var(--sl-ink));
+  --ton-line: var(--sl-ok);
+}
+
+.ton-abweichung {
+  --ton-bg: color-mix(in srgb, var(--sl-warn) 22%, var(--sl-surface));
+  --ton-ink: color-mix(in srgb, var(--sl-warn) 55%, var(--sl-ink));
+}
+
+.ton-warnung {
+  --ton-bg: color-mix(in srgb, var(--sl-danger) 14%, var(--sl-surface));
+  --ton-ink: var(--sl-danger-ink);
+}
+
+.ton-fehlt {
+  --ton-bg: transparent;
+  --ton-ink: var(--sl-mute);
+  --ton-line: var(--sl-line-strong);
+  --ton-stil: dashed;
+}
+
+.ton-frei {
+  --ton-bg: var(--sl-paper);
+  --ton-ink: var(--sl-mute-2);
+}
+
+.ton-absenz {
+  --ton-bg: color-mix(in srgb, var(--sl-art, var(--sl-st-erledigt)) 24%, var(--sl-surface));
+  --ton-ink: color-mix(in srgb, var(--sl-art, var(--sl-st-erledigt)) 65%, var(--sl-ink));
+}
+
+.ton-zukunft {
+  --ton-bg: transparent;
+  --ton-ink: var(--sl-mute-2);
+  --ton-line: var(--sl-line-soft);
+}
+
+.ton-leer {
+  --ton-bg: transparent;
+  --ton-ink: transparent;
+}
+
+.legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  padding: 2px 0;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.legende li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legende-farbe {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 1px var(--ton-stil, solid) var(--ton-line, transparent);
+  border-radius: 3px;
+  background: var(--ton-bg);
+}
+
+.plus {
+  color: var(--sl-ok);
+}
+
+.minus {
+  color: var(--sl-danger-ink);
+}
+
+/* ── §3 · Chips (Woche) ──────────────────────────────────────── */
+
+.chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: 52px;
+  height: 40px;
+  padding: 0 6px;
+  border: 1px var(--ton-stil, solid) var(--ton-line, transparent);
+  border-radius: 6px;
+  background: var(--ton-bg);
+  color: var(--ton-ink);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+button.chip {
+  cursor: pointer;
+}
+
+button.chip:hover {
+  box-shadow: inset 0 0 0 1px var(--sl-line-strong);
+}
+
+.chip-tag {
+  font-size: 10px;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.chip-wert {
+  font-weight: var(--sl-fw-semibold);
+}
+
+.chip-heute {
+  box-shadow: 0 0 0 2px var(--sl-signal);
+}
+
+.chip-leer {
+  visibility: hidden;
+}
+
+/* Sieben Chips in einer Reihe – Handy und Dossier. */
+.chips-reihe {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.chips-reihe .chip {
+  width: 100%;
+  min-width: 0;
+  padding: 0 2px;
+}
+
+.zwei {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.zwei-haupt {
+  font-family: var(--sl-font-mono);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.zwei-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ── §4 · Matrix (Monat, Jahr) ───────────────────────────────── */
+
+.raster {
+  overflow-x: auto;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.raster-zeile {
+  display: grid;
+  align-items: stretch;
+  min-height: 34px;
+  border-bottom: 1px solid var(--sl-line-soft);
+}
+
+.raster-zeile:last-child {
+  border-bottom: 0;
+}
+
+.raster-zeile.aktiv {
+  background: var(--sl-hover);
+}
+
+.raster-person {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-right: var(--sl-hairline);
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-12);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.raster-kopf .raster-person,
+.raster-kopf .raster-summe {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.raster-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.raster-meta {
+  margin-left: auto;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.raster-tag-kopf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 0;
+  border-right: 1px solid var(--sl-line-soft);
+  font-size: 10px;
+  color: var(--sl-mute);
+}
+
+.raster-tag-nummer {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-ink-2);
+}
+
+.raster-zelle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 2px;
+  border-right: 1px solid var(--sl-line-soft);
+  background: var(--ton-bg, transparent);
+  color: var(--ton-ink, var(--sl-ink));
+  font-family: var(--sl-font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+button.raster-zelle {
+  cursor: pointer;
+}
+
+button.raster-zelle:hover {
+  box-shadow: inset 0 0 0 1px var(--sl-line-strong);
+}
+
+.raster-zelle.frei,
+.raster-tag-kopf.frei {
+  background: var(--sl-paper);
+}
+
+.raster-summe {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 8px;
+  border-left: 1px solid var(--sl-line-soft);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  white-space: nowrap;
+}
+
+.raster-summe.stark {
+  font-weight: var(--sl-fw-semibold);
+}
+
+.raster-feiertage {
+  min-height: 24px;
+  background: var(--sl-paper);
+}
+
+.raster-feiertage .raster-person {
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.raster-fuss {
+  background: var(--sl-paper);
+}
+
+.raster-fuss .raster-person {
+  background: var(--sl-paper);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.feiertag-marke {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sl-signal);
+}
+
+.feiertag-marke.halb {
+  border: 1px solid var(--sl-signal);
+  background: linear-gradient(90deg, var(--sl-signal) 50%, transparent 50%);
+}
+
+.marke {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.marke-genehmigt {
+  background: var(--sl-ok);
+}
+
+.marke-eingereicht {
+  background: var(--sl-signal);
+}
+
+.marke-zurueckgewiesen {
+  background: var(--sl-danger);
+}
+
+.heute {
+  box-shadow: inset 0 0 0 2px var(--sl-signal);
+}
+
+.leer-hinweis {
+  padding: 16px;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+  text-align: center;
+}
+
+/* ── §5 · Zeitstrahl (Tag) ───────────────────────────────────── */
+
+.strahl {
+  display: flex;
+  flex-direction: column;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+  overflow: hidden;
+}
+
+.strahl-zeile {
+  display: grid;
+  grid-template-columns: 220px minmax(320px, 1fr) 160px;
+  align-items: stretch;
+  min-height: 44px;
+  border-bottom: 1px solid var(--sl-line-soft);
+}
+
+.strahl-zeile:last-child {
+  border-bottom: 0;
+}
+
+.strahl-zeile.aktiv {
+  background: var(--sl-hover);
+}
+
+.strahl-kopf {
+  min-height: 30px;
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.strahl-person {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-right: var(--sl-hairline);
+  font-size: var(--sl-fs-12);
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: left;
+}
+
+button.strahl-person {
+  cursor: pointer;
+}
+
+button.strahl-person:hover {
+  background: var(--sl-hover);
+}
+
+.strahl-skala,
+.strahl-bahn {
+  position: relative;
+  min-height: 30px;
+  overflow: hidden;
+}
+
+.strahl-stunde {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--sl-line-soft);
+}
+
+.strahl-stunde span {
+  position: absolute;
+  top: 50%;
+  padding: 0 2px;
+  transform: translate(-50%, -50%);
+  background: var(--sl-paper);
+  font-family: var(--sl-font-mono);
+  font-size: 10px;
+  color: var(--sl-mute);
+}
+
+.block {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  border-radius: 3px;
+}
+
+.block-arbeit {
+  background: color-mix(in srgb, var(--sl-ok) 70%, var(--sl-surface));
+}
+
+.block-pause {
+  background: color-mix(in srgb, var(--sl-warn) 60%, var(--sl-surface));
+}
+
+.block-laeuft {
+  background-image: repeating-linear-gradient(135deg, transparent 0 4px, rgb(255 255 255 / 0.35) 4px 8px);
+}
+
+.block-manuell {
+  outline: 1px dashed var(--sl-ink-2);
+  outline-offset: -1px;
+}
+
+.block-absenz {
+  top: 12px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  background: repeating-linear-gradient(135deg, var(--sl-line-soft) 0 3px, transparent 3px 6px);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.jetzt {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 2px;
+  background: var(--sl-signal);
+}
+
+.strahl-zahlen {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 4px 10px;
+  border-left: var(--sl-hairline);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.strahl-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

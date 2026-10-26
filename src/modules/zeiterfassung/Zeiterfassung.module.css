@@ -1,0 +1,67 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/zeiterfassung/Zeiterfassung.module.css     │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Zeitkonto-Dossier: Tageszeilen, Chips, Einträge, Korrekturspur        │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Tage ───────────────────────────────────────────────── */
+
+.tag-zelle {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tag-frei {
+  color: var(--sl-mute);
+}
+
+.tag-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.zukunft {
+  opacity: 0.55;
+}
+
+.chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.abschnitt-zusatz {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.abschnitt-text {
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+}
+
+/* ── §2 · Einträge & Spur ────────────────────────────────────── */
+
+.zeilen-aktionen {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.geloescht {
+  text-decoration: line-through;
+  color: var(--sl-mute);
+}
+
+.spur {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-line-strong);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+/* ◆ jh · eof */
