@@ -6,8 +6,8 @@
 
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { configDefaults, defineConfig } from 'vitest/config';
 
 // ── §1 · Build-Stempel ───────────────────────────────────────────
 
@@ -65,6 +65,13 @@ export default defineConfig({
     strictPort: true,
     // jh› Im Netz erreichbar (Handy am selben WLAN: http://<Laptop-IP>:5173) – nur Dev-Server, kein Build.
     host: true,
+    // jh› Die Techniker-App ist ein eigenes Projekt (app/, Port 5174); der Leitstand reicht /app/ durch,
+    //     damit beide im Dev-Modus denselben Ursprung und damit denselben Stand haben (ADR-008).
+    // jh! Nur HTTP, kein WebSocket: Der HMR-Client der App verbindet sich direkt mit 5174 (hmr.clientPort) –
+    //     ein durchgereichter WebSocket riss den Leitstand-Server mit, sobald der App-Server wegfiel.
+    proxy: {
+      '/app': { target: 'http://localhost:5174' },
+    },
   },
   optimizeDeps: {
     // jh! Vorgebündelt verliert maplibre-gl im Dev-Server seinen Worker («Worker failed to load»).
@@ -73,6 +80,10 @@ export default defineConfig({
   build: {
     // jh› Kartenbibliotheken laden erst, wenn eine Karte sichtbar wird.
     chunkSizeWarningLimit: 900,
+  },
+  test: {
+    // jh› Nur der Leitstand – App und Website testen mit eigener Konfiguration (npm run test:app).
+    exclude: [...configDefaults.exclude, 'app/**', 'webseite/**'],
   },
 });
 

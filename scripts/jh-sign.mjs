@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  scripts/jh-sign.mjs                                │
-   │  ◆ JH · 2026.10 · rev 01                                               │
-   │  Signatur-Prüfung: Kopf, §-Marken, eof, jh#-To-dos, Exporte            │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Signatur-Prüfung: Kopf, §-Marken, eof, jh#-To-dos – drei Projekte     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 // Aufruf:  node scripts/jh-sign.mjs           → Köpfe und §-Marken normieren
@@ -25,12 +25,13 @@ const STIL = {
   html: { open: '<!-- ', cont: '     ', close: ' -->', eof: '<!-- ◆ jh · eof -->' },
 };
 
-const QUELLEN = ['src', 'scripts'];
-const EINZELDATEIEN = ['vite.config.ts', 'index.html'];
+// jh› Drei Projekte, eine Handschrift: Leitstand (src), Techniker-App (app/src), Website (webseite/src).
+const QUELLEN = ['src', 'scripts', 'app/src', 'webseite/src'];
+const EINZELDATEIEN = ['vite.config.ts', 'index.html', 'app/vite.config.ts', 'app/index.html', 'webseite/vite.config.ts', 'webseite/index.html'];
 const ENDUNGEN = new Set(['.ts', '.tsx', '.css', '.mjs', '.html']);
 
-// jh› vite.config.ts verlangt den Default-Export – einzige Ausnahme.
-const DEFAULT_EXPORT_ERLAUBT = new Set(['vite.config.ts']);
+// jh› vite.config.ts verlangt den Default-Export – einzige Ausnahme (je Projekt).
+const DEFAULT_EXPORT_ERLAUBT = new Set(['vite.config.ts', 'app/vite.config.ts', 'webseite/vite.config.ts']);
 
 // ── §2 · Dateien sammeln ─────────────────────────────────────────
 
@@ -45,7 +46,9 @@ function sammle(verzeichnis) {
 
 function kopfPfad(absolut) {
   const rel = relative(ROOT, absolut).split(sep).join('/');
-  return rel.startsWith('src/') ? rel.slice(4) : rel;
+  if (rel.startsWith('src/')) return rel.slice(4);
+  // jh› app/src/seiten/HeuteSeite.tsx → app/seiten/HeuteSeite.tsx – das «src» trägt keine Information.
+  return rel.replace(/^(app|webseite)\/src\//, '$1/');
 }
 
 function stilFuer(pfad) {
