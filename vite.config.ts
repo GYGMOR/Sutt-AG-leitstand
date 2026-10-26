@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  vite.config.ts                                     │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Build-Konfiguration: React, CSS Modules, Build-Stempel, Commit        │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Build-Konfiguration: React, CSS Modules, Build-Stempel, Netzzugang    │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { execSync } from 'node:child_process';
@@ -63,6 +63,8 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    // jh› Im Netz erreichbar (Handy am selben WLAN: http://<Laptop-IP>:5173) – nur Dev-Server, kein Build.
+    host: true,
   },
   optimizeDeps: {
     // jh! Vorgebündelt verliert maplibre-gl im Dev-Server seinen Worker («Worker failed to load»).

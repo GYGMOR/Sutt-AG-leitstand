@@ -27,6 +27,7 @@ Format: ein Abschnitt pro Revision, Bereiche wie im Commit-Stil (`dispo(kalender
 - Module Zeiterfassung, Absenzen, Benutzer & Rollen, Einstellungen freigeschaltet; Sidebar, Palette und Routen folgen dem Register und den Mandanten-Freigaben.
 - Mock: Personalakten mit Hierarchie, Konten mit Anbieter-Verknüpfung, Zeiten der letzten zwei Monate (mit ArG-konformen Pausen), Absenzen, Journal; Testzeit unter vitest 11:00.
 - Login-Seite zeigt den Firmennamen des Mandanten.
+- Dev-Server ist im Netz erreichbar (`server.host: true`): Handy-Test über `http://<Laptop-IP>:5173` im selben WLAN; die Firewall-Regel für `node.exe` besteht bereits.
 
 ### Offen
 - `jh# 018` tzdata-Version Server/Client · `jh# 019` Stempel offline puffern · `jh# 020` echter OIDC-Ablauf · `jh# 021` serverseitiger Löschlauf · Fragen 25–31 in README §9.
