@@ -1,12 +1,13 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/auth/authStore.ts                             │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Mock-Anmeldung: Benutzerliste wird injiziert, Sitzung persistiert     │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Anmeldung: lokal (Mock) oder über Anbieter, Sitzung, Verzeichnis      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { nowZeitpunkt } from '../datum';
 import { createStore, useStore } from '../store';
 import type { AnmeldeErgebnis, Benutzer, Rolle, Sitzung } from './auth.types';
+import type { IdentitaetsAnbieter, IdentitaetsClaims } from './identitaet';
 
 // ── §1 · State ───────────────────────────────────────────────────
 
@@ -62,19 +63,34 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
 export const authStore = createStore(authReducer, { sitzung: readSitzung() });
 authStore.subscribe(() => writeSitzung(authStore.getState().sitzung));
 
-// ── §3 · Benutzerverzeichnis (injiziert) ─────────────────────────
+// ── §3 · Verzeichnis & Anbieter (injiziert) ──────────────────────
 
-// jh› core kennt keine Mockdaten: App.tsx hängt das Verzeichnis ein.
-let findeBenutzer: (benutzername: string) => Benutzer | undefined = () => undefined;
-let alleBenutzer: () => readonly Benutzer[] = () => [];
+export type IdentitaetsAnmeldung = (claims: IdentitaetsClaims, jetzt: string) => { ok: true; benutzer: Benutzer; neu: boolean } | { ok: false; fehler: string };
 
-export function configureAuth(verzeichnis: { finden: typeof findeBenutzer; alle: typeof alleBenutzer }): void {
-  findeBenutzer = verzeichnis.finden;
-  alleBenutzer = verzeichnis.alle;
+export interface AuthVerzeichnis {
+  finden: (benutzername: string) => Benutzer | undefined;
+  alle: () => readonly Benutzer[];
+  /** Konten beim Mock-Identitätsanbieter («Konto wählen»). */
+  identitaeten?: (anbieter: IdentitaetsAnbieter) => readonly IdentitaetsClaims[];
+  /** Prüft Claims gegen Mandant und Konten – legt bei Bedarf ein Konto an (JIT). */
+  mitIdentitaet?: IdentitaetsAnmeldung;
+  beiAnmeldung?: (sitzung: Sitzung, neu: boolean) => void;
+  beiAbmeldung?: (benutzer: Benutzer, grund: AbmeldeGrund) => void;
+}
+
+// jh› core kennt keine Mockdaten und keinen Betriebsstand: main.tsx hängt Verzeichnis, Anbieter und Journal ein.
+let verzeichnis: AuthVerzeichnis = { finden: () => undefined, alle: () => [] };
+
+export function configureAuth(neu: AuthVerzeichnis): void {
+  verzeichnis = neu;
 }
 
 export function listBenutzer(): readonly Benutzer[] {
-  return alleBenutzer();
+  return verzeichnis.alle().filter((benutzer) => benutzer.aktiv);
+}
+
+export function listIdentitaeten(anbieter: IdentitaetsAnbieter): readonly IdentitaetsClaims[] {
+  return verzeichnis.identitaeten?.(anbieter) ?? [];
 }
 
 // ── §4 · Aktionen ────────────────────────────────────────────────
@@ -85,22 +101,38 @@ export interface AnmeldeDaten {
   bleibtAngemeldet: boolean;
 }
 
+export type AbmeldeGrund = 'manuell' | 'inaktiv';
+
+function sitzungStarten(benutzer: Benutzer, bleibtAngemeldet: boolean, anbieter: Sitzung['anbieter'], neu: boolean): Sitzung {
+  const sitzung: Sitzung = { benutzer, angemeldetAm: nowZeitpunkt(), bleibtAngemeldet, anbieter };
+  authStore.dispatch({ kind: 'anmelden', sitzung });
+  verzeichnis.beiAnmeldung?.(sitzung, neu);
+  return sitzung;
+}
+
 // jh! Kein Passwortvergleich: Mock. Die Funktion nimmt das Passwort gar nicht
 //     entgegen, damit nie eines im State oder Storage landet.
 export function anmelden(daten: AnmeldeDaten): AnmeldeErgebnis {
-  const benutzer = findeBenutzer(daten.benutzername.trim().toLowerCase());
+  const benutzer = verzeichnis.finden(daten.benutzername.trim().toLowerCase());
   if (!benutzer) return { ok: false, fehler: 'Benutzername unbekannt. Demo-Zugänge stehen unter dem Formular.' };
-  const sitzung: Sitzung = {
-    benutzer: daten.rolle ? { ...benutzer, rolle: daten.rolle } : benutzer,
-    angemeldetAm: nowZeitpunkt(),
-    bleibtAngemeldet: daten.bleibtAngemeldet,
-  };
-  authStore.dispatch({ kind: 'anmelden', sitzung });
+  if (!benutzer.aktiv) return { ok: false, fehler: 'Dieses Konto ist gesperrt. Bitte an die Administration wenden.' };
+  const sitzung = sitzungStarten(daten.rolle ? { ...benutzer, rolle: daten.rolle } : benutzer, daten.bleibtAngemeldet, 'lokal', false);
   return { ok: true, sitzung };
 }
 
-export function abmelden(): void {
+/** Anmeldung mit den Claims eines Identitätsanbieters (Mock-Dialog «Konto wählen»). */
+export function anmeldenMitIdentitaet(claims: IdentitaetsClaims, bleibtAngemeldet: boolean): AnmeldeErgebnis {
+  if (!verzeichnis.mitIdentitaet) return { ok: false, fehler: 'Kein Identitätsanbieter eingerichtet.' };
+  const ergebnis = verzeichnis.mitIdentitaet(claims, nowZeitpunkt());
+  if (!ergebnis.ok) return ergebnis;
+  const sitzung = sitzungStarten(ergebnis.benutzer, bleibtAngemeldet, claims.anbieter, ergebnis.neu);
+  return { ok: true, sitzung };
+}
+
+export function abmelden(grund: AbmeldeGrund = 'manuell'): void {
+  const benutzer = authStore.getState().sitzung?.benutzer;
   authStore.dispatch({ kind: 'abmelden' });
+  if (benutzer) verzeichnis.beiAbmeldung?.(benutzer, grund);
 }
 
 export function rolleWechseln(rolle: Rolle): void {
