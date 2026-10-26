@@ -1,0 +1,97 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/personal/MeineDaten.module.css             │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Meine Daten: Kopf, Kartenraster, Kategorientabelle, Rechteliste       │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Seite ──────────────────────────────────────────────── */
+
+.seite {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  min-height: 0;
+  padding: 16px 24px 32px;
+  overflow-y: auto;
+  background: var(--sl-paper);
+}
+
+.kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.titel {
+  font-size: var(--sl-fs-28);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+}
+
+.kopf-text {
+  max-width: 520px;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+}
+
+.raster {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 12px;
+}
+
+.karte {
+  min-width: 0;
+  padding: 4px 14px 12px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+/* ── §2 · Tabelle & Rechte ───────────────────────────────────── */
+
+.tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sl-fs-12);
+}
+
+.tabelle th,
+.tabelle td {
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--sl-line-soft);
+  text-align: left;
+  vertical-align: top;
+}
+
+.tabelle th {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.tabelle tr:last-child td {
+  border-bottom: 0;
+}
+
+.rechte {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding-left: 18px;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+  list-style: disc;
+}
+
+/* ◆ jh · eof */

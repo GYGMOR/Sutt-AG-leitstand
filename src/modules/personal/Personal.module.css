@@ -1,0 +1,194 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/personal/Personal.module.css               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Geteilte Personal-Bausteine: Avatar, Zellen, Saldo, Formular          │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Avatar & Zelle ─────────────────────────────────────── */
+
+.avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--sl-chrome-2);
+  color: var(--sl-chrome-ink);
+  font-family: var(--sl-font-mono);
+  font-weight: var(--sl-fw-medium);
+}
+
+.sm {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+
+.md {
+  width: 32px;
+  height: 32px;
+  font-size: var(--sl-fs-12);
+}
+
+.lg {
+  width: 44px;
+  height: 44px;
+  font-size: var(--sl-fs-14);
+}
+
+.person-zelle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.person-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.person-name {
+  font-weight: var(--sl-fw-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.person-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+}
+
+/* ── §2 · Zahlen ─────────────────────────────────────────────── */
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.plus {
+  color: var(--sl-ok);
+}
+
+.minus {
+  color: var(--sl-danger-ink);
+}
+
+.leer-wert {
+  color: var(--sl-mute-2);
+}
+
+.zelle {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.zelle-haupt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zelle-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ── §3 · Formulare in Dialogen ──────────────────────────────── */
+
+.formular {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formular-zeile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.formular-hinweis {
+  padding: 8px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-line-strong);
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.formular-fehler {
+  padding: 8px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-danger);
+  background: var(--sl-danger-wash);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-danger-ink);
+}
+
+/* ── §4 · Dossier-Listen ─────────────────────────────────────── */
+
+.dossier {
+  display: flex;
+  flex-direction: column;
+}
+
+.liste {
+  display: flex;
+  flex-direction: column;
+}
+
+.listen-zeile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-13);
+}
+
+.listen-zeile:last-child {
+  border-bottom: 0;
+}
+
+.listen-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--sl-ink-2);
+}
+
+.listen-haupt {
+  color: var(--sl-ink);
+  font-weight: var(--sl-fw-medium);
+}
+
+.aktionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.fussnote {
+  padding-top: 8px;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.warnung {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-signal);
+  border-radius: var(--sl-radius-1);
+  background: color-mix(in srgb, var(--sl-signal) 8%, var(--sl-surface));
+  font-size: var(--sl-fs-13);
+}
+
+/* ◆ jh · eof */

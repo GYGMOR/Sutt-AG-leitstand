@@ -1,0 +1,470 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/personal/Stempeluhr.module.css             │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Stempeluhr: Pille in der Topbar, grosse Uhr mit Kreis, Streifen       │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Zustand ────────────────────────────────────────────── */
+
+.punkt {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sl-chrome-mute);
+}
+
+.arbeitet .punkt {
+  background: var(--sl-ok);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sl-ok) 30%, transparent);
+}
+
+.pause .punkt {
+  background: var(--sl-warn);
+}
+
+/* ── §2 · Pille (Topbar) ─────────────────────────────────────── */
+
+.pille {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 6px 0 10px;
+  border: 1px solid var(--sl-chrome-line);
+  border-radius: 16px;
+  background: var(--sl-chrome-2);
+  color: var(--sl-chrome-ink);
+  font-size: var(--sl-fs-12);
+  white-space: nowrap;
+}
+
+.pille-text {
+  font-family: var(--sl-font-mono);
+  color: var(--sl-chrome-ink);
+}
+
+.pille-knopf {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--sl-chrome-line);
+  border-radius: 11px;
+  background: transparent;
+  color: var(--sl-chrome-ink);
+  font-size: var(--sl-fs-12);
+}
+
+.pille-knopf:hover {
+  background: var(--sl-chrome-line);
+}
+
+.pille-haupt {
+  border-color: var(--sl-signal);
+  background: var(--sl-signal);
+  color: var(--sl-on-signal);
+  font-weight: var(--sl-fw-medium);
+}
+
+.pille-haupt:hover {
+  background: var(--sl-signal-hover);
+}
+
+@container (max-width: 1100px) {
+  .pille-text {
+    display: none;
+  }
+}
+
+/* ── §3 · Grosse Uhr ─────────────────────────────────────────── */
+
+/* jh› Eine Fläche, drei Zonen: Kopf mit Datum und Zonenzeit, Kreis mit der einen Taste, darunter Zahlen und
+       runde Nebentasten. Container-Query: auf dem Handy untereinander, ab 640 px Kreis links, Rest rechts. */
+.gross {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 16px 16px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.gross-kopf {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.gross-titel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gross-heute {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.gross-datum {
+  font-size: var(--sl-fs-14);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.gross-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+  text-align: right;
+}
+
+.gross-uhrzeit {
+  font-size: 18px;
+  font-weight: var(--sl-fw-semibold);
+  color: var(--sl-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.gross-koerper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@container (min-width: 640px) {
+  .gross-koerper {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 28px;
+  }
+}
+
+.gross-mitte {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.gross-rechts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Der Kreis: 228 px auf dem Handy, 260 px auf breiten Flächen. */
+.kreis {
+  --kreis-farbe: var(--sl-ok);
+  --kreis-text: #ffffff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 228px;
+  height: 228px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--kreis-farbe);
+  color: var(--kreis-text);
+  box-shadow: 0 0 0 10px color-mix(in srgb, var(--kreis-farbe) 18%, transparent), 0 14px 30px -14px color-mix(in srgb, var(--kreis-farbe) 70%, transparent);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@container (min-width: 640px) {
+  .kreis {
+    width: 260px;
+    height: 260px;
+  }
+}
+
+.kreis:hover {
+  transform: scale(1.02);
+}
+
+.kreis:active {
+  transform: scale(0.98);
+}
+
+.kreis:focus-visible {
+  outline: 3px solid var(--sl-ink);
+  outline-offset: 4px;
+}
+
+.kreis:disabled {
+  --kreis-farbe: var(--sl-line-strong);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.kreis.einstempeln {
+  --kreis-farbe: #2b7857;
+}
+
+.kreis.ausstempeln {
+  --kreis-farbe: #b3261e;
+}
+
+.kreis.weiter {
+  --kreis-farbe: #c08a00;
+  --kreis-text: #1a1a1a;
+}
+
+.kreis-aktion {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.kreis-timer {
+  font-family: var(--sl-font-mono);
+  font-size: 40px;
+  font-weight: var(--sl-fw-semibold);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.kreis-unter {
+  font-size: var(--sl-fs-12);
+  opacity: 0.85;
+}
+
+.gross-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+}
+
+.gross-status .punkt {
+  background: var(--sl-line-strong);
+}
+
+.gross-zahlen {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.gross-zahlen dt {
+  font-size: 10px;
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.gross-zahlen dd {
+  font-family: var(--sl-font-mono);
+  font-size: 16px;
+  font-weight: var(--sl-fw-semibold);
+}
+
+.plus {
+  color: var(--sl-ok);
+}
+
+.minus {
+  color: var(--sl-danger-ink);
+}
+
+.warn {
+  color: var(--sl-signal-ink);
+}
+
+/* Runde Nebentasten: Notiz, Pause, Nachtragen, Einsatz. */
+.rund-reihe {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  gap: 8px;
+}
+
+.rund {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--sl-ink-2);
+  font-size: var(--sl-fs-label);
+  text-align: center;
+  cursor: pointer;
+}
+
+.rund-kreis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--sl-line-strong);
+  border-radius: 50%;
+  background: var(--sl-paper);
+  color: var(--sl-ink);
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.rund:hover .rund-kreis {
+  border-color: var(--sl-ink);
+  background: var(--sl-hover);
+}
+
+.rund:disabled {
+  color: var(--sl-mute-2);
+  cursor: not-allowed;
+}
+
+.rund:disabled .rund-kreis {
+  border-style: dashed;
+  color: var(--sl-mute-2);
+}
+
+.rund.betont .rund-kreis {
+  border-color: var(--sl-signal);
+  background: color-mix(in srgb, var(--sl-signal) 12%, var(--sl-surface));
+}
+
+.rund:focus-visible .rund-kreis {
+  outline: 2px solid var(--sl-ink);
+  outline-offset: 2px;
+}
+
+.heute-liste {
+  display: flex;
+  flex-direction: column;
+  border-top: var(--sl-hairline);
+}
+
+.heute-zeile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-12);
+}
+
+.heute-zeile:last-child {
+  border-bottom: 0;
+}
+
+.heute-zeit {
+  font-family: var(--sl-font-mono);
+}
+
+.heute-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--sl-ink-2);
+}
+
+.heute-art {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--sl-ok) 70%, var(--sl-surface));
+  vertical-align: middle;
+}
+
+.heute-art.pause-art {
+  background: color-mix(in srgb, var(--sl-warn) 60%, var(--sl-surface));
+}
+
+.heute-dauer {
+  font-family: var(--sl-font-mono);
+  color: var(--sl-mute);
+}
+
+.umstellung {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-left: var(--sl-mark-width) solid var(--sl-signal);
+  border-radius: var(--sl-radius-1);
+  background: color-mix(in srgb, var(--sl-signal) 8%, var(--sl-surface));
+  font-size: var(--sl-fs-12);
+}
+
+.warnung {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-signal-ink);
+}
+
+.hinweis {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* ── §4 · Streifen (Heute-Seite der App) ─────────────────────── */
+
+.streifen {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 14px;
+  border: var(--sl-hairline);
+  border-left: var(--sl-mark-width) solid var(--sl-line-strong);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.streifen.arbeitet {
+  border-left-color: var(--sl-ok);
+}
+
+.streifen.pause {
+  border-left-color: var(--sl-warn);
+}
+
+.streifen-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sl-ink);
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.streifen-meta {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-regular);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */
