@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  App.tsx                                            │
    │  ◆ JH · 2026.10 · rev 05                                               │
-   │  Routing: Login, Dashboard, Dispo, Module, Personal, Meine Daten, App  │
+   │  Routing: Login, Dashboard, Dispo, Module, Personal, Meine Daten       │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { lazy, Suspense } from 'react';
@@ -21,7 +21,6 @@ import { DispoPage } from './modules/dispo/DispoPage';
 
 // jh› Alles ausser der Disposition lazy: der Leitstand lädt nur, was er zeigt.
 const TechnikerDruck = lazy(() => import('./modules/dispo/druck/TechnikerDruck').then((m) => ({ default: m.TechnikerDruck })));
-const AppPage = lazy(() => import('./modules/app/AppPage').then((m) => ({ default: m.AppPage })));
 const RapportePage = lazy(() => import('./modules/rapporte/RapportePage').then((m) => ({ default: m.RapportePage })));
 const RapportDruck = lazy(() => import('./modules/rapport/RapportDruck').then((m) => ({ default: m.RapportDruck })));
 const DashboardPage = lazy(() => import('./modules/dashboard/DashboardPage').then((m) => ({ default: m.DashboardPage })));
@@ -55,7 +54,6 @@ const router = createBrowserRouter([
       { path: '/dispo', element: <Navigate to="/dispo/plantafel" replace /> },
       { path: '/dispo/druck/:technikerId', element: <Suspense fallback={null}><TechnikerDruck /></Suspense> },
       { path: '/dispo/:ansicht', element: <DispoPage /> },
-      { path: '/app/*', element: <Suspense fallback={null}><AppPage /></Suspense> },
       { path: '/auftraege/:auftragId?', element: modul('auftraege', <AuftraegePage />) },
       { path: '/kunden/:kundeId?', element: modul('kunden', <KundenPage />) },
       { path: '/geraete/:geraetId?', element: modul('geraete', <GeraetePage />) },

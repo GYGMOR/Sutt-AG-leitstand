@@ -83,11 +83,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* jh› Die Techniker-App läuft auf dem Handy: dort gilt die Mindestbreite des Leitstands nicht. */
-html[data-flaeche='app'] body {
-  min-width: 0;
-}
-
 #root {
   height: 100vh;
 }

@@ -4,10 +4,11 @@
    │  Anmeldeseite: Microsoft/Google (SSO), lokal (Mock), Rollen-Weiche     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
+import type { NavigateFunction } from 'react-router';
 import { useMandant } from '../mandant/mandantStore';
 import { Button, IconButton } from '../ui/Button';
 import { Auswahl, Eingabe, Feld, Schalter } from '../ui/Form';
@@ -27,15 +28,22 @@ import styles from './LoginPage.module.css';
 
 const STANDARD_ZIEL = '/dispo/plantafel';
 const DASHBOARD_ZIEL = '/dashboard';
-const APP_ZIEL = '/app';
+const APP_ZIEL = '/app/';
 
-// jh› Aussendienst landet auf dem Handy-Plan, die Disposition in der Plantafel, Büro und
+// jh› Aussendienst landet in der Techniker-App, die Disposition in der Plantafel, Büro und
 //     Administration im Tagesüberblick – ausser jemand kam von einer bestimmten Seite.
 function zielFuer(rolle: Rolle, von: string | undefined): string {
   if (von && von !== STANDARD_ZIEL && von !== DASHBOARD_ZIEL && von !== '/') return von;
   if (rolle === 'aussendienst') return APP_ZIEL;
   if (rolle === 'disposition') return STANDARD_ZIEL;
   return DASHBOARD_ZIEL;
+}
+
+// jh› Die App ist eine eigene Auslieferung unter /app/ (ADR-008): Vollseiten-Sprung statt Router –
+//     Sitzung und Stand teilt sie über dieselbe Origin.
+function springe(ziel: string, navigate: NavigateFunction): void {
+  if (ziel === APP_ZIEL) window.location.assign(APP_ZIEL);
+  else navigate(ziel, { replace: true });
 }
 
 export function LoginPage() {
@@ -54,7 +62,12 @@ export function LoginPage() {
   const [vergessen, setVergessen] = useState(false);
   const [anbieterDialog, setAnbieterDialog] = useState<IdentitaetsAnbieter | null>(null);
 
-  if (sitzung) return <Navigate to={zielFuer(sitzung.benutzer.rolle, von)} replace />;
+  const ziel = sitzung ? zielFuer(sitzung.benutzer.rolle, von) : null;
+  useEffect(() => {
+    if (ziel === APP_ZIEL) window.location.assign(APP_ZIEL);
+  }, [ziel]);
+
+  if (ziel) return ziel === APP_ZIEL ? null : <Navigate to={ziel} replace />;
 
   // jh› Welche Anbieter die Administration unter Einstellungen → Anmeldung aktiviert hat; «nur SSO» blendet
   //     die lokale Anmeldung aus – das Produkt kennt dann kein Passwort mehr.
@@ -70,7 +83,7 @@ export function LoginPage() {
       setFehler(ergebnis.fehler);
       return;
     }
-    navigate(zielFuer(ergebnis.sitzung.benutzer.rolle, von), { replace: true });
+    springe(zielFuer(ergebnis.sitzung.benutzer.rolle, von), navigate);
   }
 
   return (
@@ -209,7 +222,7 @@ export function LoginPage() {
         )}
       </form>
 
-      <IdentitaetDialog anbieter={anbieterDialog} bleibtAngemeldet={bleibt} onClose={() => setAnbieterDialog(null)} onAngemeldet={(neu) => navigate(zielFuer(neu.benutzer.rolle, von), { replace: true })} />
+      <IdentitaetDialog anbieter={anbieterDialog} bleibtAngemeldet={bleibt} onClose={() => setAnbieterDialog(null)} onAngemeldet={(neu) => springe(zielFuer(neu.benutzer.rolle, von), navigate)} />
     </AuthLayout>
   );
 }

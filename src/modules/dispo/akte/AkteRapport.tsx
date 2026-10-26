@@ -58,7 +58,7 @@ export function AkteRapport({ rapport, einsatz, techniker, heute, onFreigeben, o
           <p className={styles.hinweis}>Entsteht in der Techniker-App, sobald {kuerzel} «Fertig» drückt. Anfahrt und Arbeitszeit kommen aus den Statusknöpfen.</p>
         )}
         <div className={styles.knoepfe}>
-          <Button variant="secondary" size="sm" icon={Smartphone} onClick={() => oeffneApp(fertig ? `/app/rapport/${einsatz.id}?als=${einsatz.technikerId}` : `/app?als=${einsatz.technikerId}`)}>
+          <Button variant="secondary" size="sm" icon={Smartphone} onClick={() => oeffneApp(fertig ? `/app/rapport/${einsatz.id}?als=${einsatz.technikerId}` : `/app/?als=${einsatz.technikerId}`)}>
             {fertig ? 'In der App erfassen' : 'Techniker-App öffnen'}
           </Button>
         </div>

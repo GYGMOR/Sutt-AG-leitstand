@@ -61,6 +61,8 @@ export interface Modul {
   icon: LucideIcon;
   gruppe: ModulGruppe;
   pfad: string;
+  /** Eigene Auslieferung unter `pfad` (ADR-008): Vollseiten-Link statt Router-Route. */
+  extern?: boolean;
   freigeschaltet: boolean;
   /** Geplante Version, in der das Modul kommt. */
   version?: string;
@@ -114,9 +116,9 @@ export const MODULE: readonly Modul[] = [
     beschreibung: 'Einsätze des Tages als nummerierte Pins, Touren pro Techniker in dessen Farbe.',
   },
   {
-    id: 'app', label: 'Techniker-App', icon: Smartphone, gruppe: 'disposition', pfad: '/app',
+    id: 'app', label: 'Techniker-App', icon: Smartphone, gruppe: 'disposition', pfad: '/app/', extern: true,
     freigeschaltet: true, rollen: ALLE,
-    beschreibung: 'Tagesplan, Statusknöpfe und Servicerapport fürs Handy – dieselben Daten wie die Plantafel.',
+    beschreibung: 'Eigene App für Handy, Tablet und Laptop: Tagesplan, Tour, Stempeluhr, Kamera, Scanner, Fahrzeuglager, Servicerapport – dieselben Daten wie die Plantafel.',
   },
   {
     id: 'auftraege', label: 'Aufträge', icon: ClipboardList, gruppe: 'auftraege-kunden', pfad: '/auftraege',

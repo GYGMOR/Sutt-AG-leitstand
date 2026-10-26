@@ -6,7 +6,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { ChevronDown, CircleQuestionMark, Lock, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { ChevronDown, CircleQuestionMark, ExternalLink, Lock, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { NavLink } from 'react-router';
 import { useBenutzer } from '../auth/authStore';
 import { useMandant } from '../mandant/mandantStore';
@@ -50,6 +50,7 @@ function Eintrag({ modul, eingeklappt, onGesperrt, onHover }: EintragProps) {
     <>
       <Icon size={20} strokeWidth={1.5} aria-hidden className={styles.icon} />
       {!freigabe.ok && <Lock size={12} strokeWidth={1.5} aria-hidden className={styles.schloss} />}
+      {freigabe.ok && modul.extern && <ExternalLink size={12} strokeWidth={1.5} aria-hidden className={styles.schloss} />}
       <span className={styles.label}>{modul.label}</span>
     </>
   );
@@ -70,11 +71,15 @@ function Eintrag({ modul, eingeklappt, onGesperrt, onHover }: EintragProps) {
     );
   }
 
+  // jh› Externe Module (Techniker-App, ADR-008) sind eine eigene Auslieferung: Vollseiten-Link in neuem Tab.
   return (
     <NavLink
       to={modul.pfad}
+      reloadDocument={modul.extern}
+      target={modul.extern ? '_blank' : undefined}
+      rel={modul.extern ? 'noopener' : undefined}
       className={({ isActive }) => cx(styles.eintrag, isActive && styles.aktiv)}
-      title={eingeklappt ? undefined : modul.beschreibung}
+      title={eingeklappt ? undefined : modul.extern ? `${modul.beschreibung} · öffnet in neuem Tab` : modul.beschreibung}
       onPointerEnter={(event) => onHover(modul.gruppe, event.currentTarget)}
       onPointerLeave={() => onHover(null, null)}
     >
@@ -121,8 +126,17 @@ function Flyout({ gruppe, anker, onClose, onEnter, onGesperrt }: FlyoutProps) {
             );
           }
           return (
-            <NavLink key={modul.id} to={modul.pfad} className={({ isActive }) => cx(styles.flyoutEintrag, isActive && styles.aktiv)} onClick={onClose}>
+            <NavLink
+              key={modul.id}
+              to={modul.pfad}
+              reloadDocument={modul.extern}
+              target={modul.extern ? '_blank' : undefined}
+              rel={modul.extern ? 'noopener' : undefined}
+              className={({ isActive }) => cx(styles.flyoutEintrag, isActive && styles.aktiv)}
+              onClick={onClose}
+            >
               <Icon size={16} strokeWidth={1.5} aria-hidden />
+              {modul.extern && <ExternalLink size={12} strokeWidth={1.5} aria-hidden className={styles.schloss} />}
               <span>{modul.label}</span>
             </NavLink>
           );

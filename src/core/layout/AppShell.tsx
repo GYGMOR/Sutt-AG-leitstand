@@ -91,7 +91,7 @@ export function AppShell({ modul, topbarExtras, menueEintraege, children }: AppS
         gruppe: 'modul',
         icon: gesperrt ? Lock : eintrag.icon,
         stichworte: eintrag.beschreibung,
-        run: () => navigate(eintrag.pfad),
+        run: () => (eintrag.extern ? window.open(eintrag.pfad, '_blank', 'noopener') : navigate(eintrag.pfad)),
         ...(gesperrt ? { gesperrt } : {}),
       };
     });
