@@ -1,0 +1,299 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  app/rahmen/AppRahmen.module.css                    │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Rahmen: Kopf, Fläche, Tabs unten, Rand links ab 900 px, Mehr-Blatt    │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Grundraster ────────────────────────────────────────── */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--sl-paper);
+}
+
+/* jh› Breit: Kopf über alles, Rand links, Fläche rechts – ein Raster, keine zweite App. */
+.breit {
+  display: grid;
+  grid-template-columns: 224px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.breit .kopf {
+  grid-column: 1 / -1;
+}
+
+/* ── §2 · Kopf ───────────────────────────────────────────────── */
+
+.kopf {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: env(safe-area-inset-top) 14px 0;
+  background: var(--sl-chrome);
+  color: var(--sl-chrome-ink);
+}
+
+.marke {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: var(--sl-fw-semibold);
+  letter-spacing: 0.06em;
+}
+
+.marke-app {
+  font-weight: var(--sl-fw-regular);
+  letter-spacing: 0;
+  color: var(--sl-chrome-mute);
+}
+
+.raute {
+  width: 9px;
+  height: 9px;
+  background: var(--sl-signal);
+  transform: rotate(45deg);
+}
+
+.datum {
+  flex: 1;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-chrome-mute);
+}
+
+.rechts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.netz {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sl-ok);
+}
+
+.netz-aus {
+  background: var(--sl-warn);
+}
+
+.profil {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.initialen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sl-chrome-2);
+  font-family: var(--sl-font-mono);
+  font-size: 11px;
+}
+
+/* ── §3 · Fläche & Inhalt ────────────────────────────────────── */
+
+.flaeche {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.offline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--sl-warn);
+  color: #1a1a1a;
+  font-size: var(--sl-fs-12);
+}
+
+.inhalt {
+  flex: 1;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 12px 12px 28px;
+}
+
+@media (min-width: 600px) {
+  .inhalt {
+    padding: 16px 20px 32px;
+  }
+}
+
+@media (min-width: 900px) {
+  .inhalt {
+    padding: 20px 28px 40px;
+  }
+}
+
+/* ── §4 · Tabs (Handy) ───────────────────────────────────────── */
+
+.tabs {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: var(--sl-hairline);
+  background: var(--sl-surface);
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 58px;
+  font-size: 11px;
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-mute);
+  text-decoration: none;
+}
+
+.tab-aktiv {
+  color: var(--sl-ink);
+  box-shadow: inset 0 2px 0 var(--sl-signal);
+}
+
+/* ── §5 · Rand (breit) ───────────────────────────────────────── */
+
+.rand {
+  position: sticky;
+  top: 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-self: start;
+  height: calc(100dvh - 56px);
+  padding: 12px 8px;
+  border-right: var(--sl-hairline);
+  background: var(--sl-surface);
+}
+
+.rand-eintrag {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-medium);
+  color: var(--sl-ink-2);
+  text-decoration: none;
+}
+
+.rand-eintrag:hover {
+  background: var(--sl-hover);
+  color: var(--sl-ink);
+}
+
+.rand-aktiv {
+  color: var(--sl-ink);
+  background: var(--sl-paper);
+  box-shadow: inset var(--sl-mark-width) 0 0 var(--sl-signal);
+}
+
+.rand-fuss {
+  margin-top: auto;
+  padding: 8px 12px;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ── §6 · Mehr-Blatt ─────────────────────────────────────────── */
+
+.blatt-hintergrund {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgb(0 0 0 / 0.4);
+}
+
+.blatt {
+  position: absolute;
+  inset: auto 0 0;
+  max-height: 80dvh;
+  padding: 8px 8px calc(12px + env(safe-area-inset-bottom));
+  border-radius: 14px 14px 0 0;
+  background: var(--sl-surface);
+  box-shadow: var(--sl-shadow-float);
+  overflow-y: auto;
+}
+
+.blatt-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px 10px;
+  border-bottom: var(--sl-hairline);
+  font-size: var(--sl-fs-14);
+}
+
+.blatt-schliessen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--sl-mute);
+}
+
+.blatt-schliessen:hover {
+  background: var(--sl-hover);
+}
+
+.blatt-liste {
+  display: flex;
+  flex-direction: column;
+  padding-top: 4px;
+}
+
+.blatt-eintrag {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 12px;
+  border-radius: var(--sl-radius-1);
+  font-size: var(--sl-fs-14);
+  color: var(--sl-ink);
+  text-align: left;
+  text-decoration: none;
+}
+
+.blatt-eintrag:hover {
+  background: var(--sl-hover);
+}
+
+.blatt-aktiv {
+  box-shadow: inset var(--sl-mark-width) 0 0 var(--sl-signal);
+  background: var(--sl-paper);
+}
+
+.blatt-abmelden {
+  color: var(--sl-danger-ink);
+}
+
+/* ◆ jh · eof */

@@ -1,0 +1,36 @@
+{
+  "name": "sutt-app",
+  "private": true,
+  "version": "0.5.0",
+  "description": "SUTT App – Techniker-App der Sutt AG · Heute, Tour, Zeit, Kamera, Scannen, Fahrzeug (Mockup, teilt Domäne und Stand mit dem Leitstand)",
+  "author": "◆ JH",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@vis.gl/react-google-maps": "^1.10.1",
+    "lucide-react": "^1.59.0",
+    "maplibre-gl": "^6.14.0",
+    "qrcode": "^1.5.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router": "^7.18.4"
+  },
+  "devDependencies": {
+    "@types/google.maps": "^3.66.7",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^5.2.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.7",
+    "vitest": "^5.0.5"
+  }
+}

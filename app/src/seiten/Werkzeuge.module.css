@@ -1,0 +1,388 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  app/seiten/Werkzeuge.module.css                    │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Tour, Scannen, Kamera, Profil: Karte, Stopps, Ergebnis, Aufnahmen     │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Tour ───────────────────────────────────────────────── */
+
+.karte {
+  height: 240px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  overflow: hidden;
+}
+
+@media (min-width: 600px) {
+  .karte {
+    height: 320px;
+  }
+}
+
+@media (min-width: 900px) {
+  .karte {
+    height: 100%;
+    min-height: 420px;
+  }
+}
+
+.stopps {
+  display: flex;
+  flex-direction: column;
+}
+
+.stopp {
+  display: grid;
+  grid-template-columns: 30px 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 60px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--sl-line-soft);
+  text-align: left;
+}
+
+.stopp:last-child {
+  border-bottom: 0;
+}
+
+.stopp:hover {
+  background: var(--sl-hover);
+}
+
+.stopp-naechster {
+  background: color-mix(in srgb, var(--sl-signal) 8%, var(--sl-surface));
+  box-shadow: inset var(--sl-mark-width) 0 0 var(--sl-signal);
+}
+
+.stopp-erledigt {
+  opacity: 0.65;
+}
+
+.stopp-nummer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--sl-edge, var(--sl-line-strong));
+  color: #fff;
+  font-family: var(--sl-font-mono);
+  font-size: 12px;
+  font-weight: var(--sl-fw-semibold);
+}
+
+.stopp-zeit {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.stopp-zeit span {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-regular);
+  color: var(--sl-mute);
+}
+
+.stopp-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.stopp-text strong {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: var(--sl-fw-medium);
+}
+
+.stopp-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stopp-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: var(--sl-hairline);
+  border-radius: 50%;
+  color: var(--sl-ink);
+}
+
+.stopp-nav:hover {
+  background: var(--sl-hover);
+}
+
+/* ── §2 · Scannen & Kamera ───────────────────────────────────── */
+
+.eingabe-zeile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.beispiele {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.beispiel {
+  min-height: 36px;
+  padding: 0 12px;
+  border: var(--sl-hairline);
+  border-radius: 18px;
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.beispiel:hover {
+  background: var(--sl-hover);
+}
+
+.ergebnis {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: var(--sl-hairline);
+  border-left: var(--sl-mark-width) solid var(--sl-signal);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.ergebnis-art {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.ergebnis-titel {
+  font-size: 17px;
+  font-weight: var(--sl-fw-semibold);
+  line-height: 1.25;
+}
+
+.ergebnis-text {
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+}
+
+.zahlen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 8px;
+}
+
+.zahlen dt {
+  font-size: 10px;
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.zahlen dd {
+  font-family: var(--sl-font-mono);
+  font-size: 16px;
+  font-weight: var(--sl-fw-semibold);
+}
+
+.verlauf {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+.verlauf li {
+  display: flex;
+  gap: 8px;
+  min-height: 28px;
+  align-items: center;
+}
+
+.motive {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.motiv {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--sl-line-strong);
+  border-radius: 19px;
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-13);
+}
+
+.motiv-aktiv {
+  border-color: var(--sl-signal);
+  background: var(--sl-signal);
+  color: var(--sl-on-signal);
+  font-weight: var(--sl-fw-medium);
+}
+
+.ausloeser {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 64px;
+  border: 0;
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-ink);
+  color: var(--sl-paper);
+  font-size: 17px;
+  font-weight: var(--sl-fw-semibold);
+  cursor: pointer;
+}
+
+.ausloeser:hover {
+  filter: brightness(1.15);
+}
+
+.ausloeser input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.aufnahmen {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.aufnahme {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-paper);
+  overflow: hidden;
+}
+
+.aufnahme img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.aufnahme-motiv {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  padding: 2px 6px;
+  border-radius: var(--sl-radius-1);
+  background: rgb(0 0 0 / 0.6);
+  color: #f4f2ee;
+  font-size: 10px;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+}
+
+.aufnahme-weg {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.6);
+  color: #f4f2ee;
+}
+
+.vorschlag {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px dashed var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-13);
+}
+
+.vorschlag dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 10px;
+}
+
+.vorschlag dt {
+  color: var(--sl-mute);
+}
+
+.vorschlag dd {
+  font-family: var(--sl-font-mono);
+}
+
+/* ── §3 · Profil ─────────────────────────────────────────────── */
+
+.profil-kopf {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.profil-name {
+  display: flex;
+  flex-direction: column;
+}
+
+.profil-name strong {
+  font-size: 17px;
+  font-weight: var(--sl-fw-semibold);
+}
+
+.profil-name span {
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+}
+
+.fakten {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 12px;
+  font-size: var(--sl-fs-13);
+}
+
+.fakten dt {
+  color: var(--sl-mute);
+}
+
+.fakten dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.auswahl {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ◆ jh · eof */

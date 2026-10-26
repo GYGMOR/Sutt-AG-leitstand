@@ -1,0 +1,187 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  app/seiten/AnmeldenSeite.module.css                │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Anmelden: Karte mittig, Anbieter-Tasten, Demo-Chips                   │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Seite ──────────────────────────────────────────────── */
+
+.seite {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+  background: var(--sl-paper);
+}
+
+@media (min-width: 600px) {
+  .seite {
+    align-items: center;
+  }
+}
+
+.karte {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 440px;
+  padding: 20px 18px 22px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.kopf {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.raute {
+  width: 11px;
+  height: 11px;
+  background: var(--sl-signal);
+  transform: rotate(45deg);
+}
+
+.marke {
+  font-weight: var(--sl-fw-semibold);
+  letter-spacing: 0.08em;
+}
+
+.marke-app {
+  color: var(--sl-mute);
+}
+
+.titel {
+  font-size: var(--sl-fs-28);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+}
+
+.untertitel {
+  margin-top: -8px;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Anbieter & Formular ────────────────────────────────── */
+
+.anbieter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.anbieter-knopf {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-14);
+  font-weight: var(--sl-fw-medium);
+}
+
+.anbieter-knopf:hover {
+  border-color: var(--sl-ink);
+  background: var(--sl-hover);
+}
+
+.anbieter-marke {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  width: 16px;
+  height: 16px;
+}
+
+.anbieter-marke span {
+  background: currentColor;
+}
+
+.anbieter-marke.google span {
+  border-radius: 50%;
+}
+
+.trenner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--sl-fs-label);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.trenner::before,
+.trenner::after {
+  content: '';
+  flex: 1;
+  border-top: var(--sl-hairline);
+}
+
+.absenden {
+  min-height: 48px;
+  justify-content: center;
+}
+
+.hinweis {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* ── §3 · Demo-Zugänge ───────────────────────────────────────── */
+
+.demo {
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: var(--sl-hairline);
+}
+
+.demo-titel {
+  margin-bottom: 8px;
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.demo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.demo-chip {
+  min-height: 36px;
+  padding: 0 10px;
+  border: var(--sl-hairline);
+  border-radius: 18px;
+  background: var(--sl-paper);
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.demo-chip strong {
+  font-family: var(--sl-font-mono);
+  color: var(--sl-ink);
+}
+
+.demo-chip-feld {
+  border-color: var(--sl-signal);
+}
+
+.demo-chip:hover {
+  background: var(--sl-hover);
+}
+
+/* ◆ jh · eof */

@@ -414,6 +414,14 @@ export function useDispoAktionen() {
         const bewegung: Lagerbewegung = { id: nextId('LB'), zeitpunkt: nowZeitpunkt(), art: 'umbuchung', artikelNummer, menge, von, nach, ...(text ? { text } : {}), benutzer: kuerzel };
         store.dispatch({ kind: 'buchen', bewegung, meta: meta(`${menge}× ${artikel.bezeichnung} · ${ortLabel(von)} → ${ortLabel(nach)}`) });
       },
+      /** Verbrauch ausserhalb des Rapports – z. B. nach dem Scan in der App; bucht vom Fahrzeug ab. */
+      verbrauchMelden(artikelNummer: string, ort: LagerOrt, menge: number, text?: string, auftragId?: string) {
+        const state = store.getState();
+        const artikel = state.stammdaten.artikel.get(artikelNummer);
+        if (!artikel || menge <= 0 || bestandVon(state.bestaende, artikelNummer, ort) < menge) return;
+        const bewegung: Lagerbewegung = { id: nextId('LB'), zeitpunkt: nowZeitpunkt(), art: 'verbrauch', artikelNummer, menge, von: ort, ...(auftragId ? { auftragId } : {}), ...(text ? { text } : {}), benutzer: kuerzel };
+        store.dispatch({ kind: 'buchen', bewegung, meta: meta(`${menge}× ${artikel.bezeichnung} · Verbrauch ${ortLabel(ort)}`) });
+      },
       bestandKorrigieren(artikelNummer: string, ort: LagerOrt, neueMenge: number, grund: string) {
         const state = store.getState();
         const artikel = state.stammdaten.artikel.get(artikelNummer);

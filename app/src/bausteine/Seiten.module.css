@@ -1,0 +1,490 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  app/bausteine/Seiten.module.css                    │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Seiten der App: Raster, Leiste, Banner, Abschnitte, Listen, Fuss      │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Grundraster ────────────────────────────────────────── */
+
+.seite {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* jh› Ab 900 px zwei Spalten, wo es Sinn hat (Einsatzkarte links, Hinweise rechts) – darunter untereinander. */
+@media (min-width: 900px) {
+  .zweispaltig {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .spalte {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .karten {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 12px;
+  }
+}
+
+.mono {
+  font-family: var(--sl-font-mono);
+}
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.leer {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--sl-mute);
+}
+
+.zurueck {
+  align-self: flex-start;
+  margin: -4px 0 -4px -8px;
+}
+
+.seitentitel {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.seitentitel h1 {
+  font-size: var(--sl-fs-20);
+  font-weight: var(--sl-fw-semibold);
+  line-height: var(--sl-lh-tight);
+}
+
+.seitentitel span {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Tagesleiste & Banner ───────────────────────────────── */
+
+.leiste {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding: 10px 12px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.leiste > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.leiste-zahl {
+  font-family: var(--sl-font-mono);
+  font-size: 17px;
+  font-weight: var(--sl-fw-semibold);
+}
+
+.leiste-von {
+  font-size: var(--sl-fs-label);
+  font-weight: var(--sl-fw-regular);
+  color: var(--sl-mute);
+}
+
+.leiste-label {
+  font-size: 10px;
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.bestaetigung {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--sl-ok);
+  border-radius: var(--sl-radius-1);
+  background: color-mix(in srgb, var(--sl-ok) 10%, var(--sl-surface));
+  font-size: var(--sl-fs-13);
+}
+
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-left: var(--sl-mark-width) solid var(--sl-signal);
+  border-radius: var(--sl-radius-1);
+  background: color-mix(in srgb, var(--sl-signal) 8%, var(--sl-surface));
+}
+
+.banner-kopf {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.banner-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--sl-fs-13);
+}
+
+.hinweis-karte {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px dashed var(--sl-line-strong);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+}
+
+/* ── §3 · Abschnitte ─────────────────────────────────────────── */
+
+.abschnitt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+}
+
+.abschnitt-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.abschnitt-kopf h2,
+.abschnitt-kopf h3 {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.punkte {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--sl-fs-13);
+}
+
+.punkte li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.punkte svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--sl-mute);
+}
+
+.kontakte {
+  display: flex;
+  flex-direction: column;
+}
+
+.kontakt {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink);
+  text-decoration: none;
+}
+
+.kontakt strong {
+  font-weight: var(--sl-fw-medium);
+}
+
+.verlauf {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--sl-fs-13);
+}
+
+.verlauf li {
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  gap: 10px;
+}
+
+.quelle {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.aktionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.aktionen > * {
+  min-height: 44px;
+}
+
+/* ── §4 · Woche ──────────────────────────────────────────────── */
+
+.tag {
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-2, 6px);
+  background: var(--sl-surface);
+  overflow: hidden;
+}
+
+.tag-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--sl-paper);
+}
+
+.tag-heute {
+  box-shadow: inset var(--sl-mark-width) 0 0 var(--sl-signal);
+}
+
+.tag-name {
+  font-size: var(--sl-fs-13);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.tag-name .mono {
+  font-weight: var(--sl-fw-regular);
+  color: var(--sl-mute);
+}
+
+.tag-meta {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.tag-liste {
+  display: flex;
+  flex-direction: column;
+}
+
+.tag-eintrag {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 6px 10px 6px 18px;
+  border-top: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-13);
+  text-align: left;
+}
+
+.tag-eintrag::before {
+  content: '';
+  position: absolute;
+  inset: 6px auto 6px 8px;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--sl-edge);
+}
+
+.tag-eintrag:hover {
+  background: var(--sl-hover);
+}
+
+.tag-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tag-status {
+  font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+/* ── §5 · Rapport-Fuss ───────────────────────────────────────── */
+
+.fuss {
+  position: sticky;
+  bottom: 58px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 -12px;
+  padding: 10px 12px 12px;
+  border-top: var(--sl-hairline);
+  background: var(--sl-surface);
+}
+
+@media (min-width: 900px) {
+  .fuss {
+    bottom: 0;
+    margin: 0;
+    border: var(--sl-hairline);
+    border-radius: var(--sl-radius-2, 6px);
+  }
+}
+
+.fuss-hinweis {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ok);
+}
+
+.fuss-knoepfe {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.fuss-knoepfe > * {
+  min-height: 48px;
+  justify-content: center;
+}
+
+/* ── §6 · Fahrzeug ───────────────────────────────────────────── */
+
+.bord {
+  display: flex;
+  flex-direction: column;
+}
+
+.bord-zeile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-13);
+}
+
+.bord-zeile:last-child {
+  border-bottom: 0;
+}
+
+.bord-icon {
+  color: var(--sl-mute);
+}
+
+.bord-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bord-text > span:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bord-menge {
+  min-width: 28px;
+  font-size: 16px;
+  font-weight: var(--sl-fw-semibold);
+  text-align: right;
+}
+
+.bord-knapp {
+  color: var(--sl-signal-ink);
+}
+
+/* ── §7 · Zeit ───────────────────────────────────────────────── */
+
+.zeit-zahlen {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.zeit-zahlen dt {
+  font-size: 10px;
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.zeit-zahlen dd {
+  font-family: var(--sl-font-mono);
+  font-size: 15px;
+  font-weight: var(--sl-fw-semibold);
+}
+
+.zeit-tage {
+  display: flex;
+  flex-direction: column;
+  border-top: var(--sl-hairline);
+}
+
+.zeit-tag {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-12);
+}
+
+.zeit-tag:last-child {
+  border-bottom: 0;
+}
+
+.zeit-tag-heute {
+  padding-left: 8px;
+  box-shadow: inset var(--sl-mark-width) 0 0 var(--sl-signal);
+}
+
+.zeit-tag-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--sl-ink-2);
+}
+
+.plus {
+  color: var(--sl-ok);
+}
+
+.minus {
+  color: var(--sl-danger-ink);
+}
+
+/* ◆ jh · eof */

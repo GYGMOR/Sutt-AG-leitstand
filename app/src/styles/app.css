@@ -1,0 +1,140 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  app/styles/app.css                                 │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Techniker-App: Reset, Handy-Typografie, Fokus, Berührung, Sicherheit  │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Reset ──────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+a {
+  color: inherit;
+}
+
+/* ── §2 · Dokument ───────────────────────────────────────────── */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* jh› Keine Mindestbreite wie im Leitstand: Die App läuft von 320 px bis zum Laptop. 14 px Grundschrift –
+       auf dem Handy eine Stufe grösser als im Leitstand, damit Zahlen im Fahrzeug lesbar bleiben. */
+body {
+  min-height: 100dvh;
+  background: var(--sl-paper);
+  color: var(--sl-ink);
+  font-family: var(--sl-font-sans);
+  font-size: var(--sl-fs-14);
+  line-height: var(--sl-lh-base);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--sl-font-mono);
+}
+
+/* ── §3 · Fokus & Auswahl ────────────────────────────────────── */
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sl-signal);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--sl-signal-wash);
+  color: var(--sl-ink);
+}
+
+/* ── §4 · Berührung ──────────────────────────────────────────── */
+
+button,
+a,
+[role='button'],
+label {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* jh› iOS zoomt in jedes Feld unter 16 px – auf dem Handy bekommen alle Felder 16 px, auch die geteilten. */
+@media (max-width: 720px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ── §5 · Scrollleisten ──────────────────────────────────────── */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sl-line-strong) transparent;
+}
+
+/* ◆ jh · eof */

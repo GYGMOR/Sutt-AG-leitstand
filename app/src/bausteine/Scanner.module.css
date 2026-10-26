@@ -1,0 +1,111 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  app/bausteine/Scanner.module.css                   │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Scanner: Kamerabild, Ecken, laufende Linie, Hinweis                   │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Rahmen ─────────────────────────────────────────────── */
+
+.rahmen {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  max-height: 360px;
+  border-radius: var(--sl-radius-2, 6px);
+  background: #1a1a1a;
+  overflow: hidden;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+}
+
+.laeuft .video {
+  opacity: 1;
+}
+
+.hinweis {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: var(--sl-radius-1);
+  background: rgb(0 0 0 / 0.55);
+  color: #f4f2ee;
+  font-size: var(--sl-fs-13);
+  text-align: left;
+}
+
+/* ── §2 · Ecken & Linie ──────────────────────────────────────── */
+
+.ecke {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--sl-signal);
+}
+
+.ecke-ol {
+  top: 14%;
+  left: 12%;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.ecke-or {
+  top: 14%;
+  right: 12%;
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.ecke-ul {
+  bottom: 14%;
+  left: 12%;
+  border-right: 0;
+  border-top: 0;
+}
+
+.ecke-ur {
+  bottom: 14%;
+  right: 12%;
+  border-left: 0;
+  border-top: 0;
+}
+
+.linie {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  height: 2px;
+  background: var(--sl-signal);
+  box-shadow: 0 0 8px var(--sl-signal);
+  animation: lauf 2.2s ease-in-out infinite;
+}
+
+@keyframes lauf {
+  0%,
+  100% {
+    top: 18%;
+  }
+
+  50% {
+    top: 80%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .linie {
+    animation: none;
+    top: 50%;
+  }
+}
+
+/* ◆ jh · eof */
