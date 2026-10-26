@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/domain/stammdaten.ts                          │
-   │  ◆ JH · 2026.10 · rev 04                                               │
-   │  Stammdaten: Kunde, Liegenschaft, Gerät, Techniker, Absenz, Region     │
+   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  Stammdaten: Kunde, Liegenschaft, Gerät, Techniker, Region             │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import type { IsoDatum, Minuten } from '../datum';
@@ -218,28 +218,9 @@ export function fullName(techniker: Techniker): string {
   return `${techniker.vorname} ${techniker.nachname}`;
 }
 
-export type AbsenzArt = 'ferien' | 'krank' | 'schulung' | 'militaer' | 'fahrzeugservice';
-
-export const ABSENZ_LABEL: Readonly<Record<AbsenzArt, string>> = {
-  ferien: 'Ferien',
-  krank: 'Krank',
-  schulung: 'Schulung',
-  militaer: 'Militär',
-  fahrzeugservice: 'Fahrzeugservice',
-};
-
-/** Ganztägige Abwesenheit – blockiert die Zeile im Plan, erscheint im Kalender als Ganztag. */
-export interface Absenz {
-  id: string;
-  technikerId: string;
-  von: IsoDatum;
-  bis: IsoDatum;
-  art: AbsenzArt;
-  notiz?: string;
-}
-
-export function isAbwesend(absenzen: readonly Absenz[], technikerId: string, datum: IsoDatum): Absenz | undefined {
-  return absenzen.find((absenz) => absenz.technikerId === technikerId && absenz.von <= datum && absenz.bis >= datum);
-}
+// jh› Absenzen leben seit rev 05 in core/domain/absenz.ts (Antrag, Entscheid, Ferienkonto, Gesundheitsschutz);
+//     die Dispo liest sie weiterhin von hier – derselbe Typ, dieselbe Sperre im Plan.
+export type { Absenz, AbsenzArt, AbsenzStatus } from './absenz';
+export { ABSENZ_LABEL, isAbwesend } from './absenz';
 
 /* ◆ jh · eof */

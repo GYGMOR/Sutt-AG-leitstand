@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/format.ts                                     │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.10 · rev 05                                               │
    │  Anzeigeformate CH: 17.10.2026 · 08:30 · CHF 1’240.50 · Oktober 2026   │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -75,6 +75,13 @@ export function formatZeitpunktKurz(zeitpunkt: IsoZeitpunkt): string {
 export function formatDauer(minuten: Minuten): string {
   if (minuten < 60) return `${minuten} min`;
   return `${Math.floor(minuten / 60)}:${pad2(minuten % 60)} h`;
+}
+
+/** Saldo mit Vorzeichen: 80 → «+1:20 h», -45 → «−0:45 h», 0 → «±0:00 h». */
+export function formatSaldo(minuten: Minuten): string {
+  const betrag = Math.abs(minuten);
+  const vorzeichen = minuten > 0 ? '+' : minuten < 0 ? '−' : '±';
+  return `${vorzeichen}${Math.floor(betrag / 60)}:${pad2(betrag % 60)} h`;
 }
 
 /** «seit 34 Tagen», «seit gestern», «seit heute» */
