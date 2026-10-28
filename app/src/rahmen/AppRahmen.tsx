@@ -13,6 +13,7 @@ import { fullName } from '@sl/core/domain/stammdaten';
 import { formatDatumKurz, formatWochentag } from '@sl/core/format';
 import { useMediaQuery } from '@sl/core/hooks/useMediaQuery';
 import { useTheme } from '@sl/core/theme';
+import { LEITSTAND_URL } from '@sl/core/urls';
 import { Avatar } from '@sl/core/ui/Avatar';
 import { cx } from '@sl/core/ui/cx';
 import { useApp } from './AppKontext';
@@ -124,7 +125,7 @@ export function AppRahmen({ children }: { children: ReactNode }) {
                 </button>
               </li>
               <li>
-                <a className={styles.blattEintrag} href="/" target="_blank" rel="noreferrer">
+                <a className={styles.blattEintrag} href={LEITSTAND_URL} target="_blank" rel="noreferrer">
                   <Monitor size={22} strokeWidth={1.5} aria-hidden />
                   <span>Leitstand öffnen</span>
                 </a>

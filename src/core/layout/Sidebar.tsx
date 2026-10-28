@@ -71,15 +71,29 @@ function Eintrag({ modul, eingeklappt, onGesperrt, onHover }: EintragProps) {
     );
   }
 
-  // jh› Externe Module (Techniker-App, ADR-008) sind eine eigene Auslieferung: Vollseiten-Link in neuem Tab.
+  // jh› Externe Module (Techniker-App, ADR-008) sind eine eigene Auslieferung: gewöhnlicher Link in neuem
+  //     Tab – ein NavLink würde dem Pfad den Router-Basisnamen voranstellen (GitHub Pages: /<repo>/).
+  if (modul.extern) {
+    return (
+      <a
+        href={modul.pfad}
+        target="_blank"
+        rel="noopener"
+        className={styles.eintrag}
+        title={eingeklappt ? undefined : `${modul.beschreibung} · öffnet in neuem Tab`}
+        onPointerEnter={(event) => onHover(modul.gruppe, event.currentTarget)}
+        onPointerLeave={() => onHover(null, null)}
+      >
+        {inhalt}
+      </a>
+    );
+  }
+
   return (
     <NavLink
       to={modul.pfad}
-      reloadDocument={modul.extern}
-      target={modul.extern ? '_blank' : undefined}
-      rel={modul.extern ? 'noopener' : undefined}
       className={({ isActive }) => cx(styles.eintrag, isActive && styles.aktiv)}
-      title={eingeklappt ? undefined : modul.extern ? `${modul.beschreibung} · öffnet in neuem Tab` : modul.beschreibung}
+      title={eingeklappt ? undefined : modul.beschreibung}
       onPointerEnter={(event) => onHover(modul.gruppe, event.currentTarget)}
       onPointerLeave={() => onHover(null, null)}
     >
@@ -125,18 +139,18 @@ function Flyout({ gruppe, anker, onClose, onEnter, onGesperrt }: FlyoutProps) {
               </button>
             );
           }
+          if (modul.extern) {
+            return (
+              <a key={modul.id} href={modul.pfad} target="_blank" rel="noopener" className={styles.flyoutEintrag} onClick={onClose}>
+                <Icon size={16} strokeWidth={1.5} aria-hidden />
+                <ExternalLink size={12} strokeWidth={1.5} aria-hidden className={styles.schloss} />
+                <span>{modul.label}</span>
+              </a>
+            );
+          }
           return (
-            <NavLink
-              key={modul.id}
-              to={modul.pfad}
-              reloadDocument={modul.extern}
-              target={modul.extern ? '_blank' : undefined}
-              rel={modul.extern ? 'noopener' : undefined}
-              className={({ isActive }) => cx(styles.flyoutEintrag, isActive && styles.aktiv)}
-              onClick={onClose}
-            >
+            <NavLink key={modul.id} to={modul.pfad} className={({ isActive }) => cx(styles.flyoutEintrag, isActive && styles.aktiv)} onClick={onClose}>
               <Icon size={16} strokeWidth={1.5} aria-hidden />
-              {modul.extern && <ExternalLink size={12} strokeWidth={1.5} aria-hidden className={styles.schloss} />}
               <span>{modul.label}</span>
             </NavLink>
           );

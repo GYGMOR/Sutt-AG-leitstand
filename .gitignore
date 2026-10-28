@@ -1,6 +1,7 @@
 # ◆ JH · SUTT·LEITSTAND
 node_modules/
 dist/
+site/
 *.local
 # Demo-Aufnahmen (Playwright) – gross, nicht versionieren
 docs/demo/*.webm

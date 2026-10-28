@@ -6,6 +6,7 @@
 
 import { Navigate, RouterProvider, createBrowserRouter } from 'react-router';
 import { ArbeitstagProvider } from '@sl/core/arbeitstag';
+import { APP_URL, routerBasename } from '@sl/core/urls';
 import { MOCK_HEUTE } from '@sl/mock';
 import { Geschuetzt } from './rahmen/Geschuetzt';
 import { AbsenzenSeite } from './seiten/AbsenzenSeite';
@@ -23,8 +24,8 @@ import { ZeitSeite } from './seiten/ZeitSeite';
 
 // ── §1 · Routen ──────────────────────────────────────────────────
 
-// jh› Alles unter /app/ (basename): So laufen Links aus dem Leitstand («In der App erfassen»,
-//     ?als=T-MB) unverändert, ob die App durchgereicht oder separat gehostet wird.
+// jh› Alles unter der App-Basis (basename «/app» oder «/<repo>/app»): So laufen Links aus dem Leitstand
+//     («In der App erfassen», ?als=T-MB) unverändert, ob die App durchgereicht oder separat gehostet wird.
 const router = createBrowserRouter(
   [
     { path: '/anmelden', element: <AnmeldenSeite /> },
@@ -46,7 +47,7 @@ const router = createBrowserRouter(
       ],
     },
   ],
-  { basename: '/app' },
+  { basename: routerBasename(APP_URL) },
 );
 
 // ── §2 · App ─────────────────────────────────────────────────────

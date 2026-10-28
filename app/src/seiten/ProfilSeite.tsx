@@ -14,6 +14,7 @@ import { FUNKTION_LABEL } from '@sl/core/domain/personal';
 import { fullName } from '@sl/core/domain/stammdaten';
 import { formatDatum } from '@sl/core/format';
 import { useTheme } from '@sl/core/theme';
+import { leitstandPfad } from '@sl/core/urls';
 import { Avatar } from '@sl/core/ui/Avatar';
 import { Button } from '@sl/core/ui/Button';
 import { CapsLabel } from '@sl/core/ui/CapsLabel';
@@ -139,11 +140,11 @@ export function ProfilSeite() {
             <CapsLabel as="h3">Daten & Datenschutz</CapsLabel>
             <p className={styles.quelle}>Was gespeichert ist, wer es ansieht und wie lange – unter «Meine Daten» im Leitstand (gleiche Anmeldung).</p>
             <div className={styles.aktionen}>
-              <Button variant="secondary" size="md" icon={ShieldCheck} onClick={() => window.open('/meine-daten', '_blank', 'noopener')}>
+              <Button variant="secondary" size="md" icon={ShieldCheck} onClick={() => window.open(leitstandPfad('meine-daten'), '_blank', 'noopener')}>
                 Meine Daten
               </Button>
               {innendienst && (
-                <Button variant="ghost" size="md" icon={Monitor} onClick={() => window.open('/dashboard', '_blank', 'noopener')}>
+                <Button variant="ghost" size="md" icon={Monitor} onClick={() => window.open(leitstandPfad('dashboard'), '_blank', 'noopener')}>
                   Leitstand
                 </Button>
               )}

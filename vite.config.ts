@@ -8,6 +8,7 @@ import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import react from '@vitejs/plugin-react';
 import { configDefaults, defineConfig } from 'vitest/config';
+import { appBasis, basisPfad } from './scripts/basis';
 
 // ── §1 · Build-Stempel ───────────────────────────────────────────
 
@@ -46,12 +47,19 @@ function scopedName(lokal: string, dateipfad: string): string {
 
 // ── §3 · Konfiguration ───────────────────────────────────────────
 
+// jh› SL_BASE=/<repo>/ baut für GitHub Pages (Leitstand unter /<repo>/, App unter /<repo>/app/); ohne
+//     SL_BASE bleibt alles wie gehostet unter «/» und «/app/».
+const basis = basisPfad();
+
 export default defineConfig({
+  base: basis,
   plugins: [react()],
   define: {
     __SL_BUILD_DATUM__: JSON.stringify(buildDatum()),
     __SL_COMMIT__: JSON.stringify(commitKuerzel()),
     __SL_VERSION__: JSON.stringify(paketVersion()),
+    __SL_LEITSTAND_URL__: JSON.stringify(basis),
+    __SL_APP_URL__: JSON.stringify(appBasis(basis)),
   },
   css: {
     modules: {

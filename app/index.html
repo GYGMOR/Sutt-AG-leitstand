@@ -16,10 +16,21 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-title" content="SUTT App" />
-    <link rel="icon" type="image/svg+xml" href="/app/favicon.svg" />
-    <link rel="apple-touch-icon" href="/app/icon.svg" />
-    <link rel="manifest" href="/app/manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <title>SUTT App</title>
+    <script>
+      // jh› GitHub Pages kennt keine SPA-Routen: 404.html leitet nach «?/pfad» um, hier kommt der Pfad zurück.
+      (function () {
+        var suche = location.search;
+        if (suche.indexOf('?/') !== 0) return;
+        var teile = suche.slice(2).split('&');
+        var pfad = teile.shift() || '';
+        var rest = teile.length > 0 ? '?' + teile.join('&') : '';
+        history.replaceState(null, '', location.pathname + pfad + rest + location.hash);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

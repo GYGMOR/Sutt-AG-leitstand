@@ -13,6 +13,7 @@ import { formatDatumKurz, formatDauer, formatSaldo, formatWochentag, formatZeit 
 import { Button } from '@sl/core/ui/Button';
 import { Chip } from '@sl/core/ui/Chip';
 import { cx } from '@sl/core/ui/cx';
+import { leitstandPfad } from '@sl/core/urls';
 import { berechneMonat, berechneTageFuer } from '@sl/modules/personal/personal.model';
 import { StempeluhrGross } from '@sl/modules/personal/Stempeluhr';
 import { TagChip } from '@sl/modules/zeiterfassung/WochenUebersicht';
@@ -123,7 +124,7 @@ export function ZeitSeite() {
                 {konto.abschluss?.status === 'zurueckgewiesen' ? 'Erneut einreichen' : 'Monat einreichen'}
               </Button>
             )}
-            <Button variant="ghost" size="sm" icon={Monitor} onClick={() => window.open(`/zeiterfassung/${mitarbeiter.id}`, '_blank', 'noopener')}>
+            <Button variant="ghost" size="sm" icon={Monitor} onClick={() => window.open(leitstandPfad(`zeiterfassung/${mitarbeiter.id}`), '_blank', 'noopener')}>
               Zeitkonto im Leitstand
             </Button>
           </div>

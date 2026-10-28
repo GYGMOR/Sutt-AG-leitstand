@@ -28,6 +28,7 @@ import { Chip } from '../../core/ui/Chip';
 import { Eingabe } from '../../core/ui/Form';
 import { Typenschild } from '../../core/ui/Typenschild';
 import { cx } from '../../core/ui/cx';
+import { appPfad } from '../../core/urls';
 import { MOCK_HEUTE, mockBestand, mockStammdaten } from '../../mock';
 import { buildFehlendeRapporte, buildRapportViews, zaehleRapporte } from '../dispo/store/dispo.selectors';
 import type { ErledigtView, RapportView } from '../dispo/store/dispo.selectors';
@@ -335,7 +336,7 @@ export function RapportePage() {
           </div>
           <ul className={styles.liste}>
             {sichtbarFehlend.map((view) => (
-              <FehlendZeile key={view.einsatz.id} view={view} heute={heute} onPlan={() => imPlanZeigen(view.einsatz.id, view.einsatz.datum)} onApp={() => oeffneApp(`/app/rapport/${view.einsatz.id}?als=${view.einsatz.technikerId}`)} />
+              <FehlendZeile key={view.einsatz.id} view={view} heute={heute} onPlan={() => imPlanZeigen(view.einsatz.id, view.einsatz.datum)} onApp={() => oeffneApp(appPfad(`rapport/${view.einsatz.id}?als=${view.einsatz.technikerId}`))} />
             ))}
             {sichtbar.map((view) => (
               <RapportZeile key={view.rapport.id} view={view} aktiv={view.rapport.id === rapportId} onClick={() => oeffnen(view.rapport.id)} />

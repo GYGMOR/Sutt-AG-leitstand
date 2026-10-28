@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { Rolle } from './auth/auth.types';
+import { APP_URL } from './urls';
 
 // ── §1 · Typen ───────────────────────────────────────────────────
 
@@ -116,7 +117,7 @@ export const MODULE: readonly Modul[] = [
     beschreibung: 'Einsätze des Tages als nummerierte Pins, Touren pro Techniker in dessen Farbe.',
   },
   {
-    id: 'app', label: 'Techniker-App', icon: Smartphone, gruppe: 'disposition', pfad: '/app/', extern: true,
+    id: 'app', label: 'Techniker-App', icon: Smartphone, gruppe: 'disposition', pfad: APP_URL, extern: true,
     freigeschaltet: true, rollen: ALLE,
     beschreibung: 'Eigene App für Handy, Tablet und Laptop: Tagesplan, Tour, Stempeluhr, Kamera, Scanner, Fahrzeuglager, Servicerapport – dieselben Daten wie die Plantafel.',
   },

@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { appBasis, basisPfad } from '../scripts/basis';
 
 // ── §1 · Build-Stempel ───────────────────────────────────────────
 
@@ -49,9 +50,11 @@ function scopedName(lokal: string, dateipfad: string): string {
 //     Store, Mock und geteilte Bausteine kommen über den Alias @sl aus ../src (ADR-008). Unter /app/ gebaut,
 //     damit der Leitstand sie im Dev-Modus durchreicht (gleicher Ursprung = geteilter Stand).
 const leitstandSrc = fileURLToPath(new URL('../src', import.meta.url));
+// jh› Dieselbe Basis wie der Leitstand (SL_BASE), die App immer eine Stufe darunter: «/app/» oder «/<repo>/app/».
+const basis = basisPfad();
 
 export default defineConfig({
-  base: '/app/',
+  base: appBasis(basis),
   plugins: [react()],
   resolve: {
     alias: { '@sl': leitstandSrc },
@@ -62,6 +65,8 @@ export default defineConfig({
     __SL_BUILD_DATUM__: JSON.stringify(buildDatum()),
     __SL_COMMIT__: JSON.stringify(commitKuerzel()),
     __SL_VERSION__: JSON.stringify(paketVersion()),
+    __SL_LEITSTAND_URL__: JSON.stringify(basis),
+    __SL_APP_URL__: JSON.stringify(appBasis(basis)),
   },
   css: {
     modules: {

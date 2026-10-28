@@ -18,6 +18,7 @@ import { formatDauer, formatSeit, formatZeitpunktKurz } from '../../../core/form
 import { Button } from '../../../core/ui/Button';
 import { Chip } from '../../../core/ui/Chip';
 import { Typenschild } from '../../../core/ui/Typenschild';
+import { appPfad } from '../../../core/urls';
 import { ABSCHLUSS_TON, RAPPORT_ICON, RAPPORT_TON } from '../../rapport/rapportStatus';
 import { UnterschriftBild } from '../../rapport/UnterschriftFeld';
 import { ZurueckDialog } from '../../rapport/ZurueckDialog';
@@ -58,7 +59,7 @@ export function AkteRapport({ rapport, einsatz, techniker, heute, onFreigeben, o
           <p className={styles.hinweis}>Entsteht in der Techniker-App, sobald {kuerzel} «Fertig» drückt. Anfahrt und Arbeitszeit kommen aus den Statusknöpfen.</p>
         )}
         <div className={styles.knoepfe}>
-          <Button variant="secondary" size="sm" icon={Smartphone} onClick={() => oeffneApp(fertig ? `/app/rapport/${einsatz.id}?als=${einsatz.technikerId}` : `/app/?als=${einsatz.technikerId}`)}>
+          <Button variant="secondary" size="sm" icon={Smartphone} onClick={() => oeffneApp(appPfad(fertig ? `rapport/${einsatz.id}?als=${einsatz.technikerId}` : `?als=${einsatz.technikerId}`))}>
             {fertig ? 'In der App erfassen' : 'Techniker-App öffnen'}
           </Button>
         </div>

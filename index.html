@@ -13,6 +13,17 @@
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>SUTT Leitstand</title>
+    <script>
+      // jh› GitHub Pages kennt keine SPA-Routen: 404.html leitet nach «?/pfad» um, hier kommt der Pfad zurück.
+      (function () {
+        var suche = location.search;
+        if (suche.indexOf('?/') !== 0) return;
+        var teile = suche.slice(2).split('&');
+        var pfad = teile.shift() || '';
+        var rest = teile.length > 0 ? '?' + teile.join('&') : '';
+        history.replaceState(null, '', location.pathname + pfad + rest + location.hash);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

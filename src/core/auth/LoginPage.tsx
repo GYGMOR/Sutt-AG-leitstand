@@ -10,6 +10,7 @@ import { Eye, EyeOff, LogIn } from 'lucide-react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import type { NavigateFunction } from 'react-router';
 import { useMandant } from '../mandant/mandantStore';
+import { APP_URL } from '../urls';
 import { Button, IconButton } from '../ui/Button';
 import { Auswahl, Eingabe, Feld, Schalter } from '../ui/Form';
 import { Kbd } from '../ui/Kbd';
@@ -28,7 +29,7 @@ import styles from './LoginPage.module.css';
 
 const STANDARD_ZIEL = '/dispo/plantafel';
 const DASHBOARD_ZIEL = '/dashboard';
-const APP_ZIEL = '/app/';
+const APP_ZIEL = APP_URL;
 
 // jh› Aussendienst landet in der Techniker-App, die Disposition in der Plantafel, Büro und
 //     Administration im Tagesüberblick – ausser jemand kam von einer bestimmten Seite.

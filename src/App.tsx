@@ -14,6 +14,7 @@ import { RequireAuth } from './core/auth/RequireAuth';
 import { FolgtPage } from './core/layout/FolgtPage';
 import { ModulRoute } from './core/layout/ModulRoute';
 import type { ModulId } from './core/modules.config';
+import { LEITSTAND_URL, routerBasename } from './core/urls';
 import { MOCK_HEUTE } from './mock';
 import { DispoPage } from './modules/dispo/DispoPage';
 
@@ -69,7 +70,7 @@ const router = createBrowserRouter([
       { path: '*', element: <FolgtPage /> },
     ],
   },
-]);
+], { basename: routerBasename(LEITSTAND_URL) });
 
 // ── §2 · App ─────────────────────────────────────────────────────
 
