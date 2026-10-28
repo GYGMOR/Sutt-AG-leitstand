@@ -10,6 +10,7 @@
     "dev": "vite",
     "dev:app": "npm run dev --workspace app",
     "dev:web": "npm run dev --workspace webseite",
+    "dev:alle": "node scripts/dev-alle.mjs",
     "build": "tsc --noEmit && vite build",
     "build:app": "npm run build --workspace app",
     "build:web": "npm run build --workspace webseite",

@@ -13,6 +13,7 @@ wird exakt nach diesen Regeln aufgebaut. Änderungen je Revision stehen in `CHAN
 
 ```bash
 npm install
+npm run dev:alle     # Leitstand · Techniker-App · Website in einem Terminal – Startanleitung für neue Rechner: docs/start.md
 npm run dev          # http://localhost:5173 → /login (Demo-Zugänge stehen unter dem Formular)
 npm run dev:app      # Techniker-App: http://localhost:5174/app/ – und über den Leitstand http://localhost:5173/app/
 npm run dev:web      # Website-Gerüst: http://localhost:5175

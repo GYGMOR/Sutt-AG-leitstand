@@ -35,6 +35,7 @@ Format: ein Abschnitt pro Revision, Bereiche wie im Commit-Stil (`dispo(kalender
 - Dev-Server ist im Netz erreichbar (`server.host: true`): Handy-Test über `http://<Laptop-IP>:5173` im selben WLAN; die Firewall-Regel für `node.exe` besteht bereits.
 - In-SPA-Techniker-App (`src/modules/app/*` ausser `app.model`) entfernt – Route `/app/*`, Telefonrahmen und `?rahmen=` gibt es nicht mehr; `html[data-flaeche='app']` aus `global.css` gestrichen. Modulregister kennt `extern?: boolean`.
 - Root-vitest schliesst `app/**` und `webseite/**` aus (eigene Läufe). `npm install` legt unter Windows ohne Symlink-Recht die Workspace-Links nicht an (EISDIR) – Skripte laufen über die Root-`node_modules`.
+- `npm run dev:alle` startet Leitstand, App und Website in einem Terminal (`scripts/dev-alle.mjs`, Ctrl+C beendet alle drei); Startanleitung für neue Notebooks (Mac/Windows, Demo-Zugänge, Fünf-Minuten-Rundgang, Handy) in `docs/start.md`.
 
 ### Offen
 - `jh# 013` Offline-Warteschlange (jetzt `app/rahmen/AppRahmen.tsx`) · `jh# 018` tzdata-Version Server/Client · `jh# 019` Stempel offline puffern · `jh# 020` echter OIDC-Ablauf · `jh# 021` serverseitiger Löschlauf · Fragen 25–31 in README §9.
