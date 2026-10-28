@@ -1,5 +1,9 @@
 # SUTT Leitstand · Start auf einem neuen Notebook (Mac oder Windows)
 
+> **Ganz ohne Installation:** Läuft die Demo auf GitHub Pages (README §1), genügt der Link – `https://<konto>.github.io/<repo>/`
+> für den Leitstand, `…/<repo>/app/` für die Techniker-App. Anmelden wie in Abschnitt 4. Der Rest dieser Anleitung ist für den
+> Start auf dem eigenen Rechner.
+
 Alles läuft lokal mit Testdaten – **kein Server, keine Datenbank, kein Konto nötig.** Es braucht genau zwei Dinge:
 
 | Was | Woher | Hinweis |

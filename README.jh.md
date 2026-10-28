@@ -48,6 +48,14 @@ sehen `/zeiterfassung?ansicht=woche|monat|jahr|tag`. `admin` meldet sich auch «
 Andrea Dietrich · SG-Admin); Einstellungen → Anmeldung zeigt die Tenant-Konfiguration. Zeitzone des Betriebs: Europe/Zurich mit
 Zeitumstellung im Programm (Einstellungen → Betrieb). «Meine Daten» im Benutzermenü zeigt jeder Person, was gespeichert ist.
 
+**Demo ohne Installation – GitHub Pages:** `.github/workflows/pages.yml` baut bei jedem Push auf `main`/`master` Leitstand und
+App mit `SL_BASE=/<repo>/` und veröffentlicht `site/`: Leitstand unter `https://<konto>.github.io/<repo>/`, App unter
+`…/<repo>/app/` – gleiche Origin, also auch dort ein Stand für zwei Fenster. Dafür ist kein Link mehr hart codiert: `core/urls.ts`
+(`LEITSTAND_URL`, `APP_URL`, `appPfad`, `leitstandPfad`) kommt aus `SL_BASE` (`scripts/basis.ts`), react-router läuft mit `basename`,
+`404.html` leitet Tiefen-Links als `?/pfad` an den richtigen Einstieg. Lokal nachstellen: `$env:SL_BASE='/<repo>/'; npm run pages:build;
+npm run pages:serve` (Mac/Linux `SL_BASE=/<repo>/ npm run …`) → `http://localhost:4175/<repo>/`. Eigene Domain: Repository-Variable
+`SL_BASE=/`. Einrichtung in GitHub: Settings → Pages → Source «GitHub Actions», dann pushen.
+
 **Techniker-App (rev 05):** eigenes Projekt `app/` – responsiv von A bis Z: unter 900 px Kopf oben und Tabs unten
 (Heute · Tour · Zeit · Kamera · Mehr), ab 900 px Rand links und zweispaltige Seiten (Tablet quer, Laptop). Alles, was der
 Aussendienst draussen braucht: Tagesplan mit Ein-Daumen-Status, Tour mit Karte, Stempeluhr, Kamera (Fotos zum Einsatz,
@@ -100,6 +108,7 @@ src/
 │  ├─ geo.ts                    Koordinaten, Distanz, Fahrzeit (Mock), Mercator, Google-Links
 │  ├─ suche.ts · kommando.ts    Suchindex, Registry für Palette (Befehle + Suchquellen)
 │  ├─ modules.config.ts         einzige Quelle für Leiste, Palette, Routing, Rollen, Freischaltung
+│  ├─ urls.ts                   Adressen von Leitstand und App aus dem Build (SL_BASE) – Links zwischen beiden
 │  ├─ aenderungen.ts            Zähler ungespeicherter Änderungen (Abmelden-Rückfrage)
 │  ├─ zeitzone.ts               Zonenzeit, Wandzeit → Zeitpunkt, Dauer über die Umstellung, Umstellungstage (ICU)
 │  ├─ datei.ts                  Download (CSV, JSON)
@@ -165,8 +174,9 @@ app/                            Techniker-App – eigenes Vite-Projekt, base /ap
 ├─ src/bausteine/               EinsatzKarte · Scanner (BarcodeDetector, Kamera) · Seiten.module.css
 └─ src/model/                   tour.model (Stopps, Strecke, Maps-Link) · scan.model (Code → Artikel/Auftrag/Rapport/Gerät/Link)
 webseite/                       Website-Gerüst (Vite, Port 5175, Tokens aus src/styles) – Neuaufbau folgt
-scripts/jh-sign.mjs · scripts/contrast.jh.ts · scripts/demo.jh.mjs
-docs/adr (001–008) · docs/design · docs/datenschutz · docs/tests · docs/prompts · .claude/skills (sutt-modul, sutt-pruefung)
+scripts/jh-sign.mjs · contrast.jh.ts · demo.jh.mjs · dev-alle.mjs · basis.ts/.mjs (SL_BASE) · pages-site.mjs · pages-serve.mjs
+.github/workflows/pages.yml     GitHub Pages: Leitstand + App als eine Site
+docs/adr (001–008) · docs/design · docs/datenschutz · docs/tests · docs/prompts · docs/start.md · .claude/skills (sutt-modul, sutt-pruefung)
 TODO.jh.md · CHANGELOG.jh.md
 ```
 
