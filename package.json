@@ -16,7 +16,7 @@
     "build:web": "npm run build --workspace webseite",
     "build:alle": "npm run build && npm run build:app && npm run build:web",
     "preview": "vite preview",
-    "pages:build": "npm run build && npm run build:app && node scripts/pages-site.mjs",
+    "pages:build": "npm run build && npm run build:app && npm run build:web && node scripts/pages-site.mjs",
     "pages:site": "node scripts/pages-site.mjs",
     "pages:serve": "node scripts/pages-serve.mjs",
     "typecheck": "tsc --noEmit",

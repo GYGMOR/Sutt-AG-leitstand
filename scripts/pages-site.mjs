@@ -1,7 +1,7 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  scripts/pages-site.mjs                             │
    │  ◆ JH · 2026.10 · rev 05                                               │
-   │  GitHub Pages: dist + app/dist → site/, 404.html mit SPA-Umleitung     │
+   │  GitHub Pages: Leitstand, App und Website → site/, 404 mit Umleitung   │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 // Aufruf:  SL_BASE=/<repo>/ npm run pages:build   → baut Leitstand und App und legt site/ an
@@ -31,6 +31,7 @@ function pruefeBuild(ordner, erwartet) {
 
 pruefeBuild('dist', basis);
 pruefeBuild(join('app', 'dist'), `${basis}app/`);
+pruefeBuild(join('webseite', 'dist'), `${basis}webseite/`);
 
 // ── §2 · 404.html ────────────────────────────────────────────────
 
@@ -50,6 +51,7 @@ function vierNullVier(basisPfadSite) {
         if (pfad.indexOf(basis) !== 0) { location.replace(basis); return; }
         var rest = pfad.slice(basis.length);
         var ziel = basis;
+        if (rest === 'webseite' || rest.indexOf('webseite/') === 0) { location.replace(basis + 'webseite/'); return; }
         if (rest === 'app' || rest.indexOf('app/') === 0) { ziel = basis + 'app/'; rest = rest.slice(4); }
         var suche = location.search ? '&' + location.search.slice(1) : '';
         location.replace(ziel + '?/' + rest + suche + location.hash);
@@ -67,8 +69,9 @@ rmSync(ZIEL, { recursive: true, force: true });
 mkdirSync(ZIEL, { recursive: true });
 cpSync('dist', ZIEL, { recursive: true });
 cpSync(join('app', 'dist'), join(ZIEL, 'app'), { recursive: true });
+cpSync(join('webseite', 'dist'), join(ZIEL, 'webseite'), { recursive: true });
 writeFileSync(join(ZIEL, '404.html'), vierNullVier(basis));
 writeFileSync(join(ZIEL, '.nojekyll'), '');
-console.log(`◆ pages-site · ${ZIEL}/ für Basis ${basis} (Leitstand) und ${basis}app/ (App)`);
+console.log(`◆ pages-site · ${ZIEL}/ für Basis ${basis} (Leitstand), ${basis}app/ (App) und ${basis}webseite/ (Website)`);
 
 /* ◆ jh · eof */

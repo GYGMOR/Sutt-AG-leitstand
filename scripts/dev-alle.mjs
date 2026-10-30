@@ -1,11 +1,13 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  scripts/dev-alle.mjs                               │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Ein Terminal, drei Dev-Server: Leitstand, Techniker-App, Website      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 // Aufruf:  npm run dev:alle   → Leitstand (5173), Techniker-App (5174) und Website (5175)
 //          Beenden mit Ctrl+C – alle drei Server gehen mit.
+// jh› Website über den Leitstand (5173/webseite/) öffnen: nur so teilen Website und Leitstand den
+//     Browser-Speicher, und die Anfrage aus dem Formular erscheint im Eingang.
 
 import { spawn } from 'node:child_process';
 
@@ -15,7 +17,7 @@ const RESET = '\x1b[0m';
 const PROZESSE = [
   { name: 'leitstand', skript: 'dev', url: 'http://localhost:5173/', farbe: '\x1b[33m' },
   { name: 'app', skript: 'dev:app', url: 'http://localhost:5174/app/', farbe: '\x1b[36m' },
-  { name: 'website', skript: 'dev:web', url: 'http://localhost:5175/', farbe: '\x1b[35m' },
+  { name: 'website', skript: 'dev:web', url: 'http://localhost:5173/webseite/  (direkt: http://localhost:5175/webseite/)', farbe: '\x1b[35m' },
 ];
 const WINDOWS = process.platform === 'win32';
 

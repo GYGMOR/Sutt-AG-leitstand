@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  scripts/basis.mjs                                  │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Basis-Pfad des Builds aus SL_BASE – für die Pages-Skripte             │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -11,6 +11,14 @@
 export function basisPfad(roh = process.env.SL_BASE) {
   const kern = (roh ?? '').trim().replace(/^\/+|\/+$/g, '');
   return kern === '' ? '/' : `/${kern}/`;
+}
+
+export function appBasis(basis = basisPfad()) {
+  return `${basis}app/`;
+}
+
+export function webseiteBasis(basis = basisPfad()) {
+  return `${basis}webseite/`;
 }
 
 /* ◆ jh · eof */

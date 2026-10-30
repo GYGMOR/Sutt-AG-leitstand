@@ -27,7 +27,18 @@ const STIL = {
 
 // jh› Drei Projekte, eine Handschrift: Leitstand (src), Techniker-App (app/src), Website (webseite/src).
 const QUELLEN = ['src', 'scripts', 'app/src', 'webseite/src'];
-const EINZELDATEIEN = ['vite.config.ts', 'index.html', 'app/vite.config.ts', 'app/index.html', 'webseite/vite.config.ts', 'webseite/index.html'];
+const EINZELDATEIEN = [
+  'vite.config.ts',
+  'index.html',
+  'app/vite.config.ts',
+  'app/index.html',
+  'webseite/vite.config.ts',
+  'webseite/index.html',
+  'webseite/anfrage.html',
+  'webseite/karriere.html',
+  'webseite/impressum.html',
+  'webseite/datenschutz.html',
+];
 const ENDUNGEN = new Set(['.ts', '.tsx', '.css', '.mjs', '.html']);
 
 // jh› vite.config.ts verlangt den Default-Export – einzige Ausnahme (je Projekt).

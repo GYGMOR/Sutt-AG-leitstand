@@ -1,0 +1,192 @@
+<!doctype html>
+<!-- ┌────────────────────────────────────────────────────────────────────────┐
+     │  SUTT·LEITSTAND  ·  webseite/anfrage.html                              │
+     │  ◆ JH · 2026.11 · rev 06                                               │
+     │  Termin anfragen: Anliegen, Gerät, Adresse, Wunsch, Kontakt, Foto      │
+     └────────────────────────────────────────────────────────────────────────┘ -->
+<html lang="de-CH">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="◆ JH" />
+    <meta name="description" content="Termin bei der Sutt AG anfragen: Reparatur, Installation, Lieferung, Mietgerät oder Garantiefall – Gerät, Adresse, Terminwunsch und Kontakt in zwei Minuten." />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#1a1a1a" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Termin anfragen – Sutt AG</title>
+  </head>
+  <body>
+    <!-- @teil kopf -->
+
+    <main id="inhalt" class="seite">
+      <header class="seite-kopf">
+        <p class="vorzeile">Anfrage</p>
+        <h1>Termin anfragen</h1>
+        <p class="einleitung">Zwei Minuten, keine Anmeldung. Wir melden uns in der Regel am nächsten Arbeitstag mit einem Terminvorschlag – dringende Fälle bitte telefonisch: <a href="tel:+41448091200">044 809 12 00</a>.</p>
+      </header>
+
+      <div class="anfrage">
+        <form class="formular" id="anfrage-formular" novalidate>
+          <div class="fehlerliste" id="fehlerliste" role="alert" hidden>
+            <p><strong>Bitte prüfen:</strong></p>
+            <ul></ul>
+          </div>
+
+          <fieldset id="anliegen" class="feldgruppe">
+            <legend>1 · Worum geht es?</legend>
+            <div class="wahl">
+              <label><input type="radio" name="anliegen" value="reparatur" checked /> <span><strong>Reparatur</strong><small>Gerät defekt oder auffällig</small></span></label>
+              <label><input type="radio" name="anliegen" value="installation" /> <span><strong>Installation / Montage</strong><small>neues Gerät anschliessen</small></span></label>
+              <label><input type="radio" name="anliegen" value="lieferung" /> <span><strong>Lieferung</strong><small>Gerät liefern, Altgerät entsorgen</small></span></label>
+              <label><input type="radio" name="anliegen" value="mietgeraet" /> <span><strong>Mietgerät</strong><small>Überbrückung auf Zeit</small></span></label>
+              <label><input type="radio" name="anliegen" value="garantie" /> <span><strong>Garantiefall</strong><small>Gerät noch in Garantie</small></span></label>
+              <label><input type="radio" name="anliegen" value="offerte" /> <span><strong>Offerte / Beratung</strong><small>reparieren oder ersetzen?</small></span></label>
+            </div>
+            <label class="haken"><input type="checkbox" name="dringend" /> <span>Dringend – Wasser läuft aus, Kühlgerät ausgefallen oder Waschküche einer Liegenschaft steht still</span></label>
+            <p class="feld-fehler" data-fehler="anliegen" hidden></p>
+          </fieldset>
+
+          <fieldset class="feldgruppe">
+            <legend>2 · Gerät</legend>
+            <div class="felder zwei">
+              <div class="feld">
+                <label for="geraeteart">Geräteart</label>
+                <input id="geraeteart" name="geraeteart" list="geraetearten" autocomplete="off" placeholder="z. B. Waschmaschine" required />
+                <datalist id="geraetearten"></datalist>
+                <p class="feld-fehler" data-fehler="geraeteart" hidden></p>
+              </div>
+              <div class="feld">
+                <label for="marke">Marke <span class="optional">(wenn bekannt)</span></label>
+                <input id="marke" name="marke" list="marken" autocomplete="off" placeholder="z. B. V-ZUG" />
+                <datalist id="marken"></datalist>
+              </div>
+            </div>
+            <div class="feld">
+              <label for="fehlerbild">Was ist das Problem? Was soll gemacht werden?</label>
+              <textarea id="fehlerbild" name="fehlerbild" rows="4" required placeholder="z. B. Geschirrspüler pumpt nicht ab, Fehlercode F24, Wasser steht im Boden"></textarea>
+              <p class="feld-hilfe">Fehlercode, Geräusche, seit wann – alles hilft dem Techniker, das richtige Teil mitzubringen.</p>
+              <p class="feld-fehler" data-fehler="fehlerbild" hidden></p>
+            </div>
+            <div class="feld">
+              <label for="foto">Foto <span class="optional">(optional – Typenschild oder Schaden)</span></label>
+              <input id="foto" name="foto" type="file" accept="image/*" />
+              <p class="feld-hilfe">Im Mockup wird nur der Dateiname übermittelt, kein Bild.</p>
+            </div>
+          </fieldset>
+
+          <fieldset class="feldgruppe">
+            <legend>3 · Wo steht das Gerät?</legend>
+            <div class="felder drei">
+              <div class="feld breit">
+                <label for="strasse">Strasse und Nummer</label>
+                <input id="strasse" name="strasse" autocomplete="street-address" required />
+                <p class="feld-fehler" data-fehler="strasse" hidden></p>
+              </div>
+              <div class="feld">
+                <label for="plz">PLZ</label>
+                <input id="plz" name="plz" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="postal-code" required />
+                <p class="feld-fehler" data-fehler="plz" hidden></p>
+              </div>
+              <div class="feld">
+                <label for="ort">Ort</label>
+                <input id="ort" name="ort" autocomplete="address-level2" required />
+                <p class="feld-fehler" data-fehler="ort" hidden></p>
+              </div>
+              <div class="feld">
+                <label for="wohnung">Wohnung / Stockwerk <span class="optional">(optional)</span></label>
+                <input id="wohnung" name="wohnung" placeholder="z. B. 3. OG links, Whg 12" />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="feldgruppe">
+            <legend>4 · Wunschtermin <span class="optional">(optional)</span></legend>
+            <div class="felder zwei">
+              <div class="feld">
+                <label for="termin-datum">Frühester Tag</label>
+                <input id="termin-datum" name="terminDatum" type="date" />
+                <p class="feld-fehler" data-fehler="terminwunsch" hidden></p>
+              </div>
+              <div class="feld" role="radiogroup" aria-labelledby="zeitfenster-label">
+                <span class="label" id="zeitfenster-label">Zeitfenster</span>
+                <div class="pillen">
+                  <label><input type="radio" name="zeitfenster" value="vormittag" /> <span>Vormittag</span></label>
+                  <label><input type="radio" name="zeitfenster" value="nachmittag" /> <span>Nachmittag</span></label>
+                  <label><input type="radio" name="zeitfenster" value="egal" checked /> <span>ganzer Tag</span></label>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="feldgruppe">
+            <legend>5 · Wie erreichen wir Sie?</legend>
+            <div class="felder zwei">
+              <div class="feld">
+                <label for="name">Vor- und Nachname</label>
+                <input id="name" name="name" autocomplete="name" required />
+                <p class="feld-fehler" data-fehler="name" hidden></p>
+              </div>
+              <div class="feld">
+                <label for="rolle">Ich bin</label>
+                <select id="rolle" name="rolle"></select>
+              </div>
+              <div class="feld">
+                <label for="telefon">Telefon</label>
+                <input id="telefon" name="telefon" type="tel" autocomplete="tel" placeholder="079 …" />
+                <p class="feld-fehler" data-fehler="kontakt" hidden></p>
+              </div>
+              <div class="feld">
+                <label for="email">E-Mail</label>
+                <input id="email" name="email" type="email" autocomplete="email" />
+                <p class="feld-hilfe">Telefon oder E-Mail – eines von beiden genügt.</p>
+                <p class="feld-fehler" data-fehler="email" hidden></p>
+              </div>
+              <div class="feld">
+                <label for="kundennummer">Kundennummer <span class="optional">(optional, steht auf der Rechnung)</span></label>
+                <input id="kundennummer" name="kundennummer" autocomplete="off" placeholder="K-…" />
+              </div>
+            </div>
+            <div class="falle" aria-hidden="true">
+              <label for="firma-web">Firma-Website</label>
+              <input id="firma-web" name="firmaWeb" tabindex="-1" autocomplete="off" />
+            </div>
+          </fieldset>
+
+          <div class="abschluss">
+            <label class="haken"><input type="checkbox" name="datenschutz" required /> <span>Ich bin einverstanden, dass die Sutt AG meine Angaben zur Terminvereinbarung und Auftragsabwicklung bearbeitet – <a href="./datenschutz.html">Datenschutzerklärung</a>.</span></label>
+            <p class="feld-fehler" data-fehler="datenschutz" hidden></p>
+            <button class="knopf knopf-gross" type="submit">Anfrage senden</button>
+            <noscript><p class="feld-hilfe">Dieses Formular braucht JavaScript. Ohne geht es telefonisch: 044 809 12 00.</p></noscript>
+          </div>
+        </form>
+
+        <section class="erfolg" id="erfolg" hidden aria-live="polite">
+          <p class="vorzeile">Anfrage eingegangen</p>
+          <h2>Danke, <span data-erfolg="name"></span>.</h2>
+          <p class="erfolg-nummer">Ihre Anfrage <strong data-erfolg="nummer"></strong> ist bei uns.</p>
+          <p data-erfolg="text"></p>
+          <p class="feld-hilfe">Dringend? <a href="tel:+41448091200">044 809 12 00</a> – zu Bürozeiten direkt die Disposition.</p>
+          <div class="aktionen">
+            <a class="knopf" href="./">Zur Startseite</a>
+            <button class="knopf knopf-leise" type="button" id="nochmals">Weitere Anfrage</button>
+          </div>
+        </section>
+
+        <aside class="seitlich" aria-label="So geht es weiter">
+          <h2>So geht es weiter</h2>
+          <ol class="schritte klein">
+            <li><strong>Anfrage</strong> – landet direkt bei der Disposition in Glattbrugg.</li>
+            <li><strong>Rückmeldung</strong> – per Telefon oder E-Mail mit einem Terminfenster, in der Regel am nächsten Arbeitstag.</li>
+            <li><strong>Bestätigung</strong> – per SMS; der Techniker meldet sich, wenn er unterwegs ist.</li>
+          </ol>
+          <p class="feld-hilfe">Verwaltungen: Objekt- und Wohnungsangabe genügt, den Hauswart erkennen wir an der Telefonnummer.</p>
+        </aside>
+      </div>
+    </main>
+
+    <!-- @teil fuss -->
+    <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/anfrage.ts"></script>
+  </body>
+</html>
+<!-- ◆ jh · eof -->

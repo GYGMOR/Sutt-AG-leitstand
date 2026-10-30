@@ -79,6 +79,7 @@ export default defineConfig({
     //     ein durchgereichter WebSocket riss den Leitstand-Server mit, sobald der App-Server wegfiel.
     proxy: {
       '/app': { target: 'http://localhost:5174' },
+      '/webseite': { target: 'http://localhost:5175' },
     },
   },
   optimizeDeps: {
