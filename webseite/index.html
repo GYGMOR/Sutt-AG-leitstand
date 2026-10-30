@@ -2,169 +2,344 @@
 <!-- ┌────────────────────────────────────────────────────────────────────────┐
      │  SUTT·LEITSTAND  ·  webseite/index.html                                │
      │  ◆ JH · 2026.11 · rev 06                                               │
-     │  Startseite: Bühne, Leistungen, Marken, Ablauf, Über uns, Kontakt      │
+     │  Startseite: Hero mit Einbau-Szene, Leistungen, Ablauf, FAQ, Kontakt   │
      └────────────────────────────────────────────────────────────────────────┘ -->
 <html lang="de-CH">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="author" content="◆ JH" />
-    <meta name="description" content="Sutt AG, Glattbrugg – Service, Reparatur, Installation und Verkauf von Haushalt-Grossgeräten für Verwaltungen, Gewerbe und Private im Raum Zürich." />
+    <meta name="description" content="Sutt AG, Glattbrugg – Service, Reparatur, Installation und Verkauf von Haushalt-Grossgeräten für Verwaltungen, Gewerbe und Private im Raum Zürich. Termin online anfragen." />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#1a1a1a" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Sutt AG – Service und Reparatur von Haushalt-Grossgeräten, Glattbrugg</title>
   </head>
-  <body>
+  <body class="start">
     <!-- @teil kopf -->
 
     <main id="inhalt">
-      <section class="buehne" aria-labelledby="start-titel">
-        <p class="vorzeile">Haushalt-Grossgeräte · Glattbrugg · Raum Zürich</p>
-        <h1 id="start-titel">Service, Reparatur und Verkauf – mit Terminen, die halten.</h1>
-        <p class="einleitung">
-          Die Sutt AG wartet, repariert und ersetzt Waschmaschinen, Tumbler, Geschirrspüler, Kühlgeräte, Backöfen und Kochfelder –
-          für Liegenschaftsverwaltungen, Gewerbe und Privathaushalte im Glattal, im Unterland und in Zürich Nord.
-        </p>
-        <div class="aktionen">
-          <a class="knopf knopf-gross" href="./anfrage.html">Termin anfragen</a>
-          <a class="knopf knopf-gross knopf-leise" href="tel:+41448091200">044 809 12 00</a>
+      <section class="hero" aria-labelledby="start-titel">
+        <div class="hero-innen">
+          <div class="hero-text">
+            <p class="vorzeile">Haushalt-Grossgeräte · Glattbrugg · Raum Zürich</p>
+            <h1 id="start-titel">Läuft wieder. <span>Pünktlich.</span></h1>
+            <p class="einleitung">
+              Reparatur, Installation und Verkauf von Waschmaschinen, Geschirrspülern, Kühl- und Kochgeräten – mit einem Terminfenster,
+              das wir per SMS bestätigen, und einem Techniker, der sich meldet, bevor er klingelt.
+            </p>
+            <div class="aktionen">
+              <a class="knopf knopf-gross" href="./anfrage.html">Termin anfragen <svg class="icon" aria-hidden="true"><use href="#i-arrow" /></svg></a>
+              <a class="knopf knopf-gross knopf-dunkel" href="tel:+41448091200"><svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg> 044 809 12 00</a>
+            </div>
+            <ul class="hero-fakten" aria-label="Was Sie erwarten dürfen">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-calendar" /></svg> Terminfenster per SMS bestätigt</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-truck" /></svg> Ersatzteile im Fahrzeug</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-file" /></svg> Rapport mit Unterschrift auf dem Tablet</li>
+            </ul>
+          </div>
+
+          <figure class="hero-buehne">
+            <!-- jh› Platz fürs Einbau-Video der Sutt AG: webseite/public/video/einbau.mp4 (und .webm) ablegen, Dev-Server
+                 oder Build neu starten – main.ts hängt die Quellen an, sobald die Datei beim Bauen da ist. Bis dahin läuft
+                 die animierte Einbau-Szene; spielt das Video, blendet sie aus. -->
+            <video class="hero-video" autoplay muted loop playsinline preload="metadata" tabindex="-1" aria-hidden="true"></video>
+            <svg class="szene" viewBox="0 0 640 440" role="img" aria-labelledby="szene-titel">
+              <title id="szene-titel">Animierte Szene: Ein Backofen wird in eine helle Küchenzeile eingebaut, Display und Statusmeldung erscheinen.</title>
+              <defs>
+                <pattern id="raster" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M40 0H0V40" fill="none" stroke="rgb(255 255 255 / 0.05)" />
+                </pattern>
+              </defs>
+              <rect width="640" height="440" fill="#232323" />
+              <rect width="640" height="440" fill="url(#raster)" />
+              <!-- Oberschränke und Haube -->
+              <rect x="60" y="72" width="520" height="96" fill="#e6e1d8" />
+              <path d="M190 72v96M450 72v96" stroke="#cfc9bf" stroke-width="2" />
+              <rect x="60" y="166" width="520" height="2" fill="#bdb8b0" />
+              <rect x="250" y="142" width="140" height="26" fill="#d9d4cc" />
+              <ellipse class="lampe" cx="320" cy="192" rx="110" ry="24" fill="#f4f2ee" opacity="0.07" />
+              <circle cx="320" cy="168" r="3" fill="#f86c04" />
+              <!-- Rückwand und Arbeitsplatte -->
+              <rect x="60" y="168" width="520" height="48" fill="#efece6" />
+              <path d="M60 192h520" stroke="#e0dbd3" />
+              <rect x="40" y="216" width="560" height="14" fill="#f4f2ee" />
+              <rect x="40" y="230" width="560" height="3" fill="#bdb8b0" />
+              <!-- Unterschränke -->
+              <rect x="60" y="233" width="180" height="167" fill="#e6e1d8" />
+              <rect x="60" y="316" width="180" height="2" fill="#cfc9bf" />
+              <rect x="130" y="300" width="40" height="3" fill="#6b6b6b" />
+              <rect x="130" y="383" width="40" height="3" fill="#6b6b6b" />
+              <rect x="250" y="233" width="140" height="167" fill="#141414" />
+              <rect x="400" y="233" width="180" height="167" fill="#e6e1d8" />
+              <rect x="400" y="233" width="180" height="30" fill="#2b2b2b" />
+              <rect x="470" y="246" width="40" height="3" fill="#9c978f" />
+              <circle class="led" cx="422" cy="248" r="3" fill="#f86c04" />
+              <rect x="400" y="263" width="180" height="2" fill="#bdb8b0" />
+              <!-- Boden -->
+              <rect x="0" y="400" width="640" height="40" fill="#1c1c1c" />
+              <!-- Backofen, wird eingeschoben -->
+              <g class="ofen">
+                <rect x="254" y="237" width="132" height="159" fill="#2b2b2b" stroke="#4d4d4d" />
+                <circle cx="276" cy="254" r="5" fill="#111" stroke="#7a7a7a" />
+                <circle cx="364" cy="254" r="5" fill="#111" stroke="#7a7a7a" />
+                <rect x="298" y="246" width="44" height="16" fill="#0b0b0b" />
+                <text class="ofen-display" x="320" y="258" text-anchor="middle">10:42</text>
+                <rect x="262" y="270" width="116" height="4" fill="#9c978f" />
+                <rect x="262" y="282" width="116" height="100" fill="#0f0f0f" stroke="#555" />
+                <rect class="ofen-licht" x="266" y="286" width="108" height="92" fill="#f86c04" opacity="0.12" />
+              </g>
+              <!-- Mass -->
+              <g class="mass" stroke="#9c978f" fill="none">
+                <path d="M254 414v10M386 414v10M254 419h132" />
+                <text x="320" y="434" text-anchor="middle" stroke="none" fill="#9c978f">60 cm</text>
+              </g>
+              <!-- Statusmeldungen -->
+              <g class="chip chip-1" transform="translate(24 20)">
+                <rect width="262" height="36" rx="3" fill="#1a1a1a" stroke="#4a4a4a" />
+                <rect x="12" y="14" width="8" height="8" fill="#f86c04" transform="rotate(45 16 18)" />
+                <text x="30" y="23">Techniker unterwegs · Ankunft 08:20</text>
+              </g>
+              <g class="chip chip-2" transform="translate(24 370)">
+                <rect width="222" height="36" rx="3" fill="#1a1a1a" stroke="#4a4a4a" />
+                <path d="m12 18 4 4 8-8" fill="none" stroke="#4fa37e" stroke-width="2" />
+                <text x="30" y="23">Eingebaut · Rapport unterschrieben</text>
+              </g>
+            </svg>
+            <figcaption class="hero-caption">Einbau in der Waschküche oder in Ihrer Küche – wir bringen das Gerät, schliessen an und nehmen das alte mit.</figcaption>
+          </figure>
         </div>
-        <ul class="fakten" aria-label="Was Sie erwarten dürfen">
-          <li><strong>Terminfenster</strong> am Vormittag oder Nachmittag – bestätigt per SMS</li>
-          <li><strong>Unterwegs-Meldung</strong> vom Techniker, kurz bevor er kommt</li>
-          <li><strong>Ersatzteile</strong> der gängigen Marken im Fahrzeug – oft in einem Besuch erledigt</li>
-          <li><strong>Rapport</strong> mit Unterschrift auf dem Tablet, als PDF per E-Mail</li>
-        </ul>
+        <a class="hero-weiter" href="#vertrauen" aria-label="Weiter zu den Inhalten"><svg class="icon" aria-hidden="true"><use href="#i-down" /></svg></a>
       </section>
 
-      <section class="abschnitt" id="leistungen" aria-labelledby="leistungen-titel">
-        <h2 id="leistungen-titel">Leistungen</h2>
-        <div class="karten">
-          <article class="karte">
-            <h3>Reparatur</h3>
-            <p>Diagnose vor Ort, Ersatzteile aus dem Fahrzeuglager, Festpreis-Auskunft vor der Arbeit. Lohnt sich die Reparatur nicht, sagen wir es.</p>
-            <a href="./anfrage.html?anliegen=reparatur">Reparatur anfragen</a>
-          </article>
-          <article class="karte">
-            <h3>Installation und Montage</h3>
-            <p>Neue Geräte liefern, anschliessen, einstellen und einweisen – das Altgerät nehmen wir mit und entsorgen es fachgerecht.</p>
-            <a href="./anfrage.html?anliegen=installation">Montage anfragen</a>
-          </article>
-          <article class="karte">
-            <h3>Lieferung</h3>
-            <p>Lieferung in der ganzen Region mit Terminfenster, auf Wunsch mit Treppentransport und Entsorgung des alten Geräts.</p>
-            <a href="./anfrage.html?anliegen=lieferung">Lieferung anfragen</a>
-          </article>
-          <article class="karte">
-            <h3>Mietgeräte</h3>
-            <p>Waschmaschine oder Kühlschrank als Überbrückung, wenn eine Reparatur länger dauert oder ein Ersatzteil bestellt ist – Tagespreis, Lieferung und Abholung inklusive.</p>
-            <a href="./anfrage.html?anliegen=mietgeraet">Mietgerät anfragen</a>
-          </article>
-          <article class="karte">
-            <h3>Garantie</h3>
-            <p>Garantiefälle wickeln wir direkt mit dem Hersteller ab – Sie brauchen nur Kaufbeleg und Seriennummer, den Rest übernehmen wir.</p>
-            <a href="./anfrage.html?anliegen=garantie">Garantiefall melden</a>
-          </article>
-          <article class="karte karte-notfall">
-            <h3>Notfall</h3>
-            <p>Wasser auf dem Boden, Kühlraum ausgefallen, Waschküche steht still: Verwaltungen und Gewerbe erreichen uns zu Bürozeiten sofort, Notfalltermine am selben Tag.</p>
-            <a href="tel:+41448091200">044 809 12 00 anrufen</a>
-          </article>
-        </div>
-      </section>
-
-      <section class="abschnitt" id="marken" aria-labelledby="marken-titel">
-        <h2 id="marken-titel">Marken</h2>
-        <p class="absatz">Unsere Techniker sind auf die in der Schweiz verbreiteten Marken geschult und führen deren Ersatzteile im Fahrzeug. Andere Marken prüfen wir auf Anfrage.</p>
-        <ul class="marken" aria-label="Marken, die wir warten und reparieren">
-          <li>Miele</li>
-          <li>V-ZUG</li>
-          <li>Electrolux</li>
-          <li>Siemens</li>
-          <li>Liebherr</li>
-          <li>Asko</li>
-          <li class="marke-mehr">weitere auf Anfrage</li>
-        </ul>
-      </section>
-
-      <section class="abschnitt" id="ablauf" aria-labelledby="ablauf-titel">
-        <h2 id="ablauf-titel">So arbeiten wir</h2>
-        <ol class="schritte">
-          <li><strong>Anfrage</strong> – online, per Telefon oder E-Mail. Die Disposition erfasst den Auftrag während des Gesprächs und schlägt ein Terminfenster vor.</li>
-          <li><strong>Termin</strong> – Bestätigung per SMS mit Datum und Zeitfenster. Der Techniker meldet sich, wenn er unterwegs ist.</li>
-          <li><strong>Einsatz</strong> – Diagnose, Reparatur, Rapport mit Ihrer Unterschrift auf dem Tablet. Fehlt ein Teil, wird es bestellt und der Folgetermin gleich vorgeschlagen.</li>
-          <li><strong>Abschluss</strong> – Rapport per E-Mail, Rechnung aus dem Büro. Bei Verwaltungen mit Objekt- und Wohnungsangabe.</li>
-        </ol>
-      </section>
-
-      <section class="abschnitt" id="ueber-uns" aria-labelledby="ueber-titel">
-        <h2 id="ueber-titel">Über uns</h2>
-        <div class="ueber">
-          <p class="absatz">
-            Die Sutt AG ist ein Fachbetrieb für Haushalt-Grossgeräte mit Sitz in Glattbrugg. Disposition und Büro sitzen an der
-            Industriestrasse, die Techniker sind im Glattal, im Zürcher Unterland und in Zürich Nord unterwegs. Wir arbeiten für
-            Liegenschaftsverwaltungen mit vielen Wohnungen genauso wie für den einzelnen Haushalt – mit denselben Terminen und demselben Rapport.
-          </p>
-          <ul class="werte">
-            <li><strong>Termintreue</strong> – ein Zeitfenster ist ein Versprechen; wenn es nicht hält, erfahren Sie es, bevor Sie warten.</li>
-            <li><strong>Reparieren vor Ersetzen</strong> – wir sagen offen, wann sich eine Reparatur lohnt und wann ein neues Gerät die bessere Wahl ist.</li>
-            <li><strong>Eine Akte pro Gerät</strong> – Einsätze, Teile und Fotos bleiben beim Gerät; beim nächsten Besuch wissen wir, was war.</li>
+      <section class="vertrauen" id="vertrauen" aria-label="Marken und Versprechen">
+        <div class="innen">
+          <p class="vertrauen-text">Geschult und mit Ersatzteilen im Fahrzeug für</p>
+          <ul class="marken" aria-label="Marken, die wir warten und reparieren">
+            <li>Miele</li>
+            <li>V-ZUG</li>
+            <li>Electrolux</li>
+            <li>Siemens</li>
+            <li>Liebherr</li>
+            <li>Asko</li>
           </ul>
         </div>
       </section>
 
-      <section class="abschnitt" id="kontakt" aria-labelledby="kontakt-titel">
-        <h2 id="kontakt-titel">Kontakt</h2>
-        <div class="kontakt">
-          <div class="kontakt-text">
-            <address>
-              <strong>Sutt AG</strong><br />
-              Industriestrasse 24<br />
-              8152 Glattbrugg<br />
-              <a href="tel:+41448091200">044 809 12 00</a><br />
-              <a href="mailto:service@sutt.example">service@sutt.example</a>
-            </address>
-            <dl class="zeiten">
-              <dt>Mo – Fr</dt>
-              <dd>07:00 – 12:00 · 13:00 – 17:30</dd>
-              <dt>Sa / So</dt>
-              <dd>geschlossen</dd>
-              <dt>Notfall</dt>
-              <dd>Verwaltungen und Gewerbe nach Vereinbarung</dd>
-            </dl>
-            <div class="aktionen">
-              <a class="knopf" href="./anfrage.html">Termin anfragen</a>
-              <a class="knopf knopf-leise" href="https://www.google.com/maps/dir/?api=1&destination=Industriestrasse+24%2C+8152+Glattbrugg" rel="noopener" target="_blank">Route planen</a>
-            </div>
+      <section class="abschnitt" id="leistungen" aria-labelledby="leistungen-titel">
+        <div class="innen">
+          <header class="abschnitt-kopf" data-reveal>
+            <p class="vorzeile">Leistungen</p>
+            <h2 id="leistungen-titel">Alles rund ums Gerät – aus einer Hand.</h2>
+            <p class="absatz">Von der Diagnose bis zur Entsorgung des Altgeräts. Sagen Sie uns, was ist; wir sagen Ihnen, was es braucht.</p>
+          </header>
+          <div class="karten">
+            <a class="karte" href="./anfrage.html?anliegen=reparatur" data-reveal>
+              <span class="karte-icon"><svg class="icon" aria-hidden="true"><use href="#i-wrench" /></svg></span>
+              <h3>Reparatur</h3>
+              <p>Diagnose vor Ort, Ersatzteile aus dem Fahrzeuglager, Preis vor der Arbeit. Lohnt es sich nicht, sagen wir es.</p>
+              <span class="karte-link">Reparatur anfragen <svg class="icon icon-klein" aria-hidden="true"><use href="#i-arrow" /></svg></span>
+            </a>
+            <a class="karte" href="./anfrage.html?anliegen=installation" data-reveal>
+              <span class="karte-icon"><svg class="icon" aria-hidden="true"><use href="#i-plug" /></svg></span>
+              <h3>Installation und Montage</h3>
+              <p>Neue Geräte liefern, einbauen, anschliessen, einweisen. Das Altgerät nehmen wir mit und entsorgen es fachgerecht.</p>
+              <span class="karte-link">Montage anfragen <svg class="icon icon-klein" aria-hidden="true"><use href="#i-arrow" /></svg></span>
+            </a>
+            <a class="karte" href="./anfrage.html?anliegen=lieferung" data-reveal>
+              <span class="karte-icon"><svg class="icon" aria-hidden="true"><use href="#i-truck" /></svg></span>
+              <h3>Lieferung</h3>
+              <p>In der ganzen Region, mit Terminfenster, auf Wunsch mit Treppentransport.</p>
+              <span class="karte-link">Lieferung anfragen <svg class="icon icon-klein" aria-hidden="true"><use href="#i-arrow" /></svg></span>
+            </a>
+            <a class="karte" href="./anfrage.html?anliegen=mietgeraet" data-reveal>
+              <span class="karte-icon"><svg class="icon" aria-hidden="true"><use href="#i-key" /></svg></span>
+              <h3>Mietgeräte</h3>
+              <p>Waschmaschine oder Kühlschrank zur Überbrückung, wenn ein Ersatzteil unterwegs ist. Tagespreis, Lieferung und Abholung inklusive.</p>
+              <span class="karte-link">Mietgerät anfragen <svg class="icon icon-klein" aria-hidden="true"><use href="#i-arrow" /></svg></span>
+            </a>
+            <a class="karte" href="./anfrage.html?anliegen=garantie" data-reveal>
+              <span class="karte-icon"><svg class="icon" aria-hidden="true"><use href="#i-shield" /></svg></span>
+              <h3>Garantie</h3>
+              <p>Garantiefälle wickeln wir direkt mit dem Hersteller ab. Sie brauchen nur Kaufbeleg und Seriennummer.</p>
+              <span class="karte-link">Garantiefall melden <svg class="icon icon-klein" aria-hidden="true"><use href="#i-arrow" /></svg></span>
+            </a>
+            <a class="karte karte-notfall" href="tel:+41448091200" data-reveal>
+              <span class="karte-icon"><svg class="icon" aria-hidden="true"><use href="#i-alert" /></svg></span>
+              <h3>Notfall</h3>
+              <p>Wasser auf dem Boden, Kühlraum ausgefallen, Waschküche steht still: Verwaltungen und Gewerbe bekommen zu Bürozeiten einen Termin am selben Tag.</p>
+              <span class="karte-link">044 809 12 00 anrufen <svg class="icon icon-klein" aria-hidden="true"><use href="#i-arrow" /></svg></span>
+            </a>
           </div>
-          <figure class="karte-schema">
-            <svg viewBox="0 0 400 260" role="img" aria-labelledby="karte-titel karte-text">
-              <title id="karte-titel">Lageplan Industriestrasse 24, Glattbrugg</title>
-              <desc id="karte-text">Schematische Darstellung: Bahnhof Glattbrugg im Süden, die Glatt im Osten, die Autobahn A51 Richtung Flughafen im Norden, die Sutt AG an der Industriestrasse.</desc>
-              <rect width="400" height="260" fill="var(--sl-surface)" />
-              <path d="M 330 0 C 300 70 340 140 300 260" fill="none" stroke="var(--sl-line-strong)" stroke-width="10" stroke-linecap="round" />
-              <text x="346" y="118" class="karte-fluss">Glatt</text>
-              <path d="M 0 70 L 400 30" fill="none" stroke="var(--sl-line)" stroke-width="12" />
-              <path d="M 0 70 L 400 30" fill="none" stroke="var(--sl-paper)" stroke-width="1.5" stroke-dasharray="14 10" />
-              <text x="208" y="36" class="karte-strasse">A51 → Flughafen · Bülach</text>
-              <path d="M 130 260 L 150 0" fill="none" stroke="var(--sl-line)" stroke-width="9" />
-              <text x="152" y="100" class="karte-strasse">Schaffhauserstrasse</text>
-              <path d="M 0 150 L 400 130" fill="none" stroke="var(--sl-line)" stroke-width="7" />
-              <text x="22" y="140" class="karte-strasse">Industriestrasse</text>
-              <path d="M 0 235 L 400 215" fill="none" stroke="var(--sl-ink-2)" stroke-width="3" />
-              <path d="M 0 235 L 400 215" fill="none" stroke="var(--sl-paper)" stroke-width="1.5" stroke-dasharray="8 8" />
-              <rect x="128" y="218" width="24" height="12" fill="var(--sl-ink)" />
-              <text x="160" y="212" class="karte-ort">Bahnhof Glattbrugg</text>
-              <g transform="translate(236 141)">
-                <rect x="-9" y="-9" width="18" height="18" transform="rotate(45)" fill="var(--sl-signal)" />
-                <text x="14" y="-6" class="karte-ziel">Sutt AG</text>
-                <text x="14" y="10" class="karte-ort">Industriestrasse 24</text>
-              </g>
-              <text x="10" y="252" class="karte-hinweis">Schema, nicht massstäblich · Norden oben</text>
-            </svg>
-            <figcaption>Parkplätze vor dem Haus. Ab Bahnhof Glattbrugg 8 Minuten zu Fuss.</figcaption>
-          </figure>
+        </div>
+      </section>
+
+      <section class="abschnitt abschnitt-dunkel" id="ablauf" aria-labelledby="ablauf-titel">
+        <div class="innen">
+          <header class="abschnitt-kopf" data-reveal>
+            <p class="vorzeile">So arbeiten wir</p>
+            <h2 id="ablauf-titel">Vier Schritte, keine Überraschungen.</h2>
+          </header>
+          <ol class="schritte">
+            <li data-reveal>
+              <span class="schritt-nummer">1</span>
+              <svg class="icon schritt-icon" aria-hidden="true"><use href="#i-phone" /></svg>
+              <h3>Anfrage</h3>
+              <p>Online in zwei Minuten oder per Telefon. Die Disposition erfasst alles während des Gesprächs.</p>
+            </li>
+            <li data-reveal>
+              <span class="schritt-nummer">2</span>
+              <svg class="icon schritt-icon" aria-hidden="true"><use href="#i-calendar" /></svg>
+              <h3>Termin</h3>
+              <p>Sie erhalten ein Terminfenster per SMS. Der Techniker meldet sich, wenn er unterwegs ist.</p>
+            </li>
+            <li data-reveal>
+              <span class="schritt-nummer">3</span>
+              <svg class="icon schritt-icon" aria-hidden="true"><use href="#i-wrench" /></svg>
+              <h3>Einsatz</h3>
+              <p>Diagnose, Reparatur oder Einbau. Fehlt ein Teil, ist der Folgetermin gleich vorgeschlagen.</p>
+            </li>
+            <li data-reveal>
+              <span class="schritt-nummer">4</span>
+              <svg class="icon schritt-icon" aria-hidden="true"><use href="#i-file" /></svg>
+              <h3>Abschluss</h3>
+              <p>Rapport mit Ihrer Unterschrift auf dem Tablet, als PDF per E-Mail. Rechnung aus dem Büro.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="abschnitt" id="warum" aria-labelledby="warum-titel">
+        <div class="innen warum">
+          <header class="abschnitt-kopf" data-reveal>
+            <p class="vorzeile">Warum Sutt</p>
+            <h2 id="warum-titel">Ein Fachbetrieb aus Glattbrugg. Kein Callcenter.</h2>
+            <p class="absatz">
+              Disposition und Büro sitzen an der Industriestrasse, die Techniker sind im Glattal, im Unterland und in Zürich Nord unterwegs.
+              Wer anruft, spricht mit jemandem, der den Plan vor sich hat.
+            </p>
+          </header>
+          <ul class="werte">
+            <li data-reveal>
+              <svg class="icon" aria-hidden="true"><use href="#i-clock" /></svg>
+              <h3>Termintreue</h3>
+              <p>Ein Zeitfenster ist ein Versprechen. Verschiebt sich etwas, erfahren Sie es, bevor Sie warten.</p>
+            </li>
+            <li data-reveal>
+              <svg class="icon" aria-hidden="true"><use href="#i-leaf" /></svg>
+              <h3>Reparieren vor Ersetzen</h3>
+              <p>Wir sagen offen, wann sich eine Reparatur lohnt und wann ein neues Gerät die bessere Wahl ist.</p>
+            </li>
+            <li data-reveal>
+              <svg class="icon" aria-hidden="true"><use href="#i-folder" /></svg>
+              <h3>Eine Akte pro Gerät</h3>
+              <p>Einsätze, Teile und Fotos bleiben beim Gerät. Beim nächsten Besuch wissen wir, was war.</p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="abschnitt abschnitt-hell" id="fragen" aria-labelledby="fragen-titel">
+        <div class="innen fragen">
+          <header class="abschnitt-kopf" data-reveal>
+            <p class="vorzeile">Häufige Fragen</p>
+            <h2 id="fragen-titel">Kurz beantwortet.</h2>
+          </header>
+          <div class="faq" data-reveal>
+            <details>
+              <summary>Was kostet eine Reparatur?</summary>
+              <p>Sie zahlen Anfahrt und Arbeitszeit nach Aufwand plus Ersatzteile. Vor der Arbeit nennt der Techniker den Preis. Lohnt sich die Reparatur nicht, berechnen wir nur die Diagnose und beraten beim Ersatz.</p>
+            </details>
+            <details>
+              <summary>Wie schnell sind Sie da?</summary>
+              <p>In der Regel innerhalb weniger Arbeitstage, dringende Fälle für Verwaltungen und Gewerbe am selben Tag. Den Terminvorschlag erhalten Sie meist am nächsten Arbeitstag nach der Anfrage.</p>
+            </details>
+            <details>
+              <summary>Muss ich zu Hause sein?</summary>
+              <p>Jemand muss den Zugang ermöglichen – Sie, der Hauswart oder die Verwaltung. Das Terminfenster ist halbtags, der Techniker meldet sich per SMS, bevor er kommt.</p>
+            </details>
+            <details>
+              <summary>Welche Geräte und Marken?</summary>
+              <p>Waschmaschinen, Trockner, Geschirrspüler, Kühl- und Gefriergeräte, Backöfen, Steamer und Kochfelder – vor allem Miele, V-ZUG, Electrolux, Siemens, Liebherr und Asko. Andere Marken prüfen wir auf Anfrage.</p>
+            </details>
+            <details>
+              <summary>Was ist mit der Garantie?</summary>
+              <p>Im Garantiefall rechnen wir direkt mit dem Hersteller ab. Halten Sie Kaufbeleg und Seriennummer bereit – ein Foto des Typenschilds im Formular genügt.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="band" aria-labelledby="band-titel">
+        <div class="innen band-innen" data-reveal>
+          <div>
+            <h2 id="band-titel">Gerät defekt? Sagen Sie uns, was ist.</h2>
+            <p>Zwei Minuten online – oder ein Anruf. Wir melden uns am nächsten Arbeitstag mit einem Termin.</p>
+          </div>
+          <div class="aktionen">
+            <a class="knopf knopf-gross" href="./anfrage.html">Termin anfragen <svg class="icon" aria-hidden="true"><use href="#i-arrow" /></svg></a>
+            <a class="knopf knopf-gross knopf-dunkel" href="tel:+41448091200"><svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg> 044 809 12 00</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="abschnitt" id="kontakt" aria-labelledby="kontakt-titel">
+        <div class="innen">
+          <header class="abschnitt-kopf" data-reveal>
+            <p class="vorzeile">Kontakt</p>
+            <h2 id="kontakt-titel">Industriestrasse 24, Glattbrugg.</h2>
+          </header>
+          <div class="kontakt" data-reveal>
+            <div class="kontakt-text">
+              <ul class="kontakt-liste">
+                <li><svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg><address>Sutt AG<br />Industriestrasse 24<br />8152 Glattbrugg</address></li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg><a href="tel:+41448091200">044 809 12 00</a></li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-mail" /></svg><a href="mailto:service@sutt.example">service@sutt.example</a></li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="#i-clock" /></svg>
+                  <dl class="zeiten">
+                    <dt>Mo – Fr</dt>
+                    <dd>07:00 – 12:00 · 13:00 – 17:30</dd>
+                    <dt>Sa / So</dt>
+                    <dd>geschlossen</dd>
+                    <dt>Notfall</dt>
+                    <dd>Verwaltungen und Gewerbe nach Vereinbarung</dd>
+                  </dl>
+                </li>
+              </ul>
+              <div class="aktionen">
+                <a class="knopf" href="./anfrage.html">Termin anfragen</a>
+                <a class="knopf knopf-leise" href="https://www.google.com/maps/dir/?api=1&destination=Industriestrasse+24%2C+8152+Glattbrugg" rel="noopener" target="_blank">Route planen <svg class="icon icon-klein" aria-hidden="true"><use href="#i-external" /></svg></a>
+              </div>
+            </div>
+            <figure class="karte-schema">
+              <svg viewBox="0 0 400 260" role="img" aria-labelledby="karte-titel karte-text">
+                <title id="karte-titel">Lageplan Industriestrasse 24, Glattbrugg</title>
+                <desc id="karte-text">Schematische Darstellung: Bahnhof Glattbrugg im Süden, die Glatt im Osten, die Autobahn A51 Richtung Flughafen im Norden, die Sutt AG an der Industriestrasse.</desc>
+                <rect width="400" height="260" fill="var(--sl-surface)" />
+                <path d="M 330 0 C 300 70 340 140 300 260" fill="none" stroke="var(--sl-line-strong)" stroke-width="10" stroke-linecap="round" />
+                <text x="346" y="118" class="karte-fluss">Glatt</text>
+                <path d="M 0 70 L 400 30" fill="none" stroke="var(--sl-line)" stroke-width="12" />
+                <path d="M 0 70 L 400 30" fill="none" stroke="var(--sl-paper)" stroke-width="1.5" stroke-dasharray="14 10" />
+                <text x="208" y="36" class="karte-strasse">A51 → Flughafen · Bülach</text>
+                <path d="M 130 260 L 150 0" fill="none" stroke="var(--sl-line)" stroke-width="9" />
+                <text x="152" y="100" class="karte-strasse">Schaffhauserstrasse</text>
+                <path d="M 0 150 L 400 130" fill="none" stroke="var(--sl-line)" stroke-width="7" />
+                <text x="22" y="140" class="karte-strasse">Industriestrasse</text>
+                <path d="M 0 235 L 400 215" fill="none" stroke="var(--sl-ink-2)" stroke-width="3" />
+                <path d="M 0 235 L 400 215" fill="none" stroke="var(--sl-paper)" stroke-width="1.5" stroke-dasharray="8 8" />
+                <rect x="128" y="218" width="24" height="12" fill="var(--sl-ink)" />
+                <text x="160" y="212" class="karte-ort">Bahnhof Glattbrugg</text>
+                <g transform="translate(236 141)">
+                  <rect x="-9" y="-9" width="18" height="18" transform="rotate(45)" fill="var(--sl-signal)" />
+                  <text x="14" y="-6" class="karte-ziel">Sutt AG</text>
+                  <text x="14" y="10" class="karte-ort">Industriestrasse 24</text>
+                </g>
+                <text x="10" y="252" class="karte-hinweis">Schema, nicht massstäblich · Norden oben</text>
+              </svg>
+              <figcaption>Parkplätze vor dem Haus. Ab Bahnhof Glattbrugg 8 Minuten zu Fuss.</figcaption>
+            </figure>
+          </div>
         </div>
       </section>
     </main>

@@ -15,17 +15,26 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Termin anfragen – Sutt AG</title>
   </head>
-  <body>
+  <body class="ohne-leiste">
     <!-- @teil kopf -->
 
     <main id="inhalt" class="seite">
       <header class="seite-kopf">
-        <p class="vorzeile">Anfrage</p>
-        <h1>Termin anfragen</h1>
-        <p class="einleitung">Zwei Minuten, keine Anmeldung. Wir melden uns in der Regel am nächsten Arbeitstag mit einem Terminvorschlag – dringende Fälle bitte telefonisch: <a href="tel:+41448091200">044 809 12 00</a>.</p>
+        <div class="innen">
+          <p class="vorzeile">Anfrage</p>
+          <h1>Termin anfragen</h1>
+          <p class="einleitung">Zwei Minuten, keine Anmeldung. Wir melden uns in der Regel am nächsten Arbeitstag mit einem Terminvorschlag – dringende Fälle bitte telefonisch: <a href="tel:+41448091200">044 809 12 00</a>.</p>
+          <ol class="fortschritt" aria-label="Schritte des Formulars">
+            <li><a href="#anliegen">Anliegen</a></li>
+            <li><a href="#geraet">Gerät</a></li>
+            <li><a href="#adresse">Adresse</a></li>
+            <li><a href="#termin">Termin</a></li>
+            <li><a href="#kontakt-schritt">Kontakt</a></li>
+          </ol>
+        </div>
       </header>
 
-      <div class="anfrage">
+      <div class="innen anfrage">
         <form class="formular" id="anfrage-formular" novalidate>
           <div class="fehlerliste" id="fehlerliste" role="alert" hidden>
             <p><strong>Bitte prüfen:</strong></p>
@@ -46,7 +55,7 @@
             <p class="feld-fehler" data-fehler="anliegen" hidden></p>
           </fieldset>
 
-          <fieldset class="feldgruppe">
+          <fieldset class="feldgruppe" id="geraet">
             <legend>2 · Gerät</legend>
             <div class="felder zwei">
               <div class="feld">
@@ -74,7 +83,7 @@
             </div>
           </fieldset>
 
-          <fieldset class="feldgruppe">
+          <fieldset class="feldgruppe" id="adresse">
             <legend>3 · Wo steht das Gerät?</legend>
             <div class="felder drei">
               <div class="feld breit">
@@ -99,7 +108,7 @@
             </div>
           </fieldset>
 
-          <fieldset class="feldgruppe">
+          <fieldset class="feldgruppe" id="termin">
             <legend>4 · Wunschtermin <span class="optional">(optional)</span></legend>
             <div class="felder zwei">
               <div class="feld">
@@ -118,7 +127,7 @@
             </div>
           </fieldset>
 
-          <fieldset class="feldgruppe">
+          <fieldset class="feldgruppe" id="kontakt-schritt">
             <legend>5 · Wie erreichen wir Sie?</legend>
             <div class="felder zwei">
               <div class="feld">

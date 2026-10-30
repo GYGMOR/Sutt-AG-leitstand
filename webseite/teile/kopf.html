@@ -1,22 +1,65 @@
 <!-- ┌────────────────────────────────────────────────────────────────────────┐
      │  SUTT·LEITSTAND  ·  webseite/teile/kopf.html                           │
      │  ◆ JH · 2026.11 · rev 06                                               │
-     │  Kopf aller Seiten: Marke, Navigation, Menü-Knopf, Portal und App      │
+     │  Kopf aller Seiten: Icon-Sprite, Sprungmarke, Marke, Menü, Aktionen    │
      └────────────────────────────────────────────────────────────────────────┘ -->
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /><circle cx="12" cy="10" r="3" /></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><path d="M12 22v-5" /><path d="M9 8V2" /><path d="M15 8V2" /><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z" /></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" /><path d="M15 18H9" /><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" /><circle cx="17" cy="18" r="2" /><circle cx="7" cy="18" r="2" /></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" /><circle cx="16.5" cy="7.5" r=".5" fill="currentColor" /></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /><path d="m9 12 2 2 4-4" /></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4" /><path d="M12 17h.01" /></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M8 2v4" /><path d="M16 2v4" /><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18" /><path d="m9 16 2 2 4-4" /></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="m9 15 2 2 4-4" /></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" /><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" /></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></symbol>
+</svg>
 <a class="sprung" href="#inhalt">Zum Inhalt springen</a>
 <header class="kopf">
-  <a class="marke" href="./"><span class="raute" aria-hidden="true"></span> SUTT AG</a>
-  <button class="menue" type="button" aria-expanded="false" aria-controls="navigation">Menü</button>
-  <nav class="navigation" id="navigation" aria-label="Seiten">
-    <a href="./#leistungen">Leistungen</a>
-    <a href="./#marken">Marken</a>
-    <a href="./#ablauf">So arbeiten wir</a>
-    <a href="./#ueber-uns">Über uns</a>
-    <a href="./#kontakt">Kontakt</a>
-    <a href="./karriere.html">Karriere</a>
-    <a class="knopf" href="./anfrage.html">Termin anfragen</a>
-    <a class="knopf knopf-leise" href="/" data-ziel="leitstand">Kundenportal</a>
-    <a class="knopf knopf-leise" href="/app/" data-ziel="app">Techniker-App</a>
-  </nav>
+  <div class="kopf-innen">
+    <a class="marke" href="./" aria-label="Sutt AG – Startseite">
+      <span class="raute" aria-hidden="true"></span>
+      <span class="marke-text">SUTT AG</span>
+      <span class="marke-claim">Haushalt-Grossgeräte</span>
+    </a>
+    <nav class="navigation" id="navigation" aria-label="Seiten">
+      <ul class="nav-liste">
+        <li><a href="./#leistungen">Leistungen</a></li>
+        <li><a href="./#ablauf">So arbeiten wir</a></li>
+        <li><a href="./#warum">Warum Sutt</a></li>
+        <li><a href="./#fragen">Fragen</a></li>
+        <li><a href="./#kontakt">Kontakt</a></li>
+        <li><a href="./karriere.html">Karriere</a></li>
+      </ul>
+      <div class="nav-aktionen">
+        <a class="nav-telefon" href="tel:+41448091200"><svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg><span>044 809 12 00</span></a>
+        <a class="knopf" href="./anfrage.html">Termin anfragen</a>
+      </div>
+      <div class="nav-partner">
+        <span class="nav-partner-label">Für Kunden und Team</span>
+        <a href="/" data-ziel="leitstand">Kundenportal <svg class="icon icon-klein" aria-hidden="true"><use href="#i-external" /></svg></a>
+        <a href="/app/" data-ziel="app">Techniker-App <svg class="icon icon-klein" aria-hidden="true"><use href="#i-external" /></svg></a>
+      </div>
+    </nav>
+    <div class="kopf-rechts">
+      <a class="kopf-telefon" href="tel:+41448091200" aria-label="Anrufen: 044 809 12 00"><svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg></a>
+      <button class="menue" type="button" aria-expanded="false" aria-controls="navigation">
+        <svg class="icon menue-auf" aria-hidden="true"><use href="#i-menu" /></svg>
+        <svg class="icon menue-zu" aria-hidden="true"><use href="#i-x" /></svg>
+        <span>Menü</span>
+      </button>
+    </div>
+  </div>
 </header>
 <!-- ◆ jh · eof -->

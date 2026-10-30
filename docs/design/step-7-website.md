@@ -21,18 +21,35 @@ Anfragen (annehmen, ablehnen, beantworten) und die SMS-/Mail-Vorlagen des Betrie
 | Dark Mode | nach Systemeinstellung (`data-theme` aus `prefers-color-scheme`), dieselben Tokens | kein Schalter auf einer Marketingseite, aber kein grelles Weiss am Abend |
 | Foto | nur der Dateiname wird übergeben, Hinweis im Formular | Bildablage ist jh# 012; ehrlich statt scheinbar |
 
+## Gestaltung – «Schweizer Industrie», aber als Schaufenster
+
+Die Regeln aus README §4 gelten für die Software. Die Website darf mehr Bühne sein (der Nutzer wollte «Hero-Video, geiles UX,
+Nutzer sollen sich wohlfühlen»), bleibt aber in der Familie: Anthrazit, warmes Papier, Orange nur als Signal, IBM Plex, Haarlinien
+statt Schatten, Radius 3 px, Messmarke links. Was dazukommt: grosse Typo (bis 76 px), ein Hero mit Video-Platz und animierter
+Einbau-Szene (SVG + CSS-Keyframes, 10-s-Schleife, aus bei «Bewegung reduzieren»), Karten mit Hover (Kante nach oben, Orange-Linie),
+Einblenden beim Scrollen (`IntersectionObserver`, `data-reveal`), kompakter Kopf beim Scrollen, Vollflächen-Menü auf dem Handy
+(Esc, Fokus auf den ersten Eintrag, Scroll-Sperre, zurück zum Knopf), feste Leiste «Anrufen · Termin anfragen» unter 900 px.
+Orientiert an den Mustern guter Service-Websites: eine Botschaft im Hero, zwei Aktionen, Vertrauensleiste, Leistungen als Karten,
+Ablauf in Schritten, FAQ, Aktions-Band, grosser Fuss. Keine Stockfotos, keine Verläufe, kein Glassmorphism.
+
+**Video:** `webseite/public/video/einbau.mp4` (und `.webm`) ablegen, Dev-Server oder Build neu starten. `vite.config.ts` prüft beim
+Bauen, welche Dateien da sind (`__SL_HERO_VIDEO__`), `main.ts` hängt nur diese als Quellen an – ohne Datei keine 404 in der Konsole,
+und die Szene bleibt. Spielt das Video, blendet die Szene aus (`data-video="laeuft"`); bei «Bewegung reduzieren» pausiert es.
+
 ## Website (`webseite/`)
 
-- `index.html`: Bühne mit vier Fakten, Leistungen (Reparatur · Installation/Montage · Lieferung · Mietgeräte · Garantie · Notfall,
-  jede mit Tiefen-Link `anfrage.html?anliegen=…`), Marken, So arbeiten wir, Über uns mit drei Werten, Kontakt mit Öffnungszeiten,
-  Route und Schema-Karte (SVG, «nicht massstäblich»).
+- `index.html`: Hero (Text links, Video/Szene rechts, drei Fakten, Pfeil nach unten), Marken-Leiste, Leistungen als Karten mit Icon
+  (Reparatur · Installation/Montage · Lieferung · Mietgeräte · Garantie · Notfall, jede mit Tiefen-Link `anfrage.html?anliegen=…`),
+  «So arbeiten wir» (vier Schritte, dunkel), «Warum Sutt» (drei Versprechen, Kopf bleibt stehen), FAQ (`<details>`), Band mit
+  zwei Aktionen, Kontakt mit Öffnungszeiten, Route und Schema-Karte (SVG, «nicht massstäblich»).
 - `anfrage.html` + `src/anfrage.ts`: fünf Schritte (Anliegen mit «dringend», Gerät mit Datalist aus `GERAETEARTEN`/`MARKEN`, Adresse,
   Wunschtermin, Kontakt mit Rolle), Datenschutz-Haken, Honeypot; Prüfung mit `pruefeAnfrage` (Fehlerliste mit Sprungmarken,
   `aria-invalid`), Ablage mit `neueAnfrage`/`speichereAnfragen`, Bestätigung mit Nummer und Kontaktweg, «Weitere Anfrage».
 - `karriere.html` (drei Beispielstellen, Bewerbung per Mail), `impressum.html`, `datenschutz.html` (DSG: Daten, Zweck, Weitergabe, Frist,
   Browser-Speicher, Hosting, Rechte – als Entwurf gekennzeichnet).
-- `teile/kopf.html` (Marke, Navigation, Menü-Knopf, «Kundenportal», «Techniker-App») und `teile/fuss.html`; `src/main.ts` setzt Thema,
-  Jahr, Version, Ziele (im Dev-Modus Port 5173), aktive Seite und das Menü.
+- `teile/kopf.html` (Icon-Sprite, Sprungmarke, Marke, Navigation mit Telefon und Aktion, Menü-Knopf, im Handy-Menü «Kundenportal» und
+  «Techniker-App») und `teile/fuss.html` (vier Spalten, Rechtliches, feste Leiste); `src/main.ts` setzt Thema, Jahr, Version, Ziele
+  (im Dev-Modus Port 5173), aktive Seite, kompakten Kopf, Menü, Einblenden und das Hero-Video.
 - `vite.config.ts`: `base` aus `SL_BASE` (`webseiteBasis`), `appType: 'mpa'`, Teile-Plugin, fünf Eingänge, `hmr.clientPort 5175`.
 
 ## Leitstand

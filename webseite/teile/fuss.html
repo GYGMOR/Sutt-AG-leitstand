@@ -1,35 +1,65 @@
 <!-- ┌────────────────────────────────────────────────────────────────────────┐
      │  SUTT·LEITSTAND  ·  webseite/teile/fuss.html                           │
      │  ◆ JH · 2026.11 · rev 06                                               │
-     │  Fuss aller Seiten: Adresse, Zeiten, Rechtliches, Mockup-Hinweis       │
+     │  Fuss aller Seiten: Marke, Leistungen, Service, Kontakt, Rechtliches   │
      └────────────────────────────────────────────────────────────────────────┘ -->
 <footer class="fuss">
-  <div class="fuss-spalten">
-    <address>
-      <strong>Sutt AG</strong><br />
-      Industriestrasse 24<br />
-      8152 Glattbrugg<br />
-      <a href="tel:+41448091200">044 809 12 00</a><br />
-      <a href="mailto:service@sutt.example">service@sutt.example</a>
-    </address>
-    <dl class="zeiten">
-      <dt>Mo – Fr</dt>
-      <dd>07:00 – 12:00 · 13:00 – 17:30</dd>
-      <dt>Notfall</dt>
-      <dd>Verwaltungen und Gewerbe nach Vereinbarung</dd>
-    </dl>
-    <nav class="fuss-nav" aria-label="Rechtliches und mehr">
-      <a href="./anfrage.html">Termin anfragen</a>
-      <a href="./karriere.html">Karriere</a>
-      <a href="./impressum.html">Impressum</a>
-      <a href="./datenschutz.html">Datenschutz</a>
-      <a href="/" data-ziel="leitstand">Kundenportal</a>
-      <a href="/app/" data-ziel="app">Techniker-App</a>
-    </nav>
-  </div>
-  <div class="fuss-zeile">
-    <span>© <span data-jahr>2026</span> Sutt AG · Mockup – alle Firmen, Personen, Nummern und Adressen sind erfunden</span>
-    <span class="signatur">◆ JH · v<span data-version></span></span>
+  <div class="fuss-innen">
+    <div class="fuss-spalten">
+      <div class="fuss-marke">
+        <a class="marke" href="./" aria-label="Sutt AG – Startseite">
+          <span class="raute" aria-hidden="true"></span>
+          <span class="marke-text">SUTT AG</span>
+        </a>
+        <p>Service, Reparatur und Verkauf von Haushalt-Grossgeräten – für Verwaltungen, Gewerbe und Private im Raum Zürich. Termine, die halten.</p>
+        <a class="knopf" href="./anfrage.html">Termin anfragen</a>
+      </div>
+      <nav class="fuss-nav" aria-label="Leistungen">
+        <h2>Leistungen</h2>
+        <a href="./anfrage.html?anliegen=reparatur">Reparatur</a>
+        <a href="./anfrage.html?anliegen=installation">Installation und Montage</a>
+        <a href="./anfrage.html?anliegen=lieferung">Lieferung</a>
+        <a href="./anfrage.html?anliegen=mietgeraet">Mietgeräte</a>
+        <a href="./anfrage.html?anliegen=garantie">Garantie</a>
+        <a href="tel:+41448091200">Notfall</a>
+      </nav>
+      <nav class="fuss-nav" aria-label="Service und Team">
+        <h2>Service</h2>
+        <a href="./#ablauf">So arbeiten wir</a>
+        <a href="./#fragen">Häufige Fragen</a>
+        <a href="./karriere.html">Karriere</a>
+        <a href="/" data-ziel="leitstand">Kundenportal</a>
+        <a href="/app/" data-ziel="app">Techniker-App</a>
+      </nav>
+      <div class="fuss-kontakt">
+        <h2>Kontakt</h2>
+        <address>
+          Sutt AG<br />
+          Industriestrasse 24<br />
+          8152 Glattbrugg
+        </address>
+        <a href="tel:+41448091200"><svg class="icon icon-klein" aria-hidden="true"><use href="#i-phone" /></svg> 044 809 12 00</a>
+        <a href="mailto:service@sutt.example"><svg class="icon icon-klein" aria-hidden="true"><use href="#i-mail" /></svg> service@sutt.example</a>
+        <dl class="zeiten">
+          <dt>Mo – Fr</dt>
+          <dd>07:00 – 12:00 · 13:00 – 17:30</dd>
+          <dt>Notfall</dt>
+          <dd>Verwaltungen und Gewerbe nach Vereinbarung</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="fuss-zeile">
+      <span>© <span data-jahr>2026</span> Sutt AG · Mockup – alle Firmen, Personen, Nummern und Adressen sind erfunden</span>
+      <nav class="fuss-rechtlich" aria-label="Rechtliches">
+        <a href="./impressum.html">Impressum</a>
+        <a href="./datenschutz.html">Datenschutz</a>
+      </nav>
+      <span class="signatur">◆ JH · v<span data-version></span></span>
+    </div>
   </div>
 </footer>
+<div class="leiste" aria-label="Schnellkontakt">
+  <a class="knopf knopf-leise" href="tel:+41448091200"><svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg> Anrufen</a>
+  <a class="knopf" href="./anfrage.html">Termin anfragen</a>
+</div>
 <!-- ◆ jh · eof -->

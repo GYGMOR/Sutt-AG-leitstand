@@ -471,9 +471,11 @@ Seitenleiste zeigt `v0.2.0 · ◆ JH`; der Tooltip trägt Build-Datum und Commit
 - **App**: Woche und Monat zurückblätterbar bis zum Systembeginn bzw. Eintritt, vergangene Monate mit allen Tagen.
 
 ### Website & SMS v0.6 – Anfragen und Vorlagen (rev 06, Phase B)
-- **Website** `webseite/` neu: fünf statische Seiten in der Handschrift des Leitstands – Start (Bühne, Leistungen mit Mietgeräten und Notfall,
-  Marken, Ablauf, Über uns, Kontakt mit Öffnungszeiten und Schema-Karte), **Termin anfragen**, Karriere, Impressum, Datenschutz (DSG).
-  Kopf und Fuss als Teile, Menü fürs Handy, Dark Mode nach System, kein Framework, kein Tracking (ADR-009).
+- **Website** `webseite/` neu: fünf statische Seiten in den Farben des Leitstands, aber als Schaufenster – Start mit **Hero** (Platz für das
+  Einbau-Video, bis dahin eine animierte Einbau-Szene), Marken-Leiste, Leistungen als Karten mit Icons (Mietgeräte und Notfall inklusive),
+  Ablauf in vier Schritten, «Warum Sutt», FAQ, Aktions-Band, Kontakt mit Öffnungszeiten und Schema-Karte; **Termin anfragen**, Karriere,
+  Impressum, Datenschutz (DSG). Kopf bleibt oben und wird kompakt, Vollflächen-Menü und feste Kontaktleiste auf dem Handy, Einblenden beim
+  Scrollen, Dark Mode nach System, kein Framework, kein Tracking (ADR-009, `docs/design/step-7-website.md`).
 - **Anfrage → Leitstand**: Das Formular prüft mit denselben Regeln wie der Leitstand (`pruefeAnfrage`), vergibt die Nummer `W-26-0101` und
   legt die Anfrage im Browser-Speicher ab, den der Leitstand sofort liest. Der Eingang der Plantafel zeigt «n neue Anfragen von der Website»;
   angenommene Anfragen stehen als Pendenz mit Chip **Website** im Eingang.
