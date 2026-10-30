@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/modules.config.ts                             │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Modul-Register: einzige Quelle für Leiste, Palette und Routing        │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -148,7 +148,7 @@ export const MODULE: readonly Modul[] = [
   },
   {
     id: 'mietgeraete', label: 'Mietgeräte', icon: KeyRound, gruppe: 'material', pfad: '/mietgeraete',
-    freigeschaltet: false, version: 'v0.5', rollen: INNENDIENST,
+    freigeschaltet: false, version: 'v2.2', rollen: INNENDIENST,
     beschreibung: 'Ersatz- und Mietgeräte: Verfügbarkeit, Ausgabe, Rücknahme und Verrechnung.',
   },
   {
@@ -168,7 +168,7 @@ export const MODULE: readonly Modul[] = [
   },
   {
     id: 'buchhaltung', label: 'Buchhaltung', icon: Banknote, gruppe: 'administration', pfad: '/buchhaltung',
-    freigeschaltet: false, version: 'v0.7', rollen: ['buero', 'administration'],
+    freigeschaltet: false, version: 'v2.3', rollen: ['buero', 'administration'],
     beschreibung: 'Rechnungen, Mahnwesen und Export in die Finanzbuchhaltung.',
   },
   {
@@ -178,7 +178,7 @@ export const MODULE: readonly Modul[] = [
   },
   {
     id: 'auswertungen', label: 'Auswertungen', icon: ChartColumn, gruppe: 'administration', pfad: '/auswertungen',
-    freigeschaltet: false, version: 'v0.7', rollen: ['disposition', 'administration'],
+    freigeschaltet: false, version: 'v2.3', rollen: ['disposition', 'administration'],
     beschreibung: 'Auslastung, Fahrzeiten, Erstlösungsquote, Umsatz nach Marke und Region.',
   },
   {

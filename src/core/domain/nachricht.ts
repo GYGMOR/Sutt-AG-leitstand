@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/domain/nachricht.ts                           │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Nachrichten an Mieter/Kontakt: SMS- und Mail-Vorlagen (Mock-Versand)  │
    └────────────────────────────────────────────────────────────────────────┘ */
 

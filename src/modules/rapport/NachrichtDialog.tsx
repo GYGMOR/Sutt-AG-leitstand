@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/rapport/NachrichtDialog.tsx                │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Mock-Versand: SMS/Mail an den Kontakt vor Ort mit Vorschau            │
    └────────────────────────────────────────────────────────────────────────┘ */
 

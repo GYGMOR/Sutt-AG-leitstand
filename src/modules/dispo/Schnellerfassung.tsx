@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/Schnellerfassung.tsx                 │
-   │  ◆ JH · 2026.10 · rev 04                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Telefon-Schnellerfassung (N): Nummer → Kunde → Gerät → Slot, < 30 s   │
    └────────────────────────────────────────────────────────────────────────┘ */
 

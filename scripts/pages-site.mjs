@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  scripts/pages-site.mjs                             │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  GitHub Pages: Leitstand, App und Website → site/, 404 mit Umleitung   │
    └────────────────────────────────────────────────────────────────────────┘ */
 

@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/mandant/mandant.types.ts                      │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Mandant: Betrieb, Kanton, Zeitzone, Arbeitszeit, Anbieter, Module     │
    └────────────────────────────────────────────────────────────────────────┘ */
 

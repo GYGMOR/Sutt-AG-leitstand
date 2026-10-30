@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/panel/PendenzCard.tsx                │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Karte im Auftragseingang – ziehbar in den Plan, mit Kunden-Chips      │
    └────────────────────────────────────────────────────────────────────────┘ */
 

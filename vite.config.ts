@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  vite.config.ts                                     │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Build-Konfiguration: React, CSS Modules, Build-Stempel, Netzzugang    │
    └────────────────────────────────────────────────────────────────────────┘ */
 

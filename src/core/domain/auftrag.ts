@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/domain/auftrag.ts                             │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Auftrag: Kategorie, Dringlichkeit, Parteien, Teile, Fotos, Rapport    │
    └────────────────────────────────────────────────────────────────────────┘ */
 

@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/useDemoReset.tsx               │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  «Demo zurücksetzen» in jedem Büro-Modul: Menü, Befehl, Bestätigung    │
    └────────────────────────────────────────────────────────────────────────┘ */
 

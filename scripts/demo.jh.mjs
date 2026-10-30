@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  scripts/demo.jh.mjs                                │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Demo-Tour aufzeichnen: Playwright fährt durch die App → WebM          │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -357,7 +357,7 @@ await schrittSicher('dark', async () => {
 await schrittSicher('abspann', async () => {
   await taste('[', 600);
   await moveTo(W / 2, H / 2, 600);
-  await caption('<b>SUTT Leitstand</b> · Disposition v0.2 · klickbares Mockup – kein Backend, alle Daten erfunden', 3800);
+  await caption('<b>SUTT Leitstand</b> v2.1.6 · klickbares Mockup – kein Backend, alle Daten erfunden', 3800);
   await caption('', 400);
 });
 

@@ -3,7 +3,7 @@
 Branchensoftware der **Sutt AG** (Haushalt-Apparate, Industriestrasse 24, 8152 Glattbrugg/Opfikon) –
 Service, Reparatur und Verkauf von Haushalts-Grossgeräten.
 
-**Stand:** rev 06 · v0.6.0 · **Vertrag & Mein Jahr** (Phase A) und **Website, Anfragen & SMS-Vorlagen** (Phase B des Master-Prompts `docs/prompts/master-prompt-rev06.md`) auf Personal v0.5, Betrieb v0.4, Aussendienst v0.3 und Disposition v2 · Techniker-App als eigenes Projekt `app/` (ADR-008) und Website `webseite/` (fünf Seiten, Anfrage → Leitstand, ADR-009) · klickbares Mockup mit Testdaten, ohne Backend.
+**Stand:** rev 06 · v2.1.6 · **Vertrag & Mein Jahr** (Phase A) und **Website, Anfragen & SMS-Vorlagen** (Phase B des Master-Prompts `docs/prompts/master-prompt-rev06.md`) auf Personal v0.5, Betrieb v0.4, Aussendienst v0.3 und Disposition v2 · Techniker-App als eigenes Projekt `app/` (ADR-008) und Website `webseite/` (fünf Seiten, Anfrage → Leitstand, ADR-009) · klickbares Mockup mit Testdaten, ohne Backend.
 Diese Datei ist der Bauplan: **jedes folgende Modul** (Kunden, Geräte, Lager, Mietgeräte, Zeit …)
 wird exakt nach diesen Regeln aufgebaut. Änderungen je Revision stehen in `CHANGELOG.jh.md`.
 
@@ -634,14 +634,14 @@ aus den erledigten Einsätzen. Alle Firmen, Personen, Nummern und E-Mails (`.exa
 
 ---
 
-## 10 · Bewusst nicht in v0.6
+## 10 · Bewusst nicht in v2.1
 
 Kein Backend, keine echte Token-Prüfung (Anbieter als Mock-Dialog, `jh# 020`), keine echten Daten. Persistenz nur als
 `localStorage`-Stand desselben Tages (Reload hält ihn, «Demo zurücksetzen» verwirft ihn, ein neuer Tag beginnt frisch).
 Kein echter SMS/Mail-Versand (Vorschau + Protokoll), kein echtes OCR (`jh# 014`), Kamerafotos nur im Fenster (`jh# 012`),
 keine Offline-Warteschlange (`jh# 013`, Stempel `jh# 019`), kein Routing-Dienst (Fahrzeit ist Luftlinie × Faktor), OSM-Kacheln
 nur fürs Mockup (`jh# 007`), keine Geokodierung neuer Liegenschaften (`jh# 016`), Löschlauf nur für den Browser-Stand (`jh# 021`),
-tzdata-Abgleich mit der API (`jh# 018`), keine Rechnungsstellung/Mahnwesen (Buchhaltung v0.7), keine Lieferanten-Anbindung,
+tzdata-Abgleich mit der API (`jh# 018`), keine Rechnungsstellung/Mahnwesen (Buchhaltung, geplant v2.3), keine Lieferanten-Anbindung,
 keine Lohnschnittstelle (CSV-Export der Zeitkonten ist der Weg). Die App ist installierbar, läuft aber nur online (kein Service
 Worker); Scanner und Kamera brauchen einen Browser mit `BarcodeDetector` bzw. `capture` – sonst Handeingabe und Dateiwahl.
 Die Website hat Texte, aber noch keine Bilder (Frage 33); Anfragen leben im Mockup im Browser-Speicher (gleiche Origin wie der Leitstand),
