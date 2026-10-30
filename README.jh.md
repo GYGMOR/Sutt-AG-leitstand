@@ -3,7 +3,7 @@
 Branchensoftware der **Sutt AG** (Haushalt-Apparate, Industriestrasse 24, 8152 Glattbrugg/Opfikon) –
 Service, Reparatur und Verkauf von Haushalts-Grossgeräten.
 
-**Stand:** rev 05 · v0.5.0 · Personal (Zeiterfassung, Absenzen, Benutzer & Rollen, Einstellungen mit SSO, Datenschutz, Dashboard-Diagramme) auf Betrieb v0.4, Aussendienst v0.3 und Disposition v2 · **Techniker-App als eigenes Projekt `app/`** (ADR-008) und Website-Gerüst `webseite/` · klickbares Mockup mit Testdaten, ohne Backend.
+**Stand:** rev 06 · v0.6.0 · **Vertrag & Mein Jahr** (Phase A des Master-Prompts `docs/prompts/master-prompt-rev06.md`) auf Personal v0.5, Betrieb v0.4, Aussendienst v0.3 und Disposition v2 · Techniker-App als eigenes Projekt `app/` (ADR-008) und Website-Gerüst `webseite/` · klickbares Mockup mit Testdaten, ohne Backend.
 Diese Datei ist der Bauplan: **jedes folgende Modul** (Kunden, Geräte, Lager, Mietgeräte, Zeit …)
 wird exakt nach diesen Regeln aufgebaut. Änderungen je Revision stehen in `CHANGELOG.jh.md`.
 
@@ -158,7 +158,7 @@ src/
 ├─ modules/lager/               Lager & Ersatzteile: LagerPage · ArtikelDossier · BestellungDossier · BestellDialog ·
 │                               LagerDialoge (Umbuchen, Korrektur, Artikel) · lager.model
 ├─ modules/suche/               globaleSuche – Suchquellen Aufträge/Kunden/Geräte für die Palette auf jeder Seite
-├─ modules/personal/            geteilt (rev 05): rechte (useRechte, useStandFuerSicht) · personal.model (Zeitkonto, Stempellage, CSV) ·
+├─ modules/personal/            geteilt (rev 05): rechte (useRechte, useStandFuerSicht) · personal.model (Zeitkonto, Mein Jahr, Vertrag, Stempellage, CSV) ·
 │                               useStempeluhr · Stempeluhr (Pille, grosse Uhr, Streifen) · PersonAvatar · anmeldung · MeineDatenPage
 ├─ modules/zeiterfassung/       ZeiterfassungPage (Liste · Tag · Woche · Monat · Jahr) · WochenUebersicht (Chips) · MonatsMatrix (+ Jahr) ·
 │                               TagesBild (Zeitstrahl) · ZeitkontoDossier · ZeitDialoge · zeiterfassung.model
@@ -453,6 +453,18 @@ Seitenleiste zeigt `v0.2.0 · ◆ JH`; der Tooltip trägt Build-Datum und Commit
   Flyout, Palette); Akte «Techniker-App öffnen» / Servicerapporte «In der App erfassen» öffnen `/app/…?als=<Techniker>`;
   Aussendienst springt nach dem Login auf `/app/`. Ein Stand, eine Sitzung – über denselben Ursprung.
 
+### Personal v0.6 – Vertrag & Mein Jahr (rev 06, Phase A)
+- **Vertrag** an jeder Personalakte: Art **unbefristet · befristet · auf Widerruf · temporär**, Vertragsbeginn (= Eintritt), Vertragsende
+  (= Austritt; leer heisst offen, bis auf Weiteres), Notiz. Befristet und temporär verlangen ein Enddatum. Soll ausserhalb des Vertrags
+  ist 0; der Konflikt-Wächter meldet Einsätze **nach dem Vertragsende**; Absenzen ausserhalb des Vertrags lehnt der Dialog ab.
+- **Hinweis 60 Tage vorher**: Dashboard «Verträge enden bald», Mitarbeitende-Tabelle (Status «Endet in n Tagen»), Chip in der Personalakte.
+- **Mein Jahr** im Zeitkonto (Leitstand `/zeiterfassung/<id>`) und in der App (Tab Zeit → **Woche · Monat · Jahr**): Jahre vom Eintritt bis
+  zum Vertragsende (offen: bis ins Folgejahr), zwölf Monate mit Soll · Ist · Saldo · Abschluss · Hinweisen, Zustände «vor Systembeginn»,
+  «nicht angestellt», «noch offen», «läuft»; Klick öffnet den Monat. Kopf **«Stand heute»**: Vertrag, Gleitzeit heute, Ferienrest,
+  Vertragsende. Jahrestotal mit Gleitzeit per Jahresende, Ferienkonto des Jahres, CSV «Jahr». Die Gleitzeit ist eine Kette ab dem
+  Systembeginn (Tag nach dem Übertrags-Stichtag) über Jahresgrenzen hinweg – Leitstand, Jahresmatrix und App zeigen denselben Wert.
+- **App**: Woche und Monat zurückblätterbar bis zum Systembeginn bzw. Eintritt, vergangene Monate mit allen Tagen.
+
 ### Mockdaten
 Alles hängt am echten Datum (`MOCK_HEUTE`). Heute (6 Techniker) und der Eingang sind handverlesen, die
 übrigen Tage und Techniker füllt ein deterministischer Generator (Saat = Datum + Techniker); Absenzen liegen
@@ -552,6 +564,12 @@ aus den erledigten Einsätzen. Alle Firmen, Personen, Nummern und E-Mails (`.exa
     nachmittags das Handy in der Hand – die App muss an beiden Orten dieselbe sein.
 34. **Fotos gehören zum Einsatz** – Die Kamera der App fragt zuerst «welcher Einsatz, welches Motiv» und legt das Bild am Auftrag ab;
     der Leitstand sieht es in Akte, Gerät und Modul Bilder. *Warum:* Fotos in der Galerie des Handys sind für das Büro verloren.
+35. **Der Vertrag bestimmt den Horizont** (rev 06) – Soll, Planung, Absenzen und Jahressicht laufen vom Vertragsbeginn bis zum Vertragsende;
+    ein offener Vertrag heisst «bis auf Weiteres», nicht «2099 im Kalender», und 60 Tage vor dem Ende melden sich Dashboard und
+    Personalakte. *Warum:* Befristungen laufen sonst still aus – der Techniker steht im Plan, obwohl sein Vertrag vorbei ist.
+36. **Mein Jahr statt Monatsblick** – Jede Person sieht ihr ganzes Jahr: zwölf Monate mit Saldo, die Gleitzeit als Kette seit dem
+    Systembeginn, den Ferienrest, den Vertrag – im Leitstand und in der App gleich. *Warum:* «Wie viel habe ich im Plus?» darf keine
+    Frage an die Personaladministration sein.
 
 ---
 
@@ -588,6 +606,7 @@ aus den erledigten Einsätzen. Alle Firmen, Personen, Nummern und E-Mails (`.exa
 29. Datenschutzberater/in benennen, Aufbewahrungsfristen mit Treuhand bestätigen? – `core/datenschutz/aufbewahrung.ts`
 30. Darf aus dem Ausland gestempelt werden (Zonenzeit ist Schweiz) – oder nur aus dem Fahrzeug/Büro? – `modules/personal/useStempeluhr.ts`
 31. Wer genehmigt Monate und Absenzen des Dispositionsleiters (Vier-Augen-Prinzip ganz oben)? – `core/berechtigung/rechte.ts`
+32. Was heisst «auf Widerruf» bei Sutt – Aushilfe ohne festes Ende oder Probezeit? Gelten für Temporäre dieselben Ferienregeln? – `core/domain/personal.ts`
 
 ---
 

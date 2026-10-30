@@ -2,6 +2,22 @@
 
 Format: ein Abschnitt pro Revision, Bereiche wie im Commit-Stil (`dispo(kalender): … ◆`).
 
+## rev 06 · 2026.11 · v0.6.0 – All-in-One, Phase A: Vertrag & Mein Jahr
+
+### Neu
+- **Vertrag** an der Personalakte: Vertragsart **unbefristet · befristet · auf Widerruf · temporär**, Vertragsbeginn (= Eintritt), Vertragsende (= Austritt; leer = offen, bis auf Weiteres), Vertragsnotiz. Enddatum Pflicht bei befristet/temporär (`pruefeVertrag`). Sichtbar im Mitarbeiter-Dialog, in der Personalakte (Fakten, Chip «Vertrag endet in n Tagen»), in der Mitarbeitenden-Tabelle (Status «Endet in n Tagen» zuoberst) und im Dashboard («Verträge enden bald», Vorlauf 60 Tage). Konflikt-Wächter meldet **«Nach Vertragsende»** für Einsätze nach dem letzten Vertragstag; der Absenzdialog weist Zeiträume vor Vertragsbeginn und nach Vertragsende ab. Soll ausserhalb des Vertrags bleibt 0.
+- **Mein Jahr** für jede Person: Jahressicht im Zeitkonto-Dossier (Leitstand) und als dritte Ansicht **«Jahr»** im App-Tab Zeit – Jahreswahl vom Eintrittsjahr bis zum Jahr des Vertragsendes (offener Vertrag: bis ins Folgejahr), zwölf Monate mit Soll · Ist · Saldo · Abschluss · Hinweisen, Zustände «vor Systembeginn / nicht angestellt / noch offen / läuft», Klick auf den Monat öffnet ihn, Kopf **«Stand heute»** mit Vertrag, Gleitzeit, Ferienrest und Vertragsende, Jahrestotal mit Gleitzeit per Jahresende, Ferienkonto des Jahres, CSV «Jahr als CSV».
+- **App Zeit**: Umschalter Woche · Monat · Jahr; Woche und Monat zurückblätterbar bis zum Systembeginn bzw. Eintritt (nicht in die Zukunft), vergangene Monate zeigen alle Tage, Sprung ins Zeitkonto des Leitstands mit dem gewählten Monat.
+- **Modell** (`modules/personal/personal.model.ts`): `berechneJahr`, `standHeute`, `vertragLabel`, `systembeginn`, `monateImJahr`, `angestelltImMonat`; die Jahresmatrix der Zeiterfassung rechnet mit derselben Funktion. `saldoKumuliert` ist eine Kette ab Systembeginn über Jahresgrenzen hinweg (vorher nur ab Jahresanfang). Domäne: `Vertragsart`, `Vertrag`, `vertragVon`, `vertragsende`, `vertragEndetIn`, `vertragsjahre`, `VERTRAG_OFFEN` (`core/domain/personal.ts`).
+- **Mock**: FR befristet bis in 45 Tagen (Hinweis sichtbar), SO mit Lehrvertrag bis 31.07.2029, NA auf Widerruf, TE beendet per 30.06.2026; Stand-Format **v5** (ältere Stände werden verworfen).
+- **Tests**: 214 – neu `core/domain/personal.test.ts` (Vertrag), `modules/personal/personal.model.test.ts` (Mein Jahr, Saldo-Kette, Stand heute), Konflikt «Vertragsende».
+
+### Geändert
+- Versionen aller drei Pakete auf 0.6.0; Master-Prompt für diese Revision in `docs/prompts/master-prompt-rev06.md`, Entwurf in `docs/design/step-6-vertrag-jahr.md`.
+
+### Offen
+- `jh?` Was «auf Widerruf» bei Sutt genau heisst (README §9, Frage 32) · Phasen B–G des Master-Prompts: Website, Mietgeräte, Benachrichtigungen, Stempel-Assistenz, API-Vorbereitung, Abschluss.
+
 ## rev 05 · 2026.10 · v0.5.0 – Personal: Zeiterfassung, Absenzen, Benutzer & Rollen, Einstellungen, Datenschutz · Techniker-App als eigenes Projekt
 
 ### Neu

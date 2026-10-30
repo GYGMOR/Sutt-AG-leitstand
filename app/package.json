@@ -1,7 +1,7 @@
 {
   "name": "sutt-app",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "SUTT App – Techniker-App der Sutt AG · Heute, Tour, Zeit, Kamera, Scannen, Fahrzeug (Mockup, teilt Domäne und Stand mit dem Leitstand)",
   "author": "◆ JH",
   "type": "module",
