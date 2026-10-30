@@ -1,18 +1,19 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/zeiterfassung/ZeitkontoDossier.tsx         │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Zeitkonto: Stempeluhr, Saldo, Tage, Korrekturen, Monatsabschluss      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, CalendarPlus, Check, Download, Pencil, Send, Trash2, Undo2 } from 'lucide-react';
+import { AlertTriangle, CalendarPlus, Check, ChevronLeft, ChevronRight, Download, Pencil, Send, Trash2, Undo2 } from 'lucide-react';
 import { ladeHerunter } from '../../core/datei';
 import type { IsoDatum, Minuten } from '../../core/datum';
 import { ABSENZ_LABEL } from '../../core/domain/absenz';
-import { FUNKTION_LABEL, mitarbeiterName } from '../../core/domain/personal';
-import { ABSCHLUSS_STATUS_LABEL, ZEIT_QUELLE_LABEL, ZEIT_WARNUNG_LABEL, eintraegeAusEinsatzplan, istAktiv } from '../../core/domain/zeit';
-import type { ZeitEintrag } from '../../core/domain/zeit';
+import { FUNKTION_LABEL, mitarbeiterName, vertragsjahre } from '../../core/domain/personal';
+import { ABSCHLUSS_STATUS_LABEL, ZEIT_QUELLE_LABEL, ZEIT_WARNUNG_LABEL, eintraegeAusEinsatzplan, istAktiv, jahrVon } from '../../core/domain/zeit';
+import type { MonatsSchluessel, ZeitEintrag } from '../../core/domain/zeit';
 import { formatDatum, formatDatumKurz, formatDauer, formatSaldo, formatWochentag, formatZeit, formatZeitpunktKurz } from '../../core/format';
+import type { Mandant } from '../../core/mandant/mandant.types';
 import { Button, IconButton } from '../../core/ui/Button';
 import { Chip } from '../../core/ui/Chip';
 import { DossierAbschnitt, DossierKopf, Fakten } from '../../core/ui/ModulSeite';
@@ -23,8 +24,8 @@ import { Verweis, ZIEL } from '../../core/ui/Verweis';
 import { cx } from '../../core/ui/cx';
 import type { DispoAktionen } from '../dispo/store/useDispoAktionen';
 import { PersonAvatar } from '../personal/PersonAvatar';
-import { exportName, zeitkontoCsv } from '../personal/personal.model';
-import type { TagMitPlan } from '../personal/personal.model';
+import { JAHR_ZUSTAND_LABEL, berechneJahr, exportName, jahresCsvFuer, monatLabelKurz, standHeute, zeitkontoCsv } from '../personal/personal.model';
+import type { JahrMonat, TagMitPlan, ZeitQuelle } from '../personal/personal.model';
 import type { Rechte } from '../personal/rechte';
 import { StempeluhrGross } from '../personal/Stempeluhr';
 import personal from '../personal/Personal.module.css';
@@ -32,6 +33,7 @@ import { AbschlussDialog, EintragDialog, GrundDialog, KorrekturDialog } from './
 import { kannEinreichen, monatLabel, monatsabschlussEntwurf } from './zeiterfassung.model';
 import type { ZeitZeile } from './zeiterfassung.model';
 import styles from './Zeiterfassung.module.css';
+import raster from './Zeitraster.module.css';
 
 // ── §1 · Spalten ─────────────────────────────────────────────────
 
@@ -94,6 +96,23 @@ const TAG_SPALTEN: readonly Spalte<TagMitPlan>[] = [
   },
 ];
 
+function istGerechnet(monat: JahrMonat): boolean {
+  return monat.zustand === 'laufend' || monat.zustand === 'vergangen';
+}
+
+const JAHR_SPALTEN: readonly Spalte<JahrMonat>[] = [
+  { id: 'monat', label: 'Monat', render: (monat) => <span className={personal.mono}>{monatLabelKurz(monat.monat)}</span>, sortWert: (monat) => monat.monat, breite: '110px' },
+  { id: 'soll', label: 'Soll', render: (monat) => (istGerechnet(monat) ? formatDauer(monat.sollMin) : <span className={personal.leerWert}>–</span>), sortWert: (monat) => monat.sollMin, align: 'right', mono: true },
+  { id: 'ist', label: 'Ist', render: (monat) => (istGerechnet(monat) ? formatDauer(monat.istMin) : <span className={personal.leerWert}>–</span>), sortWert: (monat) => monat.istMin, align: 'right', mono: true },
+  { id: 'saldo', label: 'Saldo', render: (monat) => (istGerechnet(monat) ? <span className={saldoKlasse(monat.saldoMin)}>{formatSaldo(monat.saldoMin)}</span> : <span className={personal.leerWert}>–</span>), sortWert: (monat) => monat.saldoMin, align: 'right', mono: true },
+  {
+    id: 'stand',
+    label: 'Stand',
+    render: (monat) => (monat.abschluss ? <Chip tone={ABSCHLUSS_TON[monat.abschluss]}>{ABSCHLUSS_STATUS_LABEL[monat.abschluss]}</Chip> : <span className={istGerechnet(monat) ? undefined : personal.leerWert}>{JAHR_ZUSTAND_LABEL[monat.zustand]}</span>),
+  },
+  { id: 'hinweise', label: 'Hinweise', render: (monat) => (monat.tageMitWarnung > 0 ? <Chip tone="danger" icon={AlertTriangle}>{monat.tageMitWarnung === 1 ? '1 Tag' : `${monat.tageMitWarnung} Tage`}</Chip> : <span className={personal.leerWert}>–</span>), sortWert: (monat) => monat.tageMitWarnung, nebensaechlich: true },
+];
+
 // ── §2 · Dossier ─────────────────────────────────────────────────
 
 interface ZeitkontoDossierProps {
@@ -106,11 +125,15 @@ interface ZeitkontoDossierProps {
   jetztMin: Minuten;
   /** Tag, der beim Öffnen aufgeklappt ist – z. B. aus einem Chip der Wochenübersicht. */
   startTag?: IsoDatum | null;
+  quelle: ZeitQuelle;
+  mandant: Mandant;
+  /** Monat in der Jahressicht angeklickt – die Seite wechselt den Monat. */
+  onMonat?: (monat: MonatsSchluessel) => void;
 }
 
 const protokolliert = new Set<string>();
 
-export function ZeitkontoDossier({ zeile, eigene, rechte, aktionen, alleEintraege, heute, jetztMin, startTag = null }: ZeitkontoDossierProps) {
+export function ZeitkontoDossier({ zeile, eigene, rechte, aktionen, alleEintraege, heute, jetztMin, startTag = null, quelle, mandant, onMonat }: ZeitkontoDossierProps) {
   const { konto, person } = zeile;
   const { mitarbeiter } = person;
   const [gewaehlt, setGewaehlt] = useState<IsoDatum | null>(startTag);
@@ -122,6 +145,13 @@ export function ZeitkontoDossier({ zeile, eigene, rechte, aktionen, alleEintraeg
   const [loeschen, setLoeschen] = useState<ZeitEintrag | null>(null);
   const [abschlussOffen, setAbschlussOffen] = useState(false);
   const [zurueckweisen, setZurueckweisen] = useState(false);
+  const [jahr, setJahr] = useState(jahrVon(konto.monat));
+  useEffect(() => {
+    setJahr(jahrVon(konto.monat));
+  }, [konto.monat]);
+  const jahre = useMemo(() => vertragsjahre(mitarbeiter, heute), [mitarbeiter, heute]);
+  const meinJahr = useMemo(() => berechneJahr(mitarbeiter, jahr, quelle, mandant, heute, jetztMin), [mitarbeiter, jahr, quelle, mandant, heute, jetztMin]);
+  const stand = useMemo(() => standHeute(mitarbeiter, quelle, mandant, heute, jetztMin), [mitarbeiter, quelle, mandant, heute, jetztMin]);
 
   // jh› Einsicht in fremde Personendaten wird protokolliert (DSV Art. 4) – einmal je Person und Monat pro Sitzung.
   useEffect(() => {
@@ -145,6 +175,11 @@ export function ZeitkontoDossier({ zeile, eigene, rechte, aktionen, alleEintraeg
   const exportieren = () => {
     ladeHerunter(exportName('zeitkonto', [mitarbeiter.kuerzel, konto.monat], 'csv'), zeitkontoCsv(konto), 'text/csv');
     aktionen.protokolliere({ bereich: 'zeit', art: 'export', text: `Zeitkonto ${mitarbeiterName(mitarbeiter)} ${monatLabel(konto.monat)} als CSV exportiert`, mitarbeiterId: mitarbeiter.id });
+  };
+
+  const jahrExportieren = () => {
+    ladeHerunter(exportName('zeitkonto-jahr', [mitarbeiter.kuerzel, String(jahr)], 'csv'), jahresCsvFuer(meinJahr), 'text/csv');
+    aktionen.protokolliere({ bereich: 'zeit', art: 'export', text: `Jahresübersicht ${mitarbeiterName(mitarbeiter)} ${jahr} als CSV exportiert`, mitarbeiterId: mitarbeiter.id });
   };
 
   const ausPlanUebernehmen = (ziel: TagMitPlan) => {
@@ -213,6 +248,57 @@ export function ZeitkontoDossier({ zeile, eigene, rechte, aktionen, alleEintraeg
             Ruhezeit unter 11 Stunden (ArG 15a): {konto.ruhezeit.map((eintrag) => `${formatDatumKurz(eintrag.datum)} (${formatDauer(eintrag.ruheMin)})`).join(', ')}
           </p>
         )}
+      </DossierAbschnitt>
+
+      <DossierAbschnitt
+        titel={eigene ? `Mein Jahr ${jahr}` : `Jahr ${jahr}`}
+        zusatz={
+          <span className={raster.periodeNav} role="group" aria-label="Jahr wählen">
+            {jahre.includes(jahr - 1) && <IconButton icon={ChevronLeft} label="Vorjahr" size="sm" onClick={() => setJahr(jahr - 1)} />}
+            <span className={raster.periodeLabel}>{jahr}</span>
+            {jahre.includes(jahr + 1) && <IconButton icon={ChevronRight} label="Nächstes Jahr" size="sm" onClick={() => setJahr(jahr + 1)} />}
+          </span>
+        }
+      >
+        <Fakten
+          eintraege={[
+            { label: 'Vertrag', wert: stand.vertragText, breit: true },
+            { label: 'Gleitzeit heute', wert: <span className={saldoKlasse(stand.gleitzeitMin)}>{formatSaldo(stand.gleitzeitMin)}</span>, mono: true },
+            { label: `Ferien Rest ${heute.slice(0, 4)}`, wert: `${stand.ferienRestTage} Tage`, mono: true },
+            ...(stand.endetInTagen !== null ? [{ label: 'Vertragsende', wert: <Chip tone="signal">{stand.endetInTagen === 0 ? 'heute' : `in ${stand.endetInTagen} Tagen`}</Chip> }] : []),
+          ]}
+        />
+        <Tabelle
+          spalten={JAHR_SPALTEN}
+          zeilen={meinJahr.monate}
+          zeilenId={(monat) => monat.monat}
+          label="Monate"
+          aktivId={konto.monat}
+          onZeile={(monat) => {
+            if (istGerechnet(monat)) onMonat?.(monat.monat);
+          }}
+          dicht
+          zeilenKlasse={(monat) => (istGerechnet(monat) ? undefined : styles.zukunft)}
+        />
+        <Fakten
+          eintraege={[
+            { label: `Soll ${jahr}`, wert: formatDauer(meinJahr.sollMin), mono: true },
+            { label: `Ist ${jahr}`, wert: formatDauer(meinJahr.istMin), mono: true },
+            { label: 'Saldo Jahr', wert: <span className={saldoKlasse(meinJahr.saldoMin)}>{formatSaldo(meinJahr.saldoMin)}</span>, mono: true },
+            { label: jahr < Number(heute.slice(0, 4)) ? `Gleitzeit per 31.12.${jahr}` : 'Gleitzeit per heute', wert: <span className={saldoKlasse(meinJahr.kumuliertMin)}>{formatSaldo(meinJahr.kumuliertMin)}</span>, mono: true },
+            { label: `Ferien ${jahr}`, wert: `${meinJahr.ferien.anspruchTage + meinJahr.ferien.uebertragTage} Anspruch · ${meinJahr.ferien.bezogenTage} bezogen · ${meinJahr.ferien.geplantTage} geplant · Rest ${meinJahr.ferien.restTage}`, breit: true },
+          ]}
+        />
+        <div className={personal.aktionen}>
+          {darfExport && (
+            <Button variant="secondary" size="sm" icon={Download} onClick={jahrExportieren}>
+              Jahr als CSV
+            </Button>
+          )}
+          <span className={personal.fussnote}>
+            Systembeginn {formatDatum(meinJahr.systembeginn)} – davor steckt alles im Übertrag von {formatSaldo(mitarbeiter.zeitUebertragMin)}.
+          </span>
+        </div>
       </DossierAbschnitt>
 
       <DossierAbschnitt titel="Monatsabschluss">

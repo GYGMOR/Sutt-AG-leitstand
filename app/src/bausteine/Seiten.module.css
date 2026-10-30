@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  app/bausteine/Seiten.module.css                    │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Seiten der App: Raster, Leiste, Banner, Abschnitte, Listen, Fuss      │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -485,6 +485,87 @@
 
 .minus {
   color: var(--sl-danger-ink);
+}
+
+/* jh› Zeitraum-Wahl (Woche, Monat, Jahr) als eine Zeile: Pfeile aussen, Bezeichnung in der Mitte. */
+.zeit-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.zeit-nav-label {
+  flex: 1;
+  text-align: center;
+  font-weight: var(--sl-fw-semibold);
+}
+
+.zeit-stand {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  padding: 10px 12px;
+  border: var(--sl-hairline);
+  border-left: var(--sl-mark-width) solid var(--sl-signal);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+}
+
+.zeit-stand dt {
+  font-size: 10px;
+  font-weight: var(--sl-fw-medium);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-mute);
+}
+
+.zeit-stand dd {
+  font-family: var(--sl-font-mono);
+  font-size: 14px;
+  font-weight: var(--sl-fw-semibold);
+}
+
+.zeit-stand-breit {
+  grid-column: 1 / -1;
+}
+
+.zeit-stand-breit dd {
+  font-family: var(--sl-font-sans);
+  font-weight: var(--sl-fw-medium);
+}
+
+.zeit-monat {
+  all: unset;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  border-bottom: 1px solid var(--sl-line-soft);
+  font-size: var(--sl-fs-12);
+  cursor: pointer;
+}
+
+.zeit-monat:last-child {
+  border-bottom: 0;
+}
+
+.zeit-monat:focus-visible {
+  outline: 2px solid var(--sl-signal);
+  outline-offset: -2px;
+}
+
+.zeit-monat-leer {
+  cursor: default;
+  color: var(--sl-mute);
+}
+
+.zeit-monat-aktuell {
+  padding-left: 8px;
+  box-shadow: inset var(--sl-mark-width) 0 0 var(--sl-signal);
 }
 
 /* ◆ jh · eof */

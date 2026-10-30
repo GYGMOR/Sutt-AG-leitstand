@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/zeiterfassung/ZeiterfassungPage.tsx        │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Modul Zeiterfassung: Liste, Tag, Woche, Monat, Jahr, Dossier          │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -315,7 +315,19 @@ export function ZeiterfassungPage() {
         }
         detail={
           gewaehlt ? (
-            <ZeitkontoDossier zeile={gewaehlt} eigene={eigene} rechte={rechte} aktionen={aktionen} alleEintraege={state.zeiteintraege} heute={heute} jetztMin={jetztMin} startTag={params.get('tag') && monatVon(tag) === monat ? tag : null} />
+            <ZeitkontoDossier
+              zeile={gewaehlt}
+              eigene={eigene}
+              rechte={rechte}
+              aktionen={aktionen}
+              alleEintraege={state.zeiteintraege}
+              heute={heute}
+              jetztMin={jetztMin}
+              startTag={params.get('tag') && monatVon(tag) === monat ? tag : null}
+              quelle={eigene ? state : quelle}
+              mandant={mandant}
+              onMonat={(ziel) => oeffnen(gewaehlt.person.mitarbeiter.id, ziel)}
+            />
           ) : (
             <Leer icon={Clock} titel="Zeitkonto nicht sichtbar" text="Die Person existiert nicht oder liegt ausserhalb Ihres Umfangs (eigene, Team, alle)." fuellend>
               <Button variant="secondary" size="sm" onClick={zurListe}>

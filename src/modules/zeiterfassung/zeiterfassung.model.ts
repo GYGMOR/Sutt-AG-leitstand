@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/zeiterfassung/zeiterfassung.model.ts       │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Zeiterfassung: Zeilen je Person, Sichten, Woche, Matrix, Jahr, Tag    │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -10,15 +10,16 @@ import { ferienkonto } from '../../core/domain/absenz';
 import type { Ferienkonto } from '../../core/domain/absenz';
 import { feiertageImJahr } from '../../core/domain/feiertage';
 import type { Feiertag } from '../../core/domain/feiertage';
-import type { Mitarbeiter } from '../../core/domain/personal';
-import { abschlussFuer, jahrVon, monatVon, tageImMonat, tagesSollMin } from '../../core/domain/zeit';
+import { jahrVon, monatVon, tageImMonat, tagesSollMin } from '../../core/domain/zeit';
 import type { AbschlussStatus, MonatsSchluessel, ZeitEintrag } from '../../core/domain/zeit';
 import { formatDatum, formatDatumKurz, formatMonatJahr, formatSaldo, formatWochentag, formatZeit } from '../../core/format';
 import type { Mandant } from '../../core/mandant/mandant.types';
 import { normalizeSuchtext } from '../../core/suche';
 import type { MonatsabschlussEntwurf } from '../dispo/store/useDispoAktionen';
-import { berechneMonat, berechneTageFuer, csvZeilen, saldoKumuliert, stempelLage } from '../personal/personal.model';
+import { angestelltImMonat, berechneJahr, berechneMonat, berechneTageFuer, csvZeilen, saldoKumuliert, stempelLage } from '../personal/personal.model';
 import type { PersonView, StempelLage, TagMitPlan, ZeitQuelle, ZeitkontoMonat } from '../personal/personal.model';
+
+export { angestelltImMonat };
 
 // ── §1 · Sichten ─────────────────────────────────────────────────
 
@@ -48,15 +49,6 @@ function suchtextVon(person: PersonView): string {
 
 export function isMonat(wert: string | null | undefined): wert is MonatsSchluessel {
   return typeof wert === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(wert);
-}
-
-/** Im Monat (zumindest teilweise) angestellt – Ausgetretene verschwinden aus späteren Monaten. */
-export function angestelltImMonat(mitarbeiter: Mitarbeiter, monat: MonatsSchluessel): boolean {
-  const tage = tageImMonat(monat);
-  const erster = tage[0];
-  const letzter = tage[tage.length - 1];
-  if (!erster || !letzter) return false;
-  return mitarbeiter.eintritt <= letzter && (mitarbeiter.austritt === undefined || mitarbeiter.austritt >= erster);
 }
 
 export function monatLabel(monat: MonatsSchluessel): string {
@@ -340,37 +332,29 @@ export function jahresMonate(jahr: number): MonatsSchluessel[] {
   return Array.from({ length: 12 }, (_, index) => `${jahr}-${String(index + 1).padStart(2, '0')}` as MonatsSchluessel);
 }
 
-// jh› Vor dem Stichtag zählt nur der Übertrag (so wie die Lohnbuchhaltung ein Jahr abschliesst) –
-//     sonst stünden in alten Monaten lauter Minusstunden, die längst verrechnet sind.
+// jh› Vor dem Systembeginn zählt nur der Übertrag (so wie die Lohnbuchhaltung ein Jahr abschliesst) –
+//     sonst stünden in alten Monaten lauter Minusstunden, die längst verrechnet sind. Die Rechnung selbst
+//     ist berechneJahr aus personal.model – dieselbe wie in «Mein Jahr» der Person und in der App.
 export function buildJahresZeilen(personen: readonly PersonView[], jahr: number, quelle: ZeitQuelle, mandant: Mandant, heute: IsoDatum, jetztMin: Minuten): JahresZeile[] {
-  const monate = jahresMonate(jahr);
-  const aktuell = monatVon(heute);
-  const bisDatum = jahr < Number(heute.slice(0, 4)) ? (`${jahr}-12-31` as IsoDatum) : heute;
   return personen.map((person) => {
-    const stichtag = person.mitarbeiter.zeitUebertragPer;
-    const zeilen = monate.map<JahresMonat>((monat) => {
-      const tage = tageImMonat(monat);
-      const letzter = tage[tage.length - 1] ?? (`${monat}-28` as IsoDatum);
-      const vorUebertrag = letzter <= stichtag;
-      const leer = vorUebertrag || monat > aktuell || !angestelltImMonat(person.mitarbeiter, monat);
-      if (leer) return { monat, sollMin: 0, istMin: 0, saldoMin: 0, abschluss: abschlussFuer(quelle.monatsabschluesse, person.mitarbeiter.id, monat)?.status, leer, vorUebertrag };
-      const konto = berechneMonat(person.mitarbeiter, monat, quelle, mandant, heute, jetztMin);
-      const relevante = konto.tage.filter((tag) => !tag.zukunft && tag.datum > stichtag);
-      const sollMin = relevante.reduce((summe, tag) => summe + tag.sollMin, 0);
-      const istMin = relevante.reduce((summe, tag) => summe + tag.arbeitMin, 0);
-      return { monat, sollMin, istMin, saldoMin: istMin - sollMin, abschluss: konto.abschluss?.status, leer, vorUebertrag };
-    });
-    const sollMin = zeilen.reduce((summe, monat) => summe + monat.sollMin, 0);
-    const istMin = zeilen.reduce((summe, monat) => summe + monat.istMin, 0);
+    const meinJahr = berechneJahr(person.mitarbeiter, jahr, quelle, mandant, heute, jetztMin);
     return {
       person,
-      monate: zeilen,
-      sollMin,
-      istMin,
-      saldoMin: istMin - sollMin,
-      kumuliertMin: saldoKumuliert(person.mitarbeiter, bisDatum, quelle, mandant, heute, jetztMin),
-      uebertragPer: stichtag,
-      ferien: ferienkonto(person.mitarbeiter, quelle.stammdaten.absenzen, jahr, heute, mandant.kanton, mandant.betrieblicheFeiertage),
+      monate: meinJahr.monate.map<JahresMonat>((monat) => ({
+        monat: monat.monat,
+        sollMin: monat.sollMin,
+        istMin: monat.istMin,
+        saldoMin: monat.saldoMin,
+        abschluss: monat.abschluss,
+        leer: monat.zustand !== 'laufend' && monat.zustand !== 'vergangen',
+        vorUebertrag: monat.zustand === 'vor-systembeginn',
+      })),
+      sollMin: meinJahr.sollMin,
+      istMin: meinJahr.istMin,
+      saldoMin: meinJahr.saldoMin,
+      kumuliertMin: meinJahr.kumuliertMin,
+      uebertragPer: person.mitarbeiter.zeitUebertragPer,
+      ferien: meinJahr.ferien,
       suchtext: suchtextVon(person),
     };
   });
