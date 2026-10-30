@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/benutzer/benutzer.model.ts                 │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Konten, Rechte-Matrix, Mitarbeitende, Hierarchie, Auskunft (DSG 25)   │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -12,7 +12,7 @@ import { ferienkonto } from '../../core/domain/absenz';
 import type { Absenz, Ferienkonto } from '../../core/domain/absenz';
 import type { BetrieblicherFeiertag, Kanton } from '../../core/domain/feiertage';
 import type { JournalEintrag } from '../../core/domain/journal';
-import { FUNKTION_LABEL, istAngestellt, mitarbeiterName } from '../../core/domain/personal';
+import { FUNKTION_LABEL, istAngestellt, mitarbeiterName, vertragEndetIn } from '../../core/domain/personal';
 import type { Mitarbeiter } from '../../core/domain/personal';
 import type { Techniker } from '../../core/domain/stammdaten';
 import type { Monatsabschluss, ZeitEintrag } from '../../core/domain/zeit';
@@ -159,6 +159,8 @@ export const MITARBEITER_SICHTEN: readonly { id: MitarbeiterSicht; label: string
 export interface MitarbeiterZeile {
   person: PersonView;
   ferien: Ferienkonto;
+  /** Tage bis zum Vertragsende, wenn es im Vorlauf von 60 Tagen liegt. */
+  endetInTagen: number | null;
   suchtext: string;
 }
 
@@ -166,6 +168,7 @@ export function buildMitarbeiterZeilen(personen: readonly PersonView[], absenzen
   return personen.map((person) => ({
     person,
     ferien: ferienkonto(person.mitarbeiter, absenzen, jahr, heute, kanton, betrieblich),
+    endetInTagen: vertragEndetIn(person.mitarbeiter, heute),
     suchtext: normalizeSuchtext(`${mitarbeiterName(person.mitarbeiter)} ${person.mitarbeiter.kuerzel} ${FUNKTION_LABEL[person.mitarbeiter.funktion]} ${person.mitarbeiter.email}`),
   }));
 }

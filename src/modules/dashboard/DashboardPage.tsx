@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dashboard/DashboardPage.tsx                │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Dashboard: Kennzahlen, Auswertung (Diagramme), Feld, Eingang          │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -19,6 +19,7 @@ import { useMandant } from '../../core/mandant/mandantStore';
 import { findModul } from '../../core/modules.config';
 import { Avatar } from '../../core/ui/Avatar';
 import { Button } from '../../core/ui/Button';
+import { VERTRAGSART_LABEL, mitarbeiterName } from '../../core/domain/personal';
 import { CapsLabel } from '../../core/ui/CapsLabel';
 import { Chip } from '../../core/ui/Chip';
 import { Kacheln } from '../../core/ui/Kacheln';
@@ -265,6 +266,21 @@ export function DashboardPage() {
                 </li>
               ))}
             </ul>
+            {bild.vertraege.length > 0 && (
+              <>
+                <CapsLabel as="h3">Verträge enden bald</CapsLabel>
+                <ul className={styles.liste}>
+                  {bild.vertraege.map((eintrag) => (
+                    <li key={eintrag.mitarbeiter.id} className={styles.listenZeile}>
+                      <span className={styles.listenText}>
+                        <span className={styles.listenHaupt}>{mitarbeiterName(eintrag.mitarbeiter)}</span> · {VERTRAGSART_LABEL[eintrag.mitarbeiter.vertragsart]} bis {formatDatumKurz(eintrag.ende)}
+                      </span>
+                      <Chip tone={eintrag.inTagen <= 30 ? 'signal' : 'neutral'}>{eintrag.inTagen === 0 ? 'heute' : `in ${eintrag.inTagen} Tagen`}</Chip>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </section>
         </div>
       </div>

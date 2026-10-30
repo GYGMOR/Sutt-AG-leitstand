@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/absenzen/AbsenzDialog.tsx                  │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Absenz beantragen oder bearbeiten: Person, Art, Zeitraum, Konto       │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -10,7 +10,7 @@ import { parseIsoInput } from '../../core/datum';
 import type { IsoDatum } from '../../core/datum';
 import { ABSENZ_ARTEN, ABSENZ_INFO, ABSENZ_LABEL, absenzTage, ferienkonto, ueberschneidung } from '../../core/domain/absenz';
 import type { Absenz, AbsenzArt, AbsenzStatus } from '../../core/domain/absenz';
-import { mitarbeiterName } from '../../core/domain/personal';
+import { mitarbeiterName, vertragsende } from '../../core/domain/personal';
 import { formatDatumKurz } from '../../core/format';
 import type { Mandant } from '../../core/mandant/mandant.types';
 import { Button } from '../../core/ui/Button';
@@ -96,6 +96,8 @@ export function AbsenzDialog({ open, personen, vorgabe, absenz = null, rechte, m
     if (!person) return 'Person wählen.';
     if (!vonIso || !bisIso) return 'Von und Bis als Datum eingeben.';
     if (bisIso < vonIso) return 'Bis liegt vor Von.';
+    if (vonIso < person.mitarbeiter.eintritt) return `Liegt vor dem Vertragsbeginn (${formatDatumKurz(person.mitarbeiter.eintritt)}).`;
+    if (bisIso > vertragsende(person.mitarbeiter)) return `Liegt nach dem Vertragsende (${formatDatumKurz(vertragsende(person.mitarbeiter))}).`;
     const kollision = ueberschneidung(absenzen, mitarbeiterId, vonIso, bisIso, absenz?.id);
     if (kollision) return `Überschneidet sich mit ${ABSENZ_LABEL[kollision.art]} ${formatDatumKurz(kollision.von)}–${formatDatumKurz(kollision.bis)}.`;
     if (tage === 0) return 'Der Zeitraum enthält keinen Arbeitstag.';

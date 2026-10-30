@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/store/persistenz.ts                  │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Stand in localStorage, Spiegelung in andere Fenster (ADR-001)         │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -22,9 +22,9 @@ import type { DispoState, Schnappschuss } from './dispo.reducer';
 
 // jh# 015 «Letzter Schreiber gewinnt» zwischen Fenstern – mit echter API Versionsnummer/ETag gegen verlorene Änderungen (ADR-001).
 export const STAND_SCHLUESSEL = 'sl.dispo.stand.v1';
-// jh› Version 4 (rev 05): Absenzen, Mitarbeitende (mit Übertrags-Stichtag), Konten, Zeiteinträge,
-//     Monatsabschlüsse und Journal im Stand – ältere Stände werden verworfen.
-const STAND_VERSION = 4;
+// jh› Version 5 (rev 06): Mitarbeitende mit Vertragsart und Vertragsende. Version 4 (rev 05): Absenzen,
+//     Mitarbeitende, Konten, Zeiteinträge, Monatsabschlüsse und Journal – ältere Stände werden verworfen.
+const STAND_VERSION = 5;
 
 /** Serialisierbarer Stand – Maps als Listen, kein Protokoll, keine Auswahl. */
 export interface Stand {

@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/konflikte.test.ts                    │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Konflikt-Wächter: Überschneidung, Arbeitszeit, Rapport, Unterschrift  │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -33,6 +33,18 @@ describe('findKonflikte', () => {
     const state = testState();
     const konflikte = findKonflikte(state.stammdaten, state.einsaetze, HEUTE, state.rapporte);
     expect(konflikte.every((konflikt) => konflikt.datum >= HEUTE || konflikt.art === 'rapport-fehlt' || konflikt.art === 'unterschrift-fehlt')).toBe(true);
+  });
+
+  it('meldet Einsätze nach dem Vertragsende des Technikers', () => {
+    const state = testState();
+    const mb = state.stammdaten.mitarbeiter.get('M-MB');
+    if (!mb) throw new Error('Testdaten: M-MB fehlt');
+    const mitarbeiter = new Map(state.stammdaten.mitarbeiter);
+    mitarbeiter.set('M-MB', { ...mb, vertragsart: 'befristet', austritt: addDays(HEUTE, 10) });
+    const spaeter: Einsatz = { ...einsatzMitId(state, 'E-A01-F'), id: 'E-NACH-ENDE', datum: addDays(HEUTE, 30), status: 'geplant' };
+    const konflikte = findKonflikte({ ...state.stammdaten, mitarbeiter }, [spaeter], HEUTE);
+    expect(konflikte.some((konflikt) => konflikt.art === 'vertragsende' && konflikt.einsatzId === 'E-NACH-ENDE')).toBe(true);
+    expect(findKonflikte(state.stammdaten, [spaeter], HEUTE).some((konflikt) => konflikt.art === 'vertragsende')).toBe(false);
   });
 });
 

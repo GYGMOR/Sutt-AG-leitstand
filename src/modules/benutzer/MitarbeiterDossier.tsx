@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/benutzer/MitarbeiterDossier.tsx            │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Personalakte: Stammdaten, Team, Ferienkonto, Konto, Auskunft          │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -8,7 +8,7 @@ import { FileDown, Pencil, UserPlus } from 'lucide-react';
 import { ladeHerunter } from '../../core/datei';
 import type { IsoDatum } from '../../core/datum';
 import { datenKategorie, loeschdatum } from '../../core/datenschutz/aufbewahrung';
-import { FUNKTION_LABEL, mitarbeiterName } from '../../core/domain/personal';
+import { FUNKTION_LABEL, mitarbeiterName, vertragEndetIn } from '../../core/domain/personal';
 import { formatDatum } from '../../core/format';
 import type { Mandant } from '../../core/mandant/mandant.types';
 import { Button } from '../../core/ui/Button';
@@ -19,7 +19,7 @@ import { Verweis, ZIEL } from '../../core/ui/Verweis';
 import type { DispoState } from '../dispo/store/dispo.reducer';
 import type { DispoAktionen } from '../dispo/store/useDispoAktionen';
 import { PersonAvatar } from '../personal/PersonAvatar';
-import { exportName } from '../personal/personal.model';
+import { exportName, vertragLabel } from '../personal/personal.model';
 import type { Rechte } from '../personal/rechte';
 import personal from '../personal/Personal.module.css';
 import { auskunftFuer } from './benutzer.model';
@@ -45,6 +45,7 @@ export function MitarbeiterDossier({ zeile, state, rechte, aktionen, mandant, he
   const darfAuskunft = rechte.hat('personal:exportieren') && rechte.darfPerson('personal', mitarbeiter.id);
   const aufbewahrung = datenKategorie('personalstamm');
   const jahre = mandant.aufbewahrung.personalstamm ?? aufbewahrung.aufbewahrungJahre;
+  const endetIn = vertragEndetIn(mitarbeiter, heute);
 
   const auskunft = () => {
     const daten = auskunftFuer(mitarbeiter, state, heute);
@@ -62,10 +63,11 @@ export function MitarbeiterDossier({ zeile, state, rechte, aktionen, mandant, he
           </>
         }
         titel={mitarbeiterName(mitarbeiter)}
-        untertitel={`${FUNKTION_LABEL[mitarbeiter.funktion]} · ${mitarbeiter.pensum} % · seit ${formatDatum(mitarbeiter.eintritt)}`}
+        untertitel={`${FUNKTION_LABEL[mitarbeiter.funktion]} · ${mitarbeiter.pensum} % · ${vertragLabel(mitarbeiter)}`}
         chips={
           <>
             <Chip tone={person.aktiv ? 'ok' : 'mute'}>{person.aktiv ? 'Angestellt' : `Ausgetreten ${mitarbeiter.austritt ? formatDatum(mitarbeiter.austritt) : ''}`}</Chip>
+            {endetIn !== null && <Chip tone="signal">{endetIn === 0 ? 'Vertrag endet heute' : `Vertrag endet in ${endetIn} Tagen`}</Chip>}
             {konto ? <Chip tone={konto.aktiv ? 'neutral' : 'danger'}>Konto {konto.aktiv ? `@${konto.benutzername}` : 'gesperrt'}</Chip> : <Chip tone="signal">Kein Konto</Chip>}
             {person.techniker && <Chip tone="neutral">{person.techniker.fahrzeug}</Chip>}
           </>
@@ -93,8 +95,10 @@ export function MitarbeiterDossier({ zeile, state, rechte, aktionen, mandant, he
             { label: 'Telefon', wert: mitarbeiter.telefon ?? '–', mono: true },
             { label: 'Vorgesetzte/r', wert: person.vorgesetzte ? <Verweis zu={ZIEL.mitarbeiter(person.vorgesetzte.id)} label="Person" wert={person.vorgesetzte.kuerzel} text={mitarbeiterName(person.vorgesetzte)} /> : 'Geschäftsleitung' },
             { label: 'Team', wert: person.team.length > 0 ? `${person.team.length} direkt unterstellt` : '–' },
-            { label: 'Eintritt', wert: formatDatum(mitarbeiter.eintritt), mono: true },
-            { label: 'Austritt', wert: mitarbeiter.austritt ? formatDatum(mitarbeiter.austritt) : '–', mono: true },
+            { label: 'Vertrag', wert: vertragLabel(mitarbeiter), breit: true },
+            { label: 'Vertragsbeginn', wert: formatDatum(mitarbeiter.eintritt), mono: true },
+            { label: 'Vertragsende', wert: mitarbeiter.austritt ? formatDatum(mitarbeiter.austritt) : 'offen (bis auf Weiteres)', mono: true },
+            ...(mitarbeiter.vertragsnotiz ? [{ label: 'Vertragsnotiz', wert: mitarbeiter.vertragsnotiz, breit: true }] : []),
             { label: 'Ferien / Jahr (100 %)', wert: `${mitarbeiter.ferienTageProJahr} Tage`, mono: true },
             { label: `Gleitzeit per ${formatDatum(mitarbeiter.zeitUebertragPer)}`, wert: `${(mitarbeiter.zeitUebertragMin / 60).toFixed(2)} h`, mono: true },
             { label: 'Konto', wert: konto ? <Verweis zu={ZIEL.konto(konto.id)} label="Konto" wert={konto.benutzername} /> : 'keines' },

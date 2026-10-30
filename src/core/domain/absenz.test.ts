@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/domain/absenz.test.ts                         │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Absenztage, Ferienkonto (Pensum, Eintritt), maskierte Sicht           │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -11,7 +11,7 @@ import type { Mitarbeiter } from './personal';
 
 // ── §1 · Aufbau ──────────────────────────────────────────────────
 
-const LF: Mitarbeiter = { id: 'M-LF', kuerzel: 'LF', vorname: 'Luca', nachname: 'Frei', funktion: 'techniker', technikerId: 'T-LF', pensum: 100, eintritt: '2020-01-06', ferienTageProJahr: 25, ferienUebertragTage: 0, zeitUebertragMin: 0, zeitUebertragPer: '2025-12-31', email: 'l.frei@sutt.example' };
+const LF: Mitarbeiter = { id: 'M-LF', kuerzel: 'LF', vorname: 'Luca', nachname: 'Frei', funktion: 'techniker', technikerId: 'T-LF', pensum: 100, eintritt: '2020-01-06', ferienTageProJahr: 25, ferienUebertragTage: 0, zeitUebertragMin: 0, zeitUebertragPer: '2025-12-31', vertragsart: 'unbefristet', email: 'l.frei@sutt.example' };
 
 function absenz(teil: Partial<Absenz>): Absenz {
   return { id: 'AB-T', mitarbeiterId: 'M-LF', technikerId: 'T-LF', von: '2026-07-06', bis: '2026-07-17', art: 'ferien', status: 'genehmigt', ...teil };

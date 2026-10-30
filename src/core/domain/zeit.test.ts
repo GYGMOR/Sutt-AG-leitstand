@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  core/domain/zeit.test.ts                           │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Stempeln, Tagessaldo, Pausenregel, Einsatzplan-Zeiten, Monate         │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -27,7 +27,7 @@ import type { StempelKontext, ZeitEintrag } from './zeit';
 
 // ── §1 · Aufbau ──────────────────────────────────────────────────
 
-const MB: Mitarbeiter = { id: 'M-MB', kuerzel: 'MB', vorname: 'Marco', nachname: 'Brunner', funktion: 'techniker', technikerId: 'T-MB', pensum: 100, eintritt: '2019-03-01', ferienTageProJahr: 25, ferienUebertragTage: 2, zeitUebertragMin: 0, zeitUebertragPer: '2025-12-31', email: 'm.brunner@sutt.example' };
+const MB: Mitarbeiter = { id: 'M-MB', kuerzel: 'MB', vorname: 'Marco', nachname: 'Brunner', funktion: 'techniker', technikerId: 'T-MB', pensum: 100, eintritt: '2019-03-01', ferienTageProJahr: 25, ferienUebertragTage: 2, zeitUebertragMin: 0, zeitUebertragPer: '2025-12-31', vertragsart: 'unbefristet', email: 'm.brunner@sutt.example' };
 
 let lauf = 0;
 function kontext(datum: IsoDatum = '2026-10-20', jetztMin = 450): StempelKontext {

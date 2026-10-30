@@ -1,14 +1,14 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/benutzer/MitarbeiterDialog.tsx             │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Personalakte anlegen oder bearbeiten: Funktion, Pensum, Eintritt …    │
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { useEffect, useMemo, useState } from 'react';
 import { Save } from 'lucide-react';
 import { addDays, parseIsoInput } from '../../core/datum';
-import { FUNKTIONEN, FUNKTION_LABEL, mitarbeiterName } from '../../core/domain/personal';
-import type { Funktion, Mitarbeiter } from '../../core/domain/personal';
+import { FUNKTIONEN, FUNKTION_LABEL, VERTRAGSARTEN, VERTRAGSART_HINWEIS, VERTRAGSART_LABEL, mitarbeiterName, pruefeVertrag, vertragBrauchtEnde } from '../../core/domain/personal';
+import type { Funktion, Mitarbeiter, Vertragsart } from '../../core/domain/personal';
 import { fullName } from '../../core/domain/stammdaten';
 import type { Techniker } from '../../core/domain/stammdaten';
 import type { Mandant } from '../../core/mandant/mandant.types';
@@ -41,6 +41,8 @@ export function MitarbeiterDialog({ open, mitarbeiter, alle, techniker, mandant,
   const [pensum, setPensum] = useState('100');
   const [eintritt, setEintritt] = useState('');
   const [austritt, setAustritt] = useState('');
+  const [vertragsart, setVertragsart] = useState<Vertragsart>('unbefristet');
+  const [vertragsnotiz, setVertragsnotiz] = useState('');
   const [ferien, setFerien] = useState('25');
   const [uebertrag, setUebertrag] = useState('0');
   const [zeitStunden, setZeitStunden] = useState('0');
@@ -60,6 +62,8 @@ export function MitarbeiterDialog({ open, mitarbeiter, alle, techniker, mandant,
     setPensum(String(basis?.pensum ?? 100));
     setEintritt(basis?.eintritt ?? '');
     setAustritt(basis?.austritt ?? '');
+    setVertragsart(basis?.vertragsart ?? 'unbefristet');
+    setVertragsnotiz(basis?.vertragsnotiz ?? '');
     setFerien(String(basis?.ferienTageProJahr ?? mandant.ferienTageStandard));
     setUebertrag(String(basis?.ferienUebertragTage ?? 0));
     setZeitStunden(basis ? (basis.zeitUebertragMin / 60).toFixed(2) : '0');
@@ -81,14 +85,18 @@ export function MitarbeiterDialog({ open, mitarbeiter, alle, techniker, mandant,
     if (alle.some((person) => person.id !== mitarbeiter?.id && person.kuerzel === kz)) return 'Kürzel ist schon vergeben.';
     const prozent = Number(pensum);
     if (!(prozent >= 10 && prozent <= 100)) return 'Pensum zwischen 10 und 100 Prozent.';
-    if (!parseIsoInput(eintritt)) return 'Eintrittsdatum fehlt.';
-    if (austritt && (!parseIsoInput(austritt) || austritt < eintritt)) return 'Austritt liegt vor dem Eintritt.';
+    const eintrittIso = parseIsoInput(eintritt);
+    if (!eintrittIso) return 'Vertragsbeginn (Eintritt) fehlt.';
+    const austrittIso = austritt ? parseIsoInput(austritt) : null;
+    if (austritt && !austrittIso) return 'Vertragsende als Datum eingeben.';
+    const vertragFehler = pruefeVertrag(vertragsart, eintrittIso, austrittIso);
+    if (vertragFehler) return vertragFehler;
     if (!(Number(ferien) >= 20 && Number(ferien) <= 40)) return 'Ferienanspruch zwischen 20 und 40 Tagen (OR 329a: mindestens 20).';
     if (vorgesetzterId === mitarbeiter?.id) return 'Niemand ist sich selbst vorgesetzt.';
     if (zeitPer && !parseIsoInput(zeitPer)) return 'Stichtag des Gleitzeit-Übertrags als Datum eingeben.';
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return 'E-Mail-Adresse prüfen.';
     return null;
-  }, [vorname, nachname, kuerzel, alle, mitarbeiter?.id, pensum, eintritt, austritt, ferien, vorgesetzterId, zeitPer, email]);
+  }, [vorname, nachname, kuerzel, alle, mitarbeiter?.id, pensum, eintritt, austritt, vertragsart, ferien, vorgesetzterId, zeitPer, email]);
 
   const speichern = () => {
     const eintrittIso = parseIsoInput(eintritt);
@@ -106,6 +114,8 @@ export function MitarbeiterDialog({ open, mitarbeiter, alle, techniker, mandant,
       pensum: Number(pensum),
       eintritt: eintrittIso,
       ...(austrittIso ? { austritt: austrittIso } : {}),
+      vertragsart,
+      ...(vertragsnotiz.trim() ? { vertragsnotiz: vertragsnotiz.trim() } : {}),
       ferienTageProJahr: Number(ferien),
       ferienUebertragTage: Number(uebertrag) || 0,
       zeitUebertragMin: Math.round((Number(zeitStunden) || 0) * 60),
@@ -191,8 +201,24 @@ export function MitarbeiterDialog({ open, mitarbeiter, alle, techniker, mandant,
           <Feld label="Ferien Tage/Jahr (100 %)" render={(id) => <Eingabe id={id} type="number" min={20} max={40} step={0.5} value={ferien} mono onChange={(event) => setFerien(event.target.value)} />} />
         </div>
         <div className={styles.formularZeile}>
-          <Feld label="Eintritt" render={(id) => <Eingabe id={id} type="date" value={eintritt} mono onChange={(event) => setEintritt(event.target.value)} />} />
-          <Feld label="Austritt" hinweis="Leer, solange angestellt" render={(id) => <Eingabe id={id} type="date" value={austritt} mono onChange={(event) => setAustritt(event.target.value)} />} />
+          <Feld
+            label="Vertragsart"
+            hinweis={VERTRAGSART_HINWEIS[vertragsart]}
+            render={(id) => (
+              <Auswahl id={id} value={vertragsart} onChange={(event) => setVertragsart(event.target.value as Vertragsart)}>
+                {VERTRAGSARTEN.map((wert) => (
+                  <option key={wert} value={wert}>
+                    {VERTRAGSART_LABEL[wert]}
+                  </option>
+                ))}
+              </Auswahl>
+            )}
+          />
+          <Feld label="Vertragsnotiz" hinweis="Grund der Befristung oder des Widerrufs – kein Vertragstext" render={(id) => <Eingabe id={id} value={vertragsnotiz} onChange={(event) => setVertragsnotiz(event.target.value)} />} />
+        </div>
+        <div className={styles.formularZeile}>
+          <Feld label="Vertragsbeginn (Eintritt)" render={(id) => <Eingabe id={id} type="date" value={eintritt} mono onChange={(event) => setEintritt(event.target.value)} />} />
+          <Feld label="Vertragsende" hinweis={vertragBrauchtEnde(vertragsart) ? 'Pflicht bei dieser Vertragsart' : 'Leer = offen, bis auf Weiteres'} render={(id) => <Eingabe id={id} type="date" value={austritt} mono onChange={(event) => setAustritt(event.target.value)} />} />
         </div>
         <div className={styles.formularZeile}>
           <Feld label="Ferienübertrag Vorjahr (Tage)" render={(id) => <Eingabe id={id} type="number" step={0.5} value={uebertrag} mono onChange={(event) => setUebertrag(event.target.value)} />} />

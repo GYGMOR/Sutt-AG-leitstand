@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/benutzer/BenutzerPage.tsx                  │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Modul Benutzer & Rollen: Konten, Rollen-Matrix, Mitarbeitende, Orga   │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -132,6 +132,16 @@ const KONTO_SPALTEN: readonly Spalte<KontoView>[] = [
   { id: 'letzte', label: 'Letzte Anmeldung', render: (view) => (view.benutzer.letzteAnmeldung ? formatZeitpunktKurz(view.benutzer.letzteAnmeldung) : <span className={personal.leerWert}>noch nie</span>), sortWert: (view) => view.benutzer.letzteAnmeldung ?? '', mono: true, nebensaechlich: true },
 ];
 
+function statusChip(zeile: MitarbeiterZeile) {
+  if (zeile.endetInTagen !== null) return <Chip tone="signal">{zeile.endetInTagen === 0 ? 'Endet heute' : `Endet in ${zeile.endetInTagen} Tagen`}</Chip>;
+  return <Chip tone={zeile.person.aktiv ? 'ok' : 'mute'}>{zeile.person.aktiv ? 'Angestellt' : 'Ausgetreten'}</Chip>;
+}
+
+function statusRang(zeile: MitarbeiterZeile): number {
+  if (zeile.endetInTagen !== null) return 0;
+  return zeile.person.aktiv ? 1 : 2;
+}
+
 const MITARBEITER_SPALTEN: readonly Spalte<MitarbeiterZeile>[] = [
   { id: 'person', label: 'Mitarbeiter/in', render: (zeile) => <PersonZelle mitarbeiter={zeile.person.mitarbeiter} techniker={zeile.person.techniker} />, sortWert: (zeile) => `${zeile.person.mitarbeiter.nachname} ${zeile.person.mitarbeiter.vorname}` },
   { id: 'funktion', label: 'Funktion', render: (zeile) => FUNKTION_LABEL[zeile.person.mitarbeiter.funktion], sortWert: (zeile) => FUNKTION_LABEL[zeile.person.mitarbeiter.funktion] },
@@ -140,7 +150,7 @@ const MITARBEITER_SPALTEN: readonly Spalte<MitarbeiterZeile>[] = [
   { id: 'vorgesetzte', label: 'Vorgesetzte/r', render: (zeile) => (zeile.person.vorgesetzte ? mitarbeiterName(zeile.person.vorgesetzte) : <span className={personal.leerWert}>Geschäftsleitung</span>), sortWert: (zeile) => zeile.person.vorgesetzte?.nachname ?? '', nebensaechlich: true },
   { id: 'konto', label: 'Konto', render: (zeile) => (zeile.person.konto ? <Chip tone={zeile.person.konto.aktiv ? 'neutral' : 'danger'}>@{zeile.person.konto.benutzername}</Chip> : <Chip tone="signal">kein Konto</Chip>), sortWert: (zeile) => zeile.person.konto?.benutzername ?? 'zzz' },
   { id: 'ferien', label: 'Ferien Rest', render: (zeile) => <span className={zeile.ferien.restTage < 0 ? personal.minus : undefined}>{zeile.ferien.restTage} Tage</span>, sortWert: (zeile) => zeile.ferien.restTage, align: 'right', mono: true, nebensaechlich: true },
-  { id: 'status', label: 'Status', render: (zeile) => <Chip tone={zeile.person.aktiv ? 'ok' : 'mute'}>{zeile.person.aktiv ? 'Angestellt' : 'Ausgetreten'}</Chip>, sortWert: (zeile) => (zeile.person.aktiv ? 0 : 1) },
+  { id: 'status', label: 'Status', render: statusChip, sortWert: statusRang },
 ];
 
 // ── §2 · Rollen-Matrix & Organigramm ─────────────────────────────

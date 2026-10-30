@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/konflikte.ts                         │
-   │  ◆ JH · 2026.10 · rev 03                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Konflikt-Wächter: Überschneidung, Arbeitszeit, Teil, Fahrt, Rapport   │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -9,6 +9,8 @@ import type { IsoDatum } from '../../core/datum';
 import { isTeilOffen } from '../../core/domain/auftrag';
 import { einsatzEnde } from '../../core/domain/einsatz';
 import type { Einsatz } from '../../core/domain/einsatz';
+import { vertragsende } from '../../core/domain/personal';
+import type { Mitarbeiter } from '../../core/domain/personal';
 import type { Rapport } from '../../core/domain/rapport';
 import { ABSENZ_LABEL, isAbwesend } from '../../core/domain/stammdaten';
 import { formatDatumKurz, formatZeit } from '../../core/format';
@@ -26,7 +28,8 @@ export type KonfliktArt =
   | 'fahrzeit-knapp'
   | 'absenz'
   | 'rapport-fehlt'
-  | 'unterschrift-fehlt';
+  | 'unterschrift-fehlt'
+  | 'vertragsende';
 
 export const KONFLIKT_LABEL: Readonly<Record<KonfliktArt, string>> = {
   ueberschneidung: 'Überschneidung',
@@ -36,6 +39,7 @@ export const KONFLIKT_LABEL: Readonly<Record<KonfliktArt, string>> = {
   absenz: 'Techniker abwesend',
   'rapport-fehlt': 'Rapport fehlt',
   'unterschrift-fehlt': 'Unterschrift fehlt',
+  vertragsende: 'Nach Vertragsende',
 };
 
 export interface Konflikt {
@@ -60,11 +64,24 @@ export function findKonflikte(stammdaten: DispoStammdaten, einsaetze: readonly E
   const konflikte: Konflikt[] = [];
   const relevante = einsaetze.filter((einsatz) => einsatz.datum >= heute && einsatz.status !== 'erledigt' && einsatz.status !== 'wartet-teil');
   const gesehen = new Set<string>();
+  const personJeTechniker = new Map<string, Mitarbeiter>();
+  for (const person of stammdaten.mitarbeiter.values()) {
+    if (person.technikerId) personJeTechniker.set(person.technikerId, person);
+  }
 
   for (const einsatz of relevante) {
     const kontext = resolveAuftrag(stammdaten, einsatz.auftragId);
     const tagesKollegen = einsaetze.filter((anderer) => anderer.technikerId === einsatz.technikerId && anderer.datum === einsatz.datum && anderer.id !== einsatz.id);
     const basis = `${kontext.auftrag.nummer} · ${formatDatumKurz(einsatz.datum)} ${formatZeit(einsatz.startMin)}`;
+
+    // jh› Planen über das Vertragsende hinaus bleibt möglich (Verlängerung in Sicht), aber der Wächter sagt es.
+    const person = personJeTechniker.get(einsatz.technikerId);
+    if (person && einsatz.datum > vertragsende(person)) {
+      konflikte.push({
+        id: `K-ve-${einsatz.id}`, art: 'vertragsende', einsatzId: einsatz.id, technikerId: einsatz.technikerId, datum: einsatz.datum,
+        text: `${basis} liegt nach dem Vertragsende ${formatDatumKurz(vertragsende(person))}`,
+      });
+    }
 
     for (const anderer of tagesKollegen) {
       if (!overlaps(einsatz, anderer)) continue;

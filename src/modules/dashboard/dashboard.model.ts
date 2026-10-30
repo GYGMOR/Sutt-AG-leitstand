@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dashboard/dashboard.model.ts               │
-   │  ◆ JH · 2026.10 · rev 05                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Tagesbild: Feld, Eingang, Konflikte, Rapporte, Lager · Auswertung     │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -9,7 +9,8 @@ import type { IsoDatum, Minuten } from '../../core/datum';
 import { isDringend } from '../../core/domain/auftrag';
 import { KATEGORIEN } from '../../core/domain/kategorie';
 import type { Kategorie } from '../../core/domain/kategorie';
-import { istAngestellt } from '../../core/domain/personal';
+import { istAngestellt, vertragEndetIn } from '../../core/domain/personal';
+import type { Mitarbeiter } from '../../core/domain/personal';
 import { isAbwesend } from '../../core/domain/stammdaten';
 import type { Absenz, Techniker } from '../../core/domain/stammdaten';
 import { rapportBetrag, summeBetraege } from '../../core/domain/verrechnung';
@@ -37,6 +38,12 @@ export interface FeldZeile {
   total: number;
 }
 
+export interface VertragsEnde {
+  mitarbeiter: Mitarbeiter;
+  ende: IsoDatum;
+  inTagen: number;
+}
+
 export interface Tagesbild {
   einsaetze: { total: number; erledigt: number; laufend: number; geplant: number };
   eingang: { total: number; dringend: number };
@@ -44,6 +51,8 @@ export interface Tagesbild {
   rapporte: { fehlend: number; pruefen: number; verrechnen: number; verrechnenChf: Betrag };
   lager: { ueberfaellig: number; heute: number; knapp: number; leer: number };
   abwesend: { techniker: Techniker; absenz: Absenz }[];
+  /** Verträge, die im Vorlauf (60 Tage) enden – nach Dringlichkeit. */
+  vertraege: VertragsEnde[];
   feld: FeldZeile[];
   zeilen: TagesZeile[];
   pendenzen: PendenzView[];
@@ -106,6 +115,12 @@ export function buildTagesbild(state: DispoState, heute: IsoDatum, jetztMin: Min
       const absenz = isAbwesend(stammdaten.absenzen, techniker.id, heute);
       return absenz ? [{ techniker, absenz }] : [];
     }),
+    vertraege: [...stammdaten.mitarbeiter.values()]
+      .flatMap<VertragsEnde>((mitarbeiter) => {
+        const inTagen = vertragEndetIn(mitarbeiter, heute);
+        return inTagen === null || mitarbeiter.austritt === undefined ? [] : [{ mitarbeiter, ende: mitarbeiter.austritt, inTagen }];
+      })
+      .sort((a, b) => a.inTagen - b.inTagen),
     feld,
     zeilen,
     pendenzen: pendenzViews.slice(0, LISTEN_LAENGE),
