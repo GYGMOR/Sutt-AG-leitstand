@@ -52,17 +52,39 @@
         <a class="hero-weiter" href="#vertrauen" aria-label="Weiter zu den Inhalten"><svg class="icon" aria-hidden="true"><use href="#i-down" /></svg></a>
       </section>
 
-      <section class="vertrauen" id="vertrauen" aria-label="Marken und Versprechen">
-        <div class="innen">
-          <p class="vertrauen-text">Geschult und mit Ersatzteilen im Fahrzeug für</p>
-          <ul class="marken" aria-label="Marken, die wir warten und reparieren">
-            <li>Miele</li>
-            <li>V-ZUG</li>
-            <li>Electrolux</li>
-            <li>Siemens</li>
-            <li>Liebherr</li>
-            <li>Asko</li>
-          </ul>
+      <section class="marken-band" id="vertrauen" aria-labelledby="marken-titel">
+        <div class="innen marken-kopf">
+          <div>
+            <p class="vorzeile">Marken &amp; Partner</p>
+            <h2 id="marken-titel">Wir reparieren, liefern und montieren für diese Hersteller.</h2>
+          </div>
+          <button class="marken-pause" type="button" hidden>
+            <svg class="icon icon-pause" aria-hidden="true"><use href="#i-pause" /></svg>
+            <svg class="icon icon-play" aria-hidden="true"><use href="#i-play" /></svg>
+            <span>Band anhalten</span>
+          </button>
+        </div>
+        <!-- jh› Logos: webseite/public/logos/<id>.svg|png|webp|jpg ablegen (id wie data-logo) – vite.config.ts findet sie
+             beim Start, main.ts setzt das Bild ein. Bis dahin steht der Name in der Markenfarbe. main.ts verdoppelt die
+             Liste für die Endlosschleife (Kopie aria-hidden, nicht fokussierbar); «Bewegung reduzieren» zeigt ein Raster. -->
+        <div class="marken-fenster">
+          <div class="marken-spur">
+            <ul class="marken-liste" aria-label="Hersteller – Links öffnen deren Website in einem neuen Fenster">
+              <li><a class="logo" data-logo="miele" data-voll style="--logo-farbe: #8c0014" href="https://www.miele.ch/" target="_blank" rel="noopener" aria-label="Miele"><span class="logo-wort">Miele</span></a></li>
+              <li><a class="logo" data-logo="vzug" style="--logo-farbe: #2b3674" href="https://www.vzug.com/ch/de/" target="_blank" rel="noopener" aria-label="V-ZUG"><span class="logo-wort">V-ZUG</span></a></li>
+              <li><a class="logo" data-logo="sibir" style="--logo-farbe: #0094d4" href="https://www.sibirgroup.ch/" target="_blank" rel="noopener" aria-label="SIBIR"><span class="logo-wort">SIBIR</span></a></li>
+              <li><a class="logo" data-logo="electrolux" style="--logo-farbe: #022a5e" href="https://www.electrolux.ch/" target="_blank" rel="noopener" aria-label="Electrolux"><span class="logo-wort">Electrolux</span></a></li>
+              <li><a class="logo" data-logo="gaggenau" style="--logo-farbe: #231f20" href="https://www.gaggenau.com/ch/" target="_blank" rel="noopener" aria-label="Gaggenau"><span class="logo-wort">GAGGENAU</span></a></li>
+              <li><a class="logo" data-logo="schulthess" style="--logo-farbe: #1a1a1a" href="https://www.schulthess.ch/" target="_blank" rel="noopener" aria-label="Schulthess"><span class="logo-wort">SCHULTHESS</span></a></li>
+              <li><a class="logo" data-logo="siemens" style="--logo-farbe: #008c8c" href="https://www.siemens-home.bsh-group.com/ch/" target="_blank" rel="noopener" aria-label="Siemens Hausgeräte"><span class="logo-wort">SIEMENS</span></a></li>
+              <li><a class="logo" data-logo="wesco" style="--logo-farbe: #004778" href="https://www.wesco.ch/" target="_blank" rel="noopener" aria-label="WESCO"><span class="logo-wort">WESCO</span></a></li>
+              <li><a class="logo" data-logo="bauknecht" style="--logo-farbe: #253a7c" href="https://www.bauknecht.ch/" target="_blank" rel="noopener" aria-label="Bauknecht"><span class="logo-wort">Bauknecht</span></a></li>
+              <li><a class="logo" data-logo="krueger" style="--logo-farbe: #c21924" href="https://www.krueger.ch/" target="_blank" rel="noopener" aria-label="Krüger"><span class="logo-wort">KRÜGER</span></a></li>
+              <li><a class="logo" data-logo="aerial" style="--logo-farbe: #1a1a1a" href="https://www.aerial.de/" target="_blank" rel="noopener" aria-label="Aerial – The Drying Experts"><span class="logo-wort">AERIAL</span></a></li>
+              <li><a class="logo" data-logo="tecnowash" style="--logo-farbe: #0a0aa8" href="https://www.tecnowash.ch/" target="_blank" rel="noopener" aria-label="Tecnowash Card Systeme"><span class="logo-wort">TECNOWASH</span></a></li>
+              <li><a class="logo" data-logo="fors" style="--logo-farbe: #6e7073" href="https://www.fors.ch/" target="_blank" rel="noopener" aria-label="FORS"><span class="logo-wort">FORS</span></a></li>
+            </ul>
+          </div>
         </div>
       </section>
 
@@ -200,7 +222,7 @@
             </details>
             <details>
               <summary>Welche Geräte und Marken?</summary>
-              <p>Waschmaschinen, Trockner, Geschirrspüler, Kühl- und Gefriergeräte, Backöfen, Steamer und Kochfelder – vor allem Miele, V-ZUG, Electrolux, Siemens, Liebherr und Asko. Andere Marken prüfen wir auf Anfrage.</p>
+              <p>Waschmaschinen, Trockner, Geschirrspüler, Kühl- und Gefriergeräte, Backöfen, Steamer und Kochfelder – unter anderem von Miele, V-ZUG, Electrolux, Siemens, Gaggenau, Bauknecht, Schulthess, SIBIR und FORS, dazu Lüftung (WESCO), Trocknung (Krüger, Aerial) und Waschküchen-Kartensysteme (Tecnowash). Andere Marken prüfen wir auf Anfrage.</p>
             </details>
             <details>
               <summary>Was ist mit der Garantie?</summary>

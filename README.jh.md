@@ -472,7 +472,7 @@ Seitenleiste zeigt `v0.2.0 · ◆ JH`; der Tooltip trägt Build-Datum und Commit
 
 ### Website & SMS v0.6 – Anfragen und Vorlagen (rev 06, Phase B)
 - **Website** `webseite/` neu: fünf statische Seiten in den Farben des Leitstands, aber als Schaufenster – Start mit **Hero** (Einbau-Video
-  vollflächig hinter dem Text, abgedunkelt, mit Pausen-Knopf), Marken-Leiste, Leistungen als Karten mit Icons (Mietgeräte und Notfall inklusive),
+  vollflächig hinter dem Text, abgedunkelt, mit Pausen-Knopf), Logo-Band mit 13 Herstellern (gleich grosse weisse Kacheln, endlos von links nach rechts, Links zu den Herstellern, anhaltbar), Leistungen als Karten mit Icons (Mietgeräte und Notfall inklusive),
   Ablauf in vier Schritten, «Warum Sutt», FAQ, Aktions-Band, Kontakt mit Öffnungszeiten und Schema-Karte; **Termin anfragen**, Karriere,
   Impressum, Datenschutz (DSG). Kopf bleibt oben und wird kompakt, Vollflächen-Menü und feste Kontaktleiste auf dem Handy, Einblenden beim
   Scrollen, Dark Mode nach System, kein Framework, kein Tracking (ADR-009, `docs/design/step-7-website.md`).
@@ -630,7 +630,7 @@ aus den erledigten Einsätzen. Alle Firmen, Personen, Nummern und E-Mails (`.exa
 30. Darf aus dem Ausland gestempelt werden (Zonenzeit ist Schweiz) – oder nur aus dem Fahrzeug/Büro? – `modules/personal/useStempeluhr.ts`
 31. Wer genehmigt Monate und Absenzen des Dispositionsleiters (Vier-Augen-Prinzip ganz oben)? – `core/berechtigung/rechte.ts`
 32. Was heisst «auf Widerruf» bei Sutt – Aushilfe ohne festes Ende oder Probezeit? Gelten für Temporäre dieselben Ferienregeln? – `core/domain/personal.ts`
-33. Website: endgültige Texte, Bilder und Bildrechte, Notfallnummer, Handelsregister und UID fürs Impressum, juristische Prüfung der Datenschutzerklärung? – `webseite/`
+33. Website: endgültige Texte, Bilder und Bildrechte, Logo-Freigaben der 13 Hersteller im Logo-Band, Notfallnummer, Handelsregister und UID fürs Impressum, juristische Prüfung der Datenschutzerklärung? – `webseite/`
 
 ---
 

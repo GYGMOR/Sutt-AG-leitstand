@@ -4,7 +4,7 @@
    │  Website: fünf Seiten, Kopf/Fuss als Teile, Basis wie die App          │
    └────────────────────────────────────────────────────────────────────────┘ */
 
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import type { Plugin } from 'vite';
@@ -44,6 +44,15 @@ const heroVideo = {
   quellen: ['einbau.webm', 'einbau.mp4'].filter(liegt),
   poster: liegt('einbau.jpg') ? 'einbau.jpg' : null,
 };
+// jh› Logos des Marken-Bands: public/logos/<id>.svg|png|webp|jpg – Dateiname ohne Endung = data-logo in index.html.
+const logoOrdner = new URL('./public/logos/', import.meta.url);
+const logos: Record<string, string> = existsSync(logoOrdner)
+  ? Object.fromEntries(
+      readdirSync(logoOrdner)
+        .filter((datei) => /\.(svg|png|webp|jpe?g)$/i.test(datei))
+        .map((datei) => [datei.replace(/\.[^.]+$/, '').toLowerCase(), datei]),
+    )
+  : {};
 // jh› Dieselbe Basis wie Leitstand und App (SL_BASE): lokal «/webseite/», auf Pages «/<repo>/webseite/».
 //     Der Leitstand reicht /webseite im Dev-Modus an diesen Server durch – nur über 5173 teilen Website und
 //     Leitstand den Browser-Speicher, und die Anfrage aus dem Formular landet im Eingang.
@@ -61,6 +70,7 @@ export default defineConfig({
     __SL_LEITSTAND_URL__: JSON.stringify(basis),
     __SL_APP_URL__: JSON.stringify(appBasis(basis)),
     __SL_HERO_VIDEO__: JSON.stringify(heroVideo),
+    __SL_LOGOS__: JSON.stringify(logos),
   },
   server: {
     port: 5175,

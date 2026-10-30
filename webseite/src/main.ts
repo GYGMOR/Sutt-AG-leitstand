@@ -182,4 +182,56 @@ function heroVideo(film: HTMLVideoElement, schalter: HTMLButtonElement): void {
 
 if (video && knopf && quellen.length > 0) heroVideo(video, knopf);
 
+// ── §6 · Marken-Band ─────────────────────────────────────────────
+
+// jh› Jede Kachel zeigt das Logo aus public/logos/, sobald die Datei beim Bauen da war – sonst den Namen in der
+//     Markenfarbe. Für die Endlosschleife hängt eine Kopie der Liste dahinter (aria-hidden, Links nicht fokussierbar);
+//     Maus darüber, Fokus darin oder der Knopf halten das Band an (WCAG 2.2.2). «Bewegung reduzieren»: stehendes Raster.
+function markenBand(band: HTMLElement): void {
+  for (const link of band.querySelectorAll<HTMLAnchorElement>('a[data-logo]')) {
+    const datei = __SL_LOGOS__[link.dataset.logo ?? ''];
+    if (!datei) continue;
+    const bild = document.createElement('img');
+    bild.src = `${import.meta.env.BASE_URL}logos/${datei}`;
+    bild.alt = '';
+    bild.width = 184;
+    bild.height = 92;
+    bild.decoding = 'async';
+    link.replaceChildren(bild);
+    link.dataset.bild = '1';
+  }
+
+  const spur = band.querySelector<HTMLElement>('.marken-spur');
+  const liste = band.querySelector<HTMLElement>('.marken-liste');
+  const schalter = band.querySelector<HTMLButtonElement>('.marken-pause');
+  if (ruhig.matches || !spur || !liste || !schalter) return;
+
+  const kopie = liste.cloneNode(true) as HTMLElement;
+  kopie.setAttribute('aria-hidden', 'true');
+  kopie.removeAttribute('aria-label');
+  for (const link of kopie.querySelectorAll('a')) link.tabIndex = -1;
+  spur.append(kopie);
+
+  // jh› Gleiches Tempo auf jedem Bildschirm: rund 40 px pro Sekunde, egal wie breit die Liste ist. Erst messen,
+  //     wenn das Band auf eine Zeile umgestellt ist – vorher ist die Liste so breit wie die Seite.
+  band.dataset.band = 'laeuft';
+  const tempo = () => spur.style.setProperty('--band-dauer', `${Math.max(20, Math.round(liste.offsetWidth / 40))}s`);
+  tempo();
+  window.addEventListener('resize', tempo, { passive: true });
+
+  const text = schalter.querySelector('span');
+  const anhalten = (steht: boolean) => {
+    band.toggleAttribute('data-angehalten', steht);
+    if (text) text.textContent = steht ? 'Band abspielen' : 'Band anhalten';
+  };
+  schalter.hidden = false;
+  schalter.addEventListener('click', () => anhalten(!band.hasAttribute('data-angehalten')));
+  ruhig.addEventListener('change', () => {
+    if (ruhig.matches) anhalten(true);
+  });
+}
+
+const markenBandElement = document.querySelector<HTMLElement>('.marken-band');
+if (markenBandElement) markenBand(markenBandElement);
+
 /* ◆ jh · eof */
