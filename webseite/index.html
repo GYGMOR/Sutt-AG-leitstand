@@ -20,6 +20,12 @@
 
     <main id="inhalt">
       <section class="hero" aria-labelledby="start-titel">
+        <!-- jh› Einbau-Video vollflächig hinter dem Text: webseite/public/video/einbau.webm (optional .mp4) und das Standbild
+             einbau.jpg. vite.config.ts prüft beim Bauen, was da ist; main.ts setzt Poster und Quellen und startet das Video.
+             Es ist Dekor (aria-hidden), der Knopf hält es an (WCAG 2.2.2), «Bewegung reduzieren» zeigt nur das Standbild. -->
+        <div class="hero-medien" aria-hidden="true">
+          <video class="hero-video" muted loop playsinline preload="none" tabindex="-1"></video>
+        </div>
         <div class="hero-innen">
           <div class="hero-text">
             <p class="vorzeile">Haushalt-Grossgeräte · Glattbrugg · Raum Zürich</p>
@@ -33,82 +39,16 @@
               <a class="knopf knopf-gross knopf-dunkel" href="tel:+41448091200"><svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg> 044 809 12 00</a>
             </div>
             <ul class="hero-fakten" aria-label="Was Sie erwarten dürfen">
-              <li><svg class="icon" aria-hidden="true"><use href="#i-calendar" /></svg> Terminfenster per SMS bestätigt</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-calendar" /></svg> Termin per SMS bestätigt</li>
               <li><svg class="icon" aria-hidden="true"><use href="#i-truck" /></svg> Ersatzteile im Fahrzeug</li>
-              <li><svg class="icon" aria-hidden="true"><use href="#i-file" /></svg> Rapport mit Unterschrift auf dem Tablet</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-file" /></svg> Rapport auf dem Tablet</li>
             </ul>
           </div>
-
-          <figure class="hero-buehne">
-            <!-- jh› Platz fürs Einbau-Video der Sutt AG: webseite/public/video/einbau.mp4 (und .webm) ablegen, Dev-Server
-                 oder Build neu starten – main.ts hängt die Quellen an, sobald die Datei beim Bauen da ist. Bis dahin läuft
-                 die animierte Einbau-Szene; spielt das Video, blendet sie aus. -->
-            <video class="hero-video" autoplay muted loop playsinline preload="metadata" tabindex="-1" aria-hidden="true"></video>
-            <svg class="szene" viewBox="0 0 640 440" role="img" aria-labelledby="szene-titel">
-              <title id="szene-titel">Animierte Szene: Ein Backofen wird in eine helle Küchenzeile eingebaut, Display und Statusmeldung erscheinen.</title>
-              <defs>
-                <pattern id="raster" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <path d="M40 0H0V40" fill="none" stroke="rgb(255 255 255 / 0.05)" />
-                </pattern>
-              </defs>
-              <rect width="640" height="440" fill="#232323" />
-              <rect width="640" height="440" fill="url(#raster)" />
-              <!-- Oberschränke und Haube -->
-              <rect x="60" y="72" width="520" height="96" fill="#e6e1d8" />
-              <path d="M190 72v96M450 72v96" stroke="#cfc9bf" stroke-width="2" />
-              <rect x="60" y="166" width="520" height="2" fill="#bdb8b0" />
-              <rect x="250" y="142" width="140" height="26" fill="#d9d4cc" />
-              <ellipse class="lampe" cx="320" cy="192" rx="110" ry="24" fill="#f4f2ee" opacity="0.07" />
-              <circle cx="320" cy="168" r="3" fill="#f86c04" />
-              <!-- Rückwand und Arbeitsplatte -->
-              <rect x="60" y="168" width="520" height="48" fill="#efece6" />
-              <path d="M60 192h520" stroke="#e0dbd3" />
-              <rect x="40" y="216" width="560" height="14" fill="#f4f2ee" />
-              <rect x="40" y="230" width="560" height="3" fill="#bdb8b0" />
-              <!-- Unterschränke -->
-              <rect x="60" y="233" width="180" height="167" fill="#e6e1d8" />
-              <rect x="60" y="316" width="180" height="2" fill="#cfc9bf" />
-              <rect x="130" y="300" width="40" height="3" fill="#6b6b6b" />
-              <rect x="130" y="383" width="40" height="3" fill="#6b6b6b" />
-              <rect x="250" y="233" width="140" height="167" fill="#141414" />
-              <rect x="400" y="233" width="180" height="167" fill="#e6e1d8" />
-              <rect x="400" y="233" width="180" height="30" fill="#2b2b2b" />
-              <rect x="470" y="246" width="40" height="3" fill="#9c978f" />
-              <circle class="led" cx="422" cy="248" r="3" fill="#f86c04" />
-              <rect x="400" y="263" width="180" height="2" fill="#bdb8b0" />
-              <!-- Boden -->
-              <rect x="0" y="400" width="640" height="40" fill="#1c1c1c" />
-              <!-- Backofen, wird eingeschoben -->
-              <g class="ofen">
-                <rect x="254" y="237" width="132" height="159" fill="#2b2b2b" stroke="#4d4d4d" />
-                <circle cx="276" cy="254" r="5" fill="#111" stroke="#7a7a7a" />
-                <circle cx="364" cy="254" r="5" fill="#111" stroke="#7a7a7a" />
-                <rect x="298" y="246" width="44" height="16" fill="#0b0b0b" />
-                <text class="ofen-display" x="320" y="258" text-anchor="middle">10:42</text>
-                <rect x="262" y="270" width="116" height="4" fill="#9c978f" />
-                <rect x="262" y="282" width="116" height="100" fill="#0f0f0f" stroke="#555" />
-                <rect class="ofen-licht" x="266" y="286" width="108" height="92" fill="#f86c04" opacity="0.12" />
-              </g>
-              <!-- Mass -->
-              <g class="mass" stroke="#9c978f" fill="none">
-                <path d="M254 414v10M386 414v10M254 419h132" />
-                <text x="320" y="434" text-anchor="middle" stroke="none" fill="#9c978f">60 cm</text>
-              </g>
-              <!-- Statusmeldungen -->
-              <g class="chip chip-1" transform="translate(24 20)">
-                <rect width="262" height="36" rx="3" fill="#1a1a1a" stroke="#4a4a4a" />
-                <rect x="12" y="14" width="8" height="8" fill="#f86c04" transform="rotate(45 16 18)" />
-                <text x="30" y="23">Techniker unterwegs · Ankunft 08:20</text>
-              </g>
-              <g class="chip chip-2" transform="translate(24 370)">
-                <rect width="222" height="36" rx="3" fill="#1a1a1a" stroke="#4a4a4a" />
-                <path d="m12 18 4 4 8-8" fill="none" stroke="#4fa37e" stroke-width="2" />
-                <text x="30" y="23">Eingebaut · Rapport unterschrieben</text>
-              </g>
-            </svg>
-            <figcaption class="hero-caption">Einbau in der Waschküche oder in Ihrer Küche – wir bringen das Gerät, schliessen an und nehmen das alte mit.</figcaption>
-          </figure>
         </div>
+        <button class="hero-pause" type="button" aria-label="Hintergrundvideo abspielen" title="Hintergrundvideo abspielen" hidden>
+          <svg class="icon icon-pause" aria-hidden="true"><use href="#i-pause" /></svg>
+          <svg class="icon icon-play" aria-hidden="true"><use href="#i-play" /></svg>
+        </button>
         <a class="hero-weiter" href="#vertrauen" aria-label="Weiter zu den Inhalten"><svg class="icon" aria-hidden="true"><use href="#i-down" /></svg></a>
       </section>
 

@@ -471,8 +471,8 @@ Seitenleiste zeigt `v0.2.0 · ◆ JH`; der Tooltip trägt Build-Datum und Commit
 - **App**: Woche und Monat zurückblätterbar bis zum Systembeginn bzw. Eintritt, vergangene Monate mit allen Tagen.
 
 ### Website & SMS v0.6 – Anfragen und Vorlagen (rev 06, Phase B)
-- **Website** `webseite/` neu: fünf statische Seiten in den Farben des Leitstands, aber als Schaufenster – Start mit **Hero** (Platz für das
-  Einbau-Video, bis dahin eine animierte Einbau-Szene), Marken-Leiste, Leistungen als Karten mit Icons (Mietgeräte und Notfall inklusive),
+- **Website** `webseite/` neu: fünf statische Seiten in den Farben des Leitstands, aber als Schaufenster – Start mit **Hero** (Einbau-Video
+  vollflächig hinter dem Text, abgedunkelt, mit Pausen-Knopf), Marken-Leiste, Leistungen als Karten mit Icons (Mietgeräte und Notfall inklusive),
   Ablauf in vier Schritten, «Warum Sutt», FAQ, Aktions-Band, Kontakt mit Öffnungszeiten und Schema-Karte; **Termin anfragen**, Karriere,
   Impressum, Datenschutz (DSG). Kopf bleibt oben und wird kompakt, Vollflächen-Menü und feste Kontaktleiste auf dem Handy, Einblenden beim
   Scrollen, Dark Mode nach System, kein Framework, kein Tracking (ADR-009, `docs/design/step-7-website.md`).

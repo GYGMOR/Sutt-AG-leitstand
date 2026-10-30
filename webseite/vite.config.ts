@@ -38,8 +38,12 @@ function paketVersion(): string {
 }
 
 const seite = (name: string): string => fileURLToPath(new URL(`./${name}.html`, import.meta.url));
-// jh› Hero-Video der Startseite: nur die Dateien, die in public/video/ wirklich liegen, kommen als Quelle in die Seite.
-const heroVideos = ['einbau.webm', 'einbau.mp4'].filter((datei) => existsSync(new URL(`./public/video/${datei}`, import.meta.url)));
+// jh› Hero-Video der Startseite: nur die Dateien, die in public/video/ wirklich liegen, kommen in die Seite.
+const liegt = (datei: string): boolean => existsSync(new URL(`./public/video/${datei}`, import.meta.url));
+const heroVideo = {
+  quellen: ['einbau.webm', 'einbau.mp4'].filter(liegt),
+  poster: liegt('einbau.jpg') ? 'einbau.jpg' : null,
+};
 // jh› Dieselbe Basis wie Leitstand und App (SL_BASE): lokal «/webseite/», auf Pages «/<repo>/webseite/».
 //     Der Leitstand reicht /webseite im Dev-Modus an diesen Server durch – nur über 5173 teilen Website und
 //     Leitstand den Browser-Speicher, und die Anfrage aus dem Formular landet im Eingang.
@@ -56,7 +60,7 @@ export default defineConfig({
     __SL_VERSION__: JSON.stringify(paketVersion()),
     __SL_LEITSTAND_URL__: JSON.stringify(basis),
     __SL_APP_URL__: JSON.stringify(appBasis(basis)),
-    __SL_HERO_VIDEO__: JSON.stringify(heroVideos),
+    __SL_HERO_VIDEO__: JSON.stringify(heroVideo),
   },
   server: {
     port: 5175,

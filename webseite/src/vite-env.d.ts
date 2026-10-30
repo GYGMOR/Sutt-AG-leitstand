@@ -6,7 +6,7 @@
 
 // ── §1 · Build-Konstanten ────────────────────────────────────────
 
-/** Dateinamen der Hero-Videos, die beim Bauen in public/video/ lagen – leer, wenn keines da ist. */
-declare const __SL_HERO_VIDEO__: readonly string[];
+/** Hero-Video: Dateien, die beim Bauen in public/video/ lagen – leere Liste bzw. null, wenn nichts da ist. */
+declare const __SL_HERO_VIDEO__: { readonly quellen: readonly string[]; readonly poster: string | null };
 
 /* ◆ jh · eof */

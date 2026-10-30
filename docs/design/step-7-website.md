@@ -25,20 +25,25 @@ Anfragen (annehmen, ablehnen, beantworten) und die SMS-/Mail-Vorlagen des Betrie
 
 Die Regeln aus README §4 gelten für die Software. Die Website darf mehr Bühne sein (der Nutzer wollte «Hero-Video, geiles UX,
 Nutzer sollen sich wohlfühlen»), bleibt aber in der Familie: Anthrazit, warmes Papier, Orange nur als Signal, IBM Plex, Haarlinien
-statt Schatten, Radius 3 px, Messmarke links. Was dazukommt: grosse Typo (bis 76 px), ein Hero mit Video-Platz und animierter
-Einbau-Szene (SVG + CSS-Keyframes, 10-s-Schleife, aus bei «Bewegung reduzieren»), Karten mit Hover (Kante nach oben, Orange-Linie),
+statt Schatten, Radius 3 px, Messmarke links. Was dazukommt: grosse Typo (bis 76 px), ein Hero mit dem Einbau-Video
+vollflächig hinter dem Text, Karten mit Hover (Kante nach oben, Orange-Linie),
 Einblenden beim Scrollen (`IntersectionObserver`, `data-reveal`), kompakter Kopf beim Scrollen, Vollflächen-Menü auf dem Handy
 (Esc, Fokus auf den ersten Eintrag, Scroll-Sperre, zurück zum Knopf), feste Leiste «Anrufen · Termin anfragen» unter 900 px.
 Orientiert an den Mustern guter Service-Websites: eine Botschaft im Hero, zwei Aktionen, Vertrauensleiste, Leistungen als Karten,
 Ablauf in Schritten, FAQ, Aktions-Band, grosser Fuss. Keine Stockfotos, keine Verläufe, kein Glassmorphism.
 
-**Video:** `webseite/public/video/einbau.mp4` (und `.webm`) ablegen, Dev-Server oder Build neu starten. `vite.config.ts` prüft beim
-Bauen, welche Dateien da sind (`__SL_HERO_VIDEO__`), `main.ts` hängt nur diese als Quellen an – ohne Datei keine 404 in der Konsole,
-und die Szene bleibt. Spielt das Video, blendet die Szene aus (`data-video="laeuft"`); bei «Bewegung reduzieren» pausiert es.
+**Video:** `webseite/public/video/einbau.webm` (1920 × 1080, 9,6 s, 2 MB, Techniker beim Einbau von Waschturm, Backofen und
+Waschmaschine) deckt den ganzen Hero; `einbau.jpg` ist das erste Bild als Poster (erscheint sofort, bleibt bei «Bewegung reduzieren»
+und «Daten sparen» stehen). Eine MP4-Fassung (`einbau.mp4`) wird automatisch mit angeboten, sobald sie im Ordner liegt – sinnvoll für
+ältere iPhones ohne WebM. `vite.config.ts` prüft beim Bauen, welche Dateien da sind (`__SL_HERO_VIDEO__`), `main.ts` setzt Poster und
+Quellen, startet stumm, hält ausserhalb des Bildschirms an; der Knopf (unten rechts, auf dem Handy oben rechts) hält es an (WCAG 2.2.2).
+**Abdunklung:** Anthrazit von links (Desktop, unter dem Text mindestens 82 %) bzw. von unten (Handy, unter dem Text mindestens 82 %,
+oben 30 %) – weisse Schrift bleibt so auch auf weissen Fliesen über 8:1, das orange «Pünktlich.» als grosse Schrift über 3:1; die
+Vorzeile steht auf einem eigenen dunklen Schild.
 
 ## Website (`webseite/`)
 
-- `index.html`: Hero (Text links, Video/Szene rechts, drei Fakten, Pfeil nach unten), Marken-Leiste, Leistungen als Karten mit Icon
+- `index.html`: Hero (Video vollflächig im Hintergrund, Text darüber, drei Fakten ab Tablet, Pausen-Knopf, Pfeil nach unten), Marken-Leiste, Leistungen als Karten mit Icon
   (Reparatur · Installation/Montage · Lieferung · Mietgeräte · Garantie · Notfall, jede mit Tiefen-Link `anfrage.html?anliegen=…`),
   «So arbeiten wir» (vier Schritte, dunkel), «Warum Sutt» (drei Versprechen, Kopf bleibt stehen), FAQ (`<details>`), Band mit
   zwei Aktionen, Kontakt mit Öffnungszeiten, Route und Schema-Karte (SVG, «nicht massstäblich»).

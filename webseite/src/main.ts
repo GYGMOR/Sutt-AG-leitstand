@@ -118,25 +118,68 @@ if (ruhig.matches || !('IntersectionObserver' in window)) {
 
 // ── §5 · Hero-Video ──────────────────────────────────────────────
 
-// jh› Das Video ist ein Platz: Liegt webseite/public/video/einbau.mp4 (und .webm) beim Bauen vor, setzt
-//     vite.config.ts __SL_HERO_VIDEO__, die Quellen werden angehängt, das Video spielt und die animierte Szene
-//     blendet aus. Fehlt es, bleibt die Szene – ohne Anfragen ins Leere und ohne Fehler in der Konsole.
+// jh› Das Video füllt den ganzen Hero hinter dem Text. vite.config.ts meldet, welche Dateien beim Bauen da waren
+//     (__SL_HERO_VIDEO__) – nur die werden angehängt, ohne Datei keine Anfrage ins Leere. Es startet stumm, nicht
+//     bei «Bewegung reduzieren» oder «Daten sparen» (dann bleibt das Standbild), hält ausserhalb des Bildschirms an
+//     und lässt sich mit dem Knopf anhalten und wieder starten (WCAG 2.2.2).
 const video = document.querySelector<HTMLVideoElement>('.hero-video');
-const buehne = document.querySelector<HTMLElement>('.hero-buehne');
-if (video && buehne && __SL_HERO_VIDEO__.length > 0) {
-  video.addEventListener('canplay', () => {
-    buehne.dataset.video = 'laeuft';
-    if (ruhig.matches) video.pause();
-  });
-  video.addEventListener('error', () => buehne.removeAttribute('data-video'), true);
-  if (ruhig.matches) video.removeAttribute('autoplay');
-  for (const datei of __SL_HERO_VIDEO__) {
+const knopf = document.querySelector<HTMLButtonElement>('.hero-pause');
+const { quellen, poster } = __SL_HERO_VIDEO__;
+
+function heroVideo(film: HTMLVideoElement, schalter: HTMLButtonElement): void {
+  const verbindung = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+  const automatisch = !ruhig.matches && verbindung?.saveData !== true;
+  let angehalten = !automatisch;
+
+  if (poster) film.poster = `${import.meta.env.BASE_URL}video/${poster}`;
+  for (const datei of quellen) {
     const quelle = document.createElement('source');
     quelle.src = `${import.meta.env.BASE_URL}video/${datei}`;
     quelle.type = datei.endsWith('.webm') ? 'video/webm' : 'video/mp4';
-    video.append(quelle);
+    film.append(quelle);
   }
-  video.load();
+  film.preload = automatisch ? 'auto' : 'metadata';
+
+  const zeigen = (laeuft: boolean) => {
+    const text = laeuft ? 'Hintergrundvideo anhalten' : 'Hintergrundvideo abspielen';
+    schalter.dataset.zustand = laeuft ? 'laeuft' : 'steht';
+    schalter.setAttribute('aria-label', text);
+    schalter.title = text;
+  };
+  const abspielen = () => {
+    film.play().catch(() => zeigen(false));
+  };
+  film.addEventListener('playing', () => zeigen(true));
+  film.addEventListener('pause', () => zeigen(false));
+  film.querySelector('source:last-of-type')?.addEventListener('error', () => {
+    schalter.hidden = true;
+  });
+
+  schalter.hidden = false;
+  zeigen(false);
+  schalter.addEventListener('click', () => {
+    angehalten = !film.paused;
+    if (angehalten) film.pause();
+    else abspielen();
+  });
+  ruhig.addEventListener('change', () => {
+    if (!ruhig.matches) return;
+    angehalten = true;
+    film.pause();
+  });
+
+  // jh› Sofort starten, nicht erst auf das erste Sichtbarkeits-Signal warten (kommt in gedrosselten Fenstern spät);
+  //     der Beobachter hält nur an, solange der Hero ausserhalb des Bildschirms liegt.
+  if (!angehalten) abspielen();
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([eintrag]) => {
+      if (!eintrag || angehalten) return;
+      if (eintrag.isIntersecting) abspielen();
+      else film.pause();
+    }).observe(film);
+  }
 }
+
+if (video && knopf && quellen.length > 0) heroVideo(video, knopf);
 
 /* ◆ jh · eof */
