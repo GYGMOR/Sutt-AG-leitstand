@@ -3,7 +3,7 @@
 Branchensoftware der **Sutt AG** (Haushalt-Apparate, Industriestrasse 24, 8152 Glattbrugg/Opfikon) –
 Service, Reparatur und Verkauf von Haushalts-Grossgeräten.
 
-**Stand:** rev 06 · v0.6.0 · **Vertrag & Mein Jahr** (Phase A des Master-Prompts `docs/prompts/master-prompt-rev06.md`) auf Personal v0.5, Betrieb v0.4, Aussendienst v0.3 und Disposition v2 · Techniker-App als eigenes Projekt `app/` (ADR-008) und Website-Gerüst `webseite/` · klickbares Mockup mit Testdaten, ohne Backend.
+**Stand:** rev 06 · v0.6.0 · **Vertrag & Mein Jahr** (Phase A) und **Website, Anfragen & SMS-Vorlagen** (Phase B des Master-Prompts `docs/prompts/master-prompt-rev06.md`) auf Personal v0.5, Betrieb v0.4, Aussendienst v0.3 und Disposition v2 · Techniker-App als eigenes Projekt `app/` (ADR-008) und Website `webseite/` (fünf Seiten, Anfrage → Leitstand, ADR-009) · klickbares Mockup mit Testdaten, ohne Backend.
 Diese Datei ist der Bauplan: **jedes folgende Modul** (Kunden, Geräte, Lager, Mietgeräte, Zeit …)
 wird exakt nach diesen Regeln aufgebaut. Änderungen je Revision stehen in `CHANGELOG.jh.md`.
 
@@ -16,7 +16,7 @@ npm install
 npm run dev:alle     # Leitstand · Techniker-App · Website in einem Terminal – Startanleitung für neue Rechner: docs/start.md
 npm run dev          # http://localhost:5173 → /login (Demo-Zugänge stehen unter dem Formular)
 npm run dev:app      # Techniker-App: http://localhost:5174/app/ – und über den Leitstand http://localhost:5173/app/
-npm run dev:web      # Website-Gerüst: http://localhost:5175
+npm run dev:web      # Website: http://localhost:5173/webseite/ (über den Leitstand – so landet die Anfrage im Eingang; direkt: :5175/webseite/)
 npm run build        # Typecheck (tsc strict) + Produktions-Build des Leitstands → dist/
 npm run build:app    # Techniker-App → app/dist/ (base /app/) · build:web · build:alle baut alle drei
 npm test             # vitest: Reducer, Selektoren, Konflikte, Zeitraster, Scoring, Rapport, Persistenz, App-Modell
@@ -91,7 +91,7 @@ MapLibre + OpenStreetMap, ohne Netz die Schemakarte. Die Akte sieht nie leer aus
 | Persistenz | `localStorage`-Stand (`sl.dispo.stand.v1`, v4, tagesgebunden) + Mandant (`sl.mandant.v1`), Spiegelung über `storage` (ADR-001) |
 | Zeitzone | `Intl.DateTimeFormat` (ICU) in `core/zeitzone.ts` – Zone des Betriebs, Umstellung im Programm, keine Bibliothek |
 | Diagramme | eigene SVG/HTML-Bausteine `core/ui/Diagramm.tsx` – Donut, Balken, Linie, Säulen, Anteile; Palette `--sl-dv-*` |
-| Projekte | npm-Workspaces: `.` Leitstand · `app/` Techniker-App (Alias `@sl` → `src/`, base `/app/`) · `webseite/` Gerüst – ein Build je Projekt (ADR-008) |
+| Projekte | npm-Workspaces: `.` Leitstand · `app/` Techniker-App (Alias `@sl` → `src/`, base `/app/`) · `webseite/` Website (statisch, fünf Seiten, Alias `@sl`, base `/webseite/`) – ein Build je Projekt (ADR-008, ADR-009) |
 
 ---
 
@@ -167,6 +167,8 @@ src/
 │                               MitarbeiterDossier · KontoDialog · MitarbeiterDialog · benutzer.model (Auskunft DSG 25)
 ├─ modules/einstellungen/       EinstellungenPage · Betrieb (Zeitzone, Arbeitszeit, Feiertage) · Anmeldung (Microsoft, Google) ·
 │                               Datenschutz (Stelle, Fristen, Löschlauf, Protokoll) · Module · einstellungen.model
+├─ modules/website/             SMS & Website (rev 06): WebsitePage (Anfragen, Vorlagen) · AnfrageDossier · AntwortDialog · VorlagenBereich ·
+│                               anfrageStore (Spiegel von sl.website.anfragen.v1) · website.model (Kundenvorschlag, Vorbelegung, Antwort)
 ├─ mock/                        Testdaten – nur von Modulwurzeln und main.tsx importiert (personal, benutzer, identitaeten, zeit, absenzen, journal …)
 └─ test/testdaten.ts            Testhelfer auf dem echten Mock (deterministisch, relativ zu heute)
 app/                            Techniker-App – eigenes Vite-Projekt, base /app/, Alias @sl → ../src (ADR-008)
@@ -176,10 +178,13 @@ app/                            Techniker-App – eigenes Vite-Projekt, base /ap
 ├─ src/seiten/                  Anmelden · Heute · Woche · Einsatz · Rapport · Tour · Scannen · Kamera · Zeit · Absenzen · Fahrzeug · Profil
 ├─ src/bausteine/               EinsatzKarte · Scanner (BarcodeDetector, Kamera) · Seiten.module.css
 └─ src/model/                   tour.model (Stopps, Strecke, Maps-Link) · scan.model (Code → Artikel/Auftrag/Rapport/Gerät/Link)
-webseite/                       Website-Gerüst (Vite, Port 5175, Tokens aus src/styles) – Neuaufbau folgt
+webseite/                       Website – fünf statische Seiten, Vite ohne Framework, Alias @sl, base /webseite/ (ADR-009)
+├─ index.html · anfrage.html · karriere.html · impressum.html · datenschutz.html
+├─ teile/kopf.html · fuss.html  Kopf und Fuss, per Vite-Plugin an <!-- @teil kopf --> eingesetzt
+└─ src/main.ts · anfrage.ts · styles/site.css   Thema, Ziele, Menü · Formular (pruefeAnfrage, speichereAnfragen) · Stile
 scripts/jh-sign.mjs · contrast.jh.ts · demo.jh.mjs · dev-alle.mjs · basis.ts/.mjs (SL_BASE) · pages-site.mjs · pages-serve.mjs
-.github/workflows/pages.yml     GitHub Pages: Leitstand + App als eine Site
-docs/adr (001–008) · docs/design · docs/datenschutz · docs/tests · docs/prompts (step-2, master-prompt-rev06) · docs/start.md
+.github/workflows/pages.yml     GitHub Pages: Leitstand + App + Website als eine Site
+docs/adr (001–009) · docs/design · docs/datenschutz · docs/tests · docs/prompts (step-2, master-prompt-rev06) · docs/start.md
 .claude/skills                  sutt-modul · sutt-pruefung · zehn agent-skills (addyosmani) · skills-lock.json im Root
 TODO.jh.md · CHANGELOG.jh.md
 ```
@@ -465,6 +470,19 @@ Seitenleiste zeigt `v0.2.0 · ◆ JH`; der Tooltip trägt Build-Datum und Commit
   Systembeginn (Tag nach dem Übertrags-Stichtag) über Jahresgrenzen hinweg – Leitstand, Jahresmatrix und App zeigen denselben Wert.
 - **App**: Woche und Monat zurückblätterbar bis zum Systembeginn bzw. Eintritt, vergangene Monate mit allen Tagen.
 
+### Website & SMS v0.6 – Anfragen und Vorlagen (rev 06, Phase B)
+- **Website** `webseite/` neu: fünf statische Seiten in der Handschrift des Leitstands – Start (Bühne, Leistungen mit Mietgeräten und Notfall,
+  Marken, Ablauf, Über uns, Kontakt mit Öffnungszeiten und Schema-Karte), **Termin anfragen**, Karriere, Impressum, Datenschutz (DSG).
+  Kopf und Fuss als Teile, Menü fürs Handy, Dark Mode nach System, kein Framework, kein Tracking (ADR-009).
+- **Anfrage → Leitstand**: Das Formular prüft mit denselben Regeln wie der Leitstand (`pruefeAnfrage`), vergibt die Nummer `W-26-0101` und
+  legt die Anfrage im Browser-Speicher ab, den der Leitstand sofort liest. Der Eingang der Plantafel zeigt «n neue Anfragen von der Website»;
+  angenommene Anfragen stehen als Pendenz mit Chip **Website** im Eingang.
+- **Modul SMS & Website** `/sms-website/:bereich?`: Kacheln Neu · Angenommen · Abgelehnt · Alle, Suche, Tabelle, Dossier mit Kundenvorschlag
+  (Kundennummer → Telefon → E-Mail → Adresse), **Auftrag erfassen** (Schnellerfassung vorbelegt mit Kunde, Liegenschaft, Wohnung, Telefon,
+  Anrufer, Fehlerbild, Kategorie, Dringlichkeit, Geräteart, Marke, Kanal), **Antworten** und **Ablehnen** (Mail oder SMS aus Vorlage,
+  Mock-Versand mit Eintrag an der Anfrage und im Journal). Bereich **Vorlagen**: SMS- und Mail-Texte des Betriebs je Nachrichtenart mit
+  Platzhaltern `{techniker} {kontakt} {datum} {zeit} {ankunft} {rapport} {anfrage} {telefon}` und Vorschau – Akte, Rapportmodul und App lesen sie von dort.
+
 ### Mockdaten
 Alles hängt am echten Datum (`MOCK_HEUTE`). Heute (6 Techniker) und der Eingang sind handverlesen, die
 übrigen Tage und Techniker füllt ein deterministischer Generator (Saat = Datum + Techniker); Absenzen liegen
@@ -570,6 +588,9 @@ aus den erledigten Einsätzen. Alle Firmen, Personen, Nummern und E-Mails (`.exa
 36. **Mein Jahr statt Monatsblick** – Jede Person sieht ihr ganzes Jahr: zwölf Monate mit Saldo, die Gleitzeit als Kette seit dem
     Systembeginn, den Ferienrest, den Vertrag – im Leitstand und in der App gleich. *Warum:* «Wie viel habe ich im Plus?» darf keine
     Frage an die Personaladministration sein.
+37. **Anfrage ohne Abschrift** (rev 06) – Was der Kunde auf der Website eintippt, steht im Leitstand schon in der Schnellerfassung: Kunde
+    erkannt an Telefon oder Adresse, Gerät, Fehlerbild, Dringlichkeit, Wunschtermin – das Büro prüft und klickt «Erfassen». *Warum:* Jede
+    Abschrift kostet Zeit und erzeugt Fehler; die Anfrage bleibt dabei eine Anfrage, bis ein Mensch sie zum Auftrag macht.
 
 ---
 
@@ -607,10 +628,11 @@ aus den erledigten Einsätzen. Alle Firmen, Personen, Nummern und E-Mails (`.exa
 30. Darf aus dem Ausland gestempelt werden (Zonenzeit ist Schweiz) – oder nur aus dem Fahrzeug/Büro? – `modules/personal/useStempeluhr.ts`
 31. Wer genehmigt Monate und Absenzen des Dispositionsleiters (Vier-Augen-Prinzip ganz oben)? – `core/berechtigung/rechte.ts`
 32. Was heisst «auf Widerruf» bei Sutt – Aushilfe ohne festes Ende oder Probezeit? Gelten für Temporäre dieselben Ferienregeln? – `core/domain/personal.ts`
+33. Website: endgültige Texte, Bilder und Bildrechte, Notfallnummer, Handelsregister und UID fürs Impressum, juristische Prüfung der Datenschutzerklärung? – `webseite/`
 
 ---
 
-## 10 · Bewusst nicht in v0.5
+## 10 · Bewusst nicht in v0.6
 
 Kein Backend, keine echte Token-Prüfung (Anbieter als Mock-Dialog, `jh# 020`), keine echten Daten. Persistenz nur als
 `localStorage`-Stand desselben Tages (Reload hält ihn, «Demo zurücksetzen» verwirft ihn, ein neuer Tag beginnt frisch).
@@ -620,7 +642,8 @@ nur fürs Mockup (`jh# 007`), keine Geokodierung neuer Liegenschaften (`jh# 016`
 tzdata-Abgleich mit der API (`jh# 018`), keine Rechnungsstellung/Mahnwesen (Buchhaltung v0.7), keine Lieferanten-Anbindung,
 keine Lohnschnittstelle (CSV-Export der Zeitkonten ist der Weg). Die App ist installierbar, läuft aber nur online (kein Service
 Worker); Scanner und Kamera brauchen einen Browser mit `BarcodeDetector` bzw. `capture` – sonst Handeingabe und Dateiwahl.
-Die Website in `webseite/` ist ein Gerüst, kein Inhalt.
+Die Website hat Texte, aber noch keine Bilder (Frage 33); Anfragen leben im Mockup im Browser-Speicher (gleiche Origin wie der Leitstand),
+Antworten werden nur protokolliert, ein Foto aus dem Formular nur als Dateiname übergeben (`jh# 012`).
 
 ---
 

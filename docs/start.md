@@ -1,8 +1,8 @@
 # SUTT Leitstand · Start auf einem neuen Notebook (Mac oder Windows)
 
 > **Ganz ohne Installation:** Läuft die Demo auf GitHub Pages (README §1), genügt der Link – `https://<konto>.github.io/<repo>/`
-> für den Leitstand, `…/<repo>/app/` für die Techniker-App. Anmelden wie in Abschnitt 4. Der Rest dieser Anleitung ist für den
-> Start auf dem eigenen Rechner.
+> für den Leitstand, `…/<repo>/app/` für die Techniker-App, `…/<repo>/webseite/` für die Website. Anmelden wie in Abschnitt 4.
+> Der Rest dieser Anleitung ist für den Start auf dem eigenen Rechner.
 
 Alles läuft lokal mit Testdaten – **kein Server, keine Datenbank, kein Konto nötig.** Es braucht genau zwei Dinge:
 
@@ -39,9 +39,10 @@ npm run dev:alle
 | --- | --- | --- |
 | **Leitstand** (Portal) | http://localhost:5173 | Login → Plantafel, Dashboard, Module |
 | **Techniker-App** | http://localhost:5173/app/ (oder http://localhost:5174/app/) | Handy-Oberfläche, auch am Mac im Fenster |
-| **Website** (Gerüst) | http://localhost:5175 | Startseite mit Links zu App und Leitstand |
+| **Website** | http://localhost:5173/webseite/ | Startseite, Leistungen, «Termin anfragen» – die Anfrage erscheint im Leitstand (Eingang → SMS & Website) |
 
-Einzeln geht es mit `npm run dev`, `npm run dev:app`, `npm run dev:web`. Beenden mit `Ctrl+C`.
+Einzeln geht es mit `npm run dev`, `npm run dev:app`, `npm run dev:web`. Beenden mit `Ctrl+C`. Die Website immer über die Adresse mit
+`5173/webseite/` öffnen: nur so teilen Website und Leitstand den Browser-Speicher, und die Anfrage aus dem Formular landet im Eingang.
 
 ## 4 · Anmelden (Demo-Zugänge, Passwort beliebig)
 
@@ -63,6 +64,8 @@ Der Leitstand und die App teilen sich die Anmeldung: wer sich als `mb` anmeldet,
 4. In der App «Fertig» → **Servicerapport** mit Zeiten, Arbeiten, Teilen, Foto, Unterschrift mit der Maus → Abschliessen → im Leitstand unter «Servicerapporte» prüfen und freigeben.
 5. **Zeiterfassung** (als `admin`): Ansichten Woche (Chips) und Monat (Matrix); grosse **Stempeluhr** im eigenen Zeitkonto und in der App unter «Zeit».
 6. **Einstellungen** (als `admin`): Betrieb mit Zeitzone, Feiertage, Anmeldung (Microsoft/Google), Datenschutz, Protokoll.
+7. **Website** (http://localhost:5173/webseite/): «Termin anfragen» ausfüllen und senden → im Leitstand zeigt der Eingang «1 neue Anfrage von der
+   Website», das Modul **SMS & Website** den Kundenvorschlag; «Auftrag erfassen» öffnet die vorbelegte Schnellerfassung, die Pendenz trägt den Chip «Website».
 
 «Demo zurücksetzen» im Benutzermenü (oben rechts) stellt den Ausgangszustand her. Der Stand lebt im Browser; ein neuer Tag beginnt automatisch frisch.
 
@@ -82,4 +85,4 @@ Handy ins gleiche WLAN, IP des Notebooks ermitteln (Mac: Systemeinstellungen →
 
 Prüfen, ob alles sauber ist: `npm run typecheck:alle`, `npm run test:alle`, `npm run jh:check`.
 
-◆ JH · rev 05
+◆ JH · rev 06
