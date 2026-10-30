@@ -11,6 +11,7 @@ import type { Kommando } from '../../../core/kommando';
 import type { MenueEintrag } from '../../../core/layout/BenutzerMenu';
 import { resetMandant } from '../../../core/mandant/mandantStore';
 import { ConfirmDialog } from '../../../core/ui/Dialog';
+import { resetAnfragen } from '../../website/anfrageStore';
 import { useDispoAktionen } from './useDispoAktionen';
 
 // ── §1 · Hook ────────────────────────────────────────────────────
@@ -47,6 +48,7 @@ export function useDemoReset(): DemoReset {
       onConfirm={() => {
         setOffen(false);
         resetMandant();
+        resetAnfragen();
         aktionen.resetDemo();
       }}
       onClose={() => setOffen(false)}

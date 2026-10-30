@@ -42,7 +42,7 @@ export function isDringend(dringlichkeit: Dringlichkeit): boolean {
   return dringlichkeit === 'notfall' || dringlichkeit === 'hoch';
 }
 
-export type Eingangskanal = 'Telefon' | 'E-Mail' | 'Portal' | 'Schnellerfassung';
+export type Eingangskanal = 'Telefon' | 'E-Mail' | 'Portal' | 'Schnellerfassung' | 'Website';
 
 // ── §2 · Parteien ────────────────────────────────────────────────
 

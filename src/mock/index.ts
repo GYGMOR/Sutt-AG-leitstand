@@ -196,6 +196,7 @@ export const mockBestand: Bestand = {
 };
 
 export { MOCK_HEUTE };
+export { MOCK_ANFRAGEN } from './anfragen';
 
 function nurZiffern(telefon: string): string {
   return telefon.replace(/\D/g, '');

@@ -1,0 +1,123 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐
+   │  SUTT·LEITSTAND  ·  modules/website/Website.module.css                 │
+   │  ◆ JH · 2026.11 · rev 06                                               │
+   │  Modul SMS & Website: Anfragen-Dossier, Antwort, Vorlagen-Karten       │
+   └────────────────────────────────────────────────────────────────────────┘ */
+
+/* ── §1 · Dossier ────────────────────────────────────────────── */
+
+.fehlerbild {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: var(--sl-fs-13);
+  line-height: var(--sl-lh-base);
+}
+
+.treffer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 10px 12px;
+  border: var(--sl-hairline);
+  border-left: var(--sl-mark-width) solid var(--sl-signal);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+}
+
+.treffer-text {
+  flex: 1;
+  min-width: 160px;
+  font-size: var(--sl-fs-13);
+  color: var(--sl-ink-2);
+}
+
+.antwort {
+  margin: 0;
+  padding: 10px 12px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-paper);
+  white-space: pre-wrap;
+  font-size: var(--sl-fs-13);
+  line-height: var(--sl-lh-base);
+}
+
+.aktionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fussnote {
+  font-size: var(--sl-fs-12);
+  color: var(--sl-mute);
+}
+
+/* ── §2 · Vorlagen ───────────────────────────────────────────── */
+
+.vorlagen {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+  padding: 12px 16px 24px;
+}
+
+.vorlage {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: var(--sl-hairline);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+}
+
+.vorlage-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.vorlage-kopf h3 {
+  margin: 0;
+  font-size: var(--sl-fs-14);
+  font-weight: var(--sl-fw-semibold);
+}
+
+.vorlage textarea {
+  min-height: 112px;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-fs-12);
+}
+
+.vorschau {
+  margin: 0;
+  padding: 8px 10px;
+  border-left: 2px solid var(--sl-line);
+  white-space: pre-wrap;
+  font-size: var(--sl-fs-12);
+  color: var(--sl-ink-2);
+}
+
+.platzhalter {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 12px;
+  margin: 0;
+  padding: 12px 16px;
+  font-size: var(--sl-fs-12);
+}
+
+.platzhalter dt {
+  font-family: var(--sl-font-mono);
+  color: var(--sl-signal-ink);
+}
+
+.platzhalter dd {
+  margin: 0;
+  color: var(--sl-ink-2);
+}
+
+/* ◆ jh · eof */

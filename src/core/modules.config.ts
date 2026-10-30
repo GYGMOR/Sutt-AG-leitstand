@@ -173,8 +173,8 @@ export const MODULE: readonly Modul[] = [
   },
   {
     id: 'sms-website', label: 'SMS & Website', icon: MessageSquareText, gruppe: 'administration', pfad: '/sms-website',
-    freigeschaltet: false, version: 'v0.6', rollen: INNENDIENST,
-    beschreibung: 'Terminbestätigung per SMS, «Techniker unterwegs»-Meldung und Anfragen über die Website.',
+    freigeschaltet: true, rollen: INNENDIENST,
+    beschreibung: 'Anfragen von der Website annehmen oder beantworten, daraus Aufträge erfassen; Vorlagen für Terminbestätigung, «unterwegs», nicht angetroffen und Rapport-Mail – zentral für Büro und App.',
   },
   {
     id: 'auswertungen', label: 'Auswertungen', icon: ChartColumn, gruppe: 'administration', pfad: '/auswertungen',

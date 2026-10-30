@@ -6,7 +6,7 @@
 
 import type { KeyboardEvent } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { GripVertical, MapPin } from 'lucide-react';
+import { Globe, GripVertical, MapPin } from 'lucide-react';
 import { KATEGORIE_LABEL } from '../../../core/domain/kategorie';
 import { formatStrasse } from '../../../core/domain/stammdaten';
 import { formatDatumKurz, formatDauer, formatZeitpunktKurz } from '../../../core/format';
@@ -104,6 +104,11 @@ export function PendenzCard({ view, ausgewaehlt, markiert, onSelect }: PendenzCa
 
       <div className={styles.fuss}>
         {istFolge && <span className={styles.tag}>Folgetermin</span>}
+        {auftrag.kanal === 'Website' && (
+          <Chip tone="neutral" icon={Globe}>
+            Website
+          </Chip>
+        )}
         {!auftrag.bestelltAm && <span className={cx(styles.tag, styles.tagOffen)}>Bestellung ausstehend</span>}
         <span className={styles.mono}>{formatDauer(pendenz.dauerMin)}</span>
         {pendenz.fruehestensAm && <span className={styles.mono}>ab {formatDatumKurz(pendenz.fruehestensAm)}</span>}

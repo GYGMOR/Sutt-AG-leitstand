@@ -8,6 +8,7 @@ import type { AnbieterKonfiguration, IdentitaetsAnbieter } from '../auth/identit
 import type { DatenKategorieId } from '../datenschutz/aufbewahrung';
 import { BETRIEBLICHE_FEIERTAGE_STANDARD } from '../domain/feiertage';
 import type { BetrieblicherFeiertag, Kanton } from '../domain/feiertage';
+import type { NachrichtArt } from '../domain/nachricht';
 import { ARBEITSZEIT_STANDARD } from '../domain/zeit';
 import type { Arbeitszeitmodell } from '../domain/zeit';
 import type { ModulId } from '../modules.config';
@@ -45,6 +46,8 @@ export interface Mandant {
   /** Pro Mandant abgeschaltete oder freigegebene Module (fehlt = Register entscheidet). */
   modulFreigaben: Readonly<Partial<Record<ModulId, boolean>>>;
   datenschutz: DatenschutzStelle;
+  /** Eigene Texte für SMS und Mail (Modul SMS & Website); fehlt eine, gilt die Standardvorlage. */
+  nachrichtVorlagen: Readonly<Partial<Record<NachrichtArt, string>>>;
 }
 
 // ── §2 · Standard ────────────────────────────────────────────────
@@ -87,6 +90,7 @@ export const MANDANT_STANDARD: Mandant = {
   aufbewahrung: {},
   modulFreigaben: {},
   datenschutz: { verantwortlich: 'Sutt AG, Geschäftsleitung', email: 'datenschutz@sutt.example', telefon: '044 809 12 00' },
+  nachrichtVorlagen: {},
 };
 
 /* ◆ jh · eof */

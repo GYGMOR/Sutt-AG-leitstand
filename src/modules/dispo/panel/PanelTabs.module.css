@@ -1,6 +1,6 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/panel/PanelTabs.module.css           │
-   │  ◆ JH · 2026.10 · rev 02                                               │
+   │  ◆ JH · 2026.11 · rev 06                                               │
    │  Gemeinsame Stile der Panel-Tabs (Eingang, Wartet, Erledigt)           │
    └────────────────────────────────────────────────────────────────────────┘ */
 
@@ -36,6 +36,30 @@
   border-top: var(--sl-hairline);
   background: var(--sl-surface);
   font-size: var(--sl-fs-label);
+  color: var(--sl-mute);
+}
+
+.hinweis {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px var(--sl-space-3) 0;
+  padding: 8px 10px;
+  border: var(--sl-hairline);
+  border-left: var(--sl-mark-width) solid var(--sl-signal);
+  border-radius: var(--sl-radius-1);
+  background: var(--sl-surface);
+  color: var(--sl-ink);
+  font-size: var(--sl-fs-12);
+  text-decoration: none;
+}
+
+.hinweis:hover {
+  background: var(--sl-hover);
+}
+
+.hinweis-pfeil {
+  margin-left: auto;
   color: var(--sl-mute);
 }
 

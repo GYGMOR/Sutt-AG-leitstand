@@ -1,10 +1,12 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐
    │  SUTT·LEITSTAND  ·  modules/dispo/panel/EingangTab.tsx                 │
-   │  ◆ JH · 2026.10 · rev 02                                               │
-   │  Tab Eingang: nicht disponierte Aufträge nach Dringlichkeit            │
+   │  ◆ JH · 2026.11 · rev 06                                               │
+   │  Tab Eingang: nicht disponierte Aufträge, neue Website-Anfragen        │
    └────────────────────────────────────────────────────────────────────────┘ */
 
-import { Inbox } from 'lucide-react';
+import { Globe, Inbox } from 'lucide-react';
+import { Link } from 'react-router';
+import { useAnfragen } from '../../website/anfrageStore';
 import type { PendenzView } from '../store/dispo.selectors';
 import { PendenzCard } from './PendenzCard';
 import styles from './PanelTabs.module.css';
@@ -19,12 +21,33 @@ interface EingangTabProps {
   onSelectPendenz: (pendenzId: string) => void;
 }
 
+// jh› Anfragen von der Website sind noch keine Aufträge (ungeprüft, ohne Kunde) – der Eingang zeigt sie als
+//     Hinweis mit Sprung ins Modul, angenommene Anfragen stehen dann als Pendenz mit Chip «Website» hier.
+function WebsiteHinweis() {
+  const neu = useAnfragen().filter((anfrage) => anfrage.status === 'neu');
+  if (neu.length === 0) return null;
+  const dringend = neu.filter((anfrage) => anfrage.dringend).length;
+  return (
+    <Link to="/sms-website/anfragen" className={styles.hinweis}>
+      <Globe size={14} strokeWidth={1.5} aria-hidden />
+      <span>
+        {neu.length === 1 ? '1 neue Anfrage' : `${neu.length} neue Anfragen`} von der Website
+        {dringend > 0 && ` · ${dringend} dringend`}
+      </span>
+      <span className={styles.hinweisPfeil} aria-hidden>
+        →
+      </span>
+    </Link>
+  );
+}
+
 export function EingangTab({ pendenzen, ausgewaehltId, markiertId, regionGefiltert, onSelectPendenz }: EingangTabProps) {
   return (
     <>
       <p className={styles.untertitel}>
         Nicht disponiert · nach Dringlichkeit{regionGefiltert && ' · Region gefiltert'}
       </p>
+      <WebsiteHinweis />
       <ul className={styles.liste}>
         {pendenzen.map((view) => (
           <li key={view.pendenz.id}>

@@ -9,7 +9,7 @@ import { CalendarCheck, Inbox, Phone, Timer, X } from 'lucide-react';
 import { nowZeitpunkt } from '../../core/datum';
 import type { IsoDatum, Minuten } from '../../core/datum';
 import { DRINGLICHKEIT_LABEL } from '../../core/domain/auftrag';
-import type { Auftrag, Dringlichkeit } from '../../core/domain/auftrag';
+import type { Auftrag, Dringlichkeit, Eingangskanal } from '../../core/domain/auftrag';
 import type { Einsatz, Pendenz } from '../../core/domain/einsatz';
 import { KATEGORIEN, kategorieFor } from '../../core/domain/kategorie';
 import type { Kategorie } from '../../core/domain/kategorie';
@@ -44,13 +44,22 @@ export interface TelefonTreffer {
   wohnungNummer?: string;
 }
 
-/** Vorbelegung aus Kunden-, Geräte- oder Auftragsdossier – die Nummer bleibt frei. */
+/** Vorbelegung aus Kunden-, Geräte-, Auftragsdossier oder Website-Anfrage – die Nummer bleibt frei. */
 export interface Vorbelegung {
   kundeId?: string;
   liegenschaftId?: string;
   geraetId?: string;
   wohnungNummer?: string;
   telefon?: string;
+  anrufer?: string;
+  fehlerbild?: string;
+  kategorie?: Kategorie;
+  dringlichkeit?: Dringlichkeit;
+  geraeteart?: Geraeteart;
+  marke?: Marke;
+  kanal?: Eingangskanal;
+  /** Hinweis an der Pendenz im Eingang, z. B. «Website-Anfrage W-26-0101 · Wunsch 02.11. Vormittag». */
+  hinweis?: string;
 }
 
 interface SchnellerfassungProps {
@@ -105,6 +114,12 @@ export function Schnellerfassung({ open, stammdaten, einsaetze, telefonbuch, heu
       if (vorbelegung.geraetId) setGeraetId(vorbelegung.geraetId);
       if (vorbelegung.wohnungNummer) setWohnung(vorbelegung.wohnungNummer);
       if (vorbelegung.telefon) setTelefon(vorbelegung.telefon);
+      if (vorbelegung.anrufer) setAnrufer(vorbelegung.anrufer);
+      if (vorbelegung.fehlerbild) setFehlerbild(vorbelegung.fehlerbild);
+      if (vorbelegung.kategorie) setKategorie(vorbelegung.kategorie);
+      if (vorbelegung.dringlichkeit) setDringlichkeit(vorbelegung.dringlichkeit);
+      if (vorbelegung.geraeteart) setNeuArt(vorbelegung.geraeteart);
+      if (vorbelegung.marke) setNeuMarke(vorbelegung.marke);
     }
     window.setTimeout(() => telefonRef.current?.focus(), 0);
     const timer = window.setInterval(() => setSekunden(Math.floor((Date.now() - start) / 1000)), 1000);
@@ -177,7 +192,7 @@ export function Schnellerfassung({ open, stammdaten, einsaetze, telefonbuch, heu
       kategorie: kategorie === 'notfall' || dringlichkeit !== 'notfall' ? kategorie : kategorieFor('Reparatur', dringlichkeit),
       dringlichkeit,
       fehlerbild: fehlerbild.trim(),
-      kanal: 'Schnellerfassung',
+      kanal: vorbelegung?.kanal ?? 'Schnellerfassung',
       angefragtAm: nowZeitpunkt(),
       bestelltAm: nowZeitpunkt(),
       kundeId,
@@ -212,7 +227,7 @@ export function Schnellerfassung({ open, stammdaten, einsaetze, telefonbuch, heu
   function inEingang() {
     const gebaut = bauen();
     if (!gebaut) return;
-    const pendenz: Pendenz = { id: nextId('P'), auftragId: gebaut.auftrag.id, anlass: 'neu', dauerMin: dauer, erstelltAm: nowZeitpunkt(), hinweis: `Telefon ${telefon.trim() || 'ohne Nummer'}` };
+    const pendenz: Pendenz = { id: nextId('P'), auftragId: gebaut.auftrag.id, anlass: 'neu', dauerMin: dauer, erstelltAm: nowZeitpunkt(), hinweis: vorbelegung?.hinweis ?? `Telefon ${telefon.trim() || 'ohne Nummer'}` };
     onCreate(gebaut.auftrag, { ...(gebaut.geraet ? { geraet: gebaut.geraet } : {}), pendenz });
     zuruecksetzen();
     onClose();

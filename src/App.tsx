@@ -35,6 +35,7 @@ const AbsenzenPage = lazy(() => import('./modules/absenzen/AbsenzenPage').then((
 const BenutzerPage = lazy(() => import('./modules/benutzer/BenutzerPage').then((m) => ({ default: m.BenutzerPage })));
 const EinstellungenPage = lazy(() => import('./modules/einstellungen/EinstellungenPage').then((m) => ({ default: m.EinstellungenPage })));
 const MeineDatenPage = lazy(() => import('./modules/personal/MeineDatenPage').then((m) => ({ default: m.MeineDatenPage })));
+const WebsitePage = lazy(() => import('./modules/website/WebsitePage').then((m) => ({ default: m.WebsitePage })));
 
 function modul(id: ModulId, element: ReactNode): ReactNode {
   return (
@@ -64,6 +65,7 @@ const router = createBrowserRouter([
       { path: '/absenzen/:absenzId?', element: modul('absenzen', <AbsenzenPage />) },
       { path: '/benutzer/:bereich?', element: modul('benutzer', <BenutzerPage />) },
       { path: '/einstellungen/:bereich?', element: modul('einstellungen', <EinstellungenPage />) },
+      { path: '/sms-website/:bereich?', element: modul('sms-website', <WebsitePage />) },
       { path: '/meine-daten', element: <Suspense fallback={null}><MeineDatenPage /></Suspense> },
       { path: '/rapporte/:rapportId/druck', element: <Suspense fallback={null}><RapportDruck /></Suspense> },
       { path: '/rapporte/:rapportId?', element: <Suspense fallback={null}><RapportePage /></Suspense> },

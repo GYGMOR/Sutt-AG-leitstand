@@ -11,6 +11,8 @@
 //     und App laufen nur über diese Helfer.
 export const LEITSTAND_URL: string = __SL_LEITSTAND_URL__;
 export const APP_URL: string = __SL_APP_URL__;
+/** Die Website liegt neben der App: «<Basis>webseite/» – gehostet später die Hauptdomain. */
+export const WEBSITE_URL: string = `${LEITSTAND_URL}webseite/`;
 
 export function leitstandPfad(pfad: string): string {
   return LEITSTAND_URL + pfad.replace(/^\/+/, '');

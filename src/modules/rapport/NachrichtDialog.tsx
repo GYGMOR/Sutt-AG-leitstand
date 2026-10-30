@@ -9,6 +9,7 @@ import { Mail, MessageSquareText, Send } from 'lucide-react';
 import type { Auftrag } from '../../core/domain/auftrag';
 import type { Einsatz } from '../../core/domain/einsatz';
 import { NACHRICHT_KANAL, NACHRICHT_LABEL, vorlageText } from '../../core/domain/nachricht';
+import { useMandant } from '../../core/mandant/mandantStore';
 import type { NachrichtArt } from '../../core/domain/nachricht';
 import { fullName } from '../../core/domain/stammdaten';
 import type { Techniker } from '../../core/domain/stammdaten';
@@ -38,14 +39,20 @@ interface NachrichtDialogProps {
 //     editierbar, damit der Techniker nicht an der Vorlage scheitert.
 export function NachrichtDialog({ open, art, auftrag, einsatz, techniker, ankunftMin, rapportNummer, onSenden, onClose }: NachrichtDialogProps) {
   const kanal = NACHRICHT_KANAL[art];
-  const vorlage = vorlageText(art, {
-    technikerName: techniker ? fullName(techniker) : 'unser Techniker',
-    kontaktName: auftrag.kontaktVorOrt.name,
-    datum: einsatz ? formatDatum(einsatz.datum) : '',
-    zeit: einsatz ? formatZeit(einsatz.startMin) : '',
-    ...(ankunftMin !== undefined ? { ankunft: formatZeit(ankunftMin) } : {}),
-    ...(rapportNummer ? { rapportNummer } : {}),
-  });
+  // jh› Vorlagen des Betriebs (Modul SMS & Website) gelten für Büro und App gleichermassen.
+  const { nachrichtVorlagen } = useMandant();
+  const vorlage = vorlageText(
+    art,
+    {
+      technikerName: techniker ? fullName(techniker) : 'unser Techniker',
+      kontaktName: auftrag.kontaktVorOrt.name,
+      datum: einsatz ? formatDatum(einsatz.datum) : '',
+      zeit: einsatz ? formatZeit(einsatz.startMin) : '',
+      ...(ankunftMin !== undefined ? { ankunft: formatZeit(ankunftMin) } : {}),
+      ...(rapportNummer ? { rapportNummer } : {}),
+    },
+    nachrichtVorlagen,
+  );
   const [text, setText] = useState(vorlage);
   const [gesendet, setGesendet] = useState(false);
 
