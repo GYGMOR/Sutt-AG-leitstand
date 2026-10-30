@@ -99,7 +99,7 @@ export function buildAnfrageViews(anfragen: readonly Anfrage[], stammdaten: Disp
     .map((anfrage) => ({
       anfrage,
       treffer: kundenTreffer(anfrage, stammdaten),
-      suchtext: normalizeSuchtext(`${anfrage.nummer} ${anfrage.kontakt.name} ${anfrage.kontakt.telefon} ${anfrage.kontakt.email} ${anfrage.adresse.strasse} ${anfrage.adresse.ort} ${anfrage.geraeteart} ${anfrage.marke} ${anfrage.fehlerbild} ${ANLIEGEN_LABEL[anfrage.anliegen]}`),
+      suchtext: normalizeSuchtext(`${anfrage.nummer} ${anfrage.kontakt.name} ${anfrage.kontakt.telefon} ${anfrage.kontakt.email} ${anfrage.adresse.strasse} ${anfrage.adresse.ort} ${anfrage.geraeteart} ${anfrage.marke} ${anfrage.fehlerbild} ${anfrage.kurzinfo ?? ''} ${ANLIEGEN_LABEL[anfrage.anliegen]}`),
     }));
 }
 
@@ -124,9 +124,12 @@ function istMarke(wert: string): wert is Marke {
   return (MARKEN as readonly string[]).includes(wert);
 }
 
+// jh› Ein eigenes Zeitfenster («12:00 – 16:00 zuhause») ersetzt die Auswahl Vormittag/Nachmittag; das Datum bleibt.
 export function terminwunschText(anfrage: Anfrage): string | null {
-  if (!anfrage.terminwunsch) return null;
-  return `${formatDatumKurz(anfrage.terminwunsch.datum)} ${ZEITFENSTER_LABEL[anfrage.terminwunsch.zeitfenster]}`;
+  const eigenes = anfrage.zeitwunsch?.trim();
+  if (!anfrage.terminwunsch) return eigenes || null;
+  const datum = formatDatumKurz(anfrage.terminwunsch.datum);
+  return eigenes ? `ab ${datum}, ${eigenes}` : `${datum} ${ZEITFENSTER_LABEL[anfrage.terminwunsch.zeitfenster]}`;
 }
 
 /** Alles, was die Anfrage schon weiss, steht im Formular – das Büro prüft und ergänzt nur noch. */
@@ -145,7 +148,7 @@ export function vorbelegungAus(view: AnfrageView): Vorbelegung {
     ...(istGeraeteart(anfrage.geraeteart) ? { geraeteart: anfrage.geraeteart } : {}),
     ...(istMarke(anfrage.marke) ? { marke: anfrage.marke } : {}),
     kanal: 'Website',
-    hinweis: `Website-Anfrage ${anfrage.nummer}${wunsch ? ` · Wunsch ${wunsch}` : ''}`,
+    hinweis: `Website-Anfrage ${anfrage.nummer}${anfrage.kurzinfo?.trim() ? ` · «${anfrage.kurzinfo.trim()}»` : ''}${wunsch ? ` · Wunsch ${wunsch}` : ''}`,
   };
 }
 

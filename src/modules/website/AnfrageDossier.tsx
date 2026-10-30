@@ -78,6 +78,7 @@ export function AnfrageDossier({ view, stammdaten, onAuftragErfassen, onAntworte
         <Fakten
           eintraege={[
             { label: 'Anliegen', wert: ANLIEGEN_LABEL[anfrage.anliegen] },
+            ...(anfrage.kurzinfo?.trim() ? [{ label: 'Kurzinfo', wert: anfrage.kurzinfo.trim() }] : []),
             { label: 'Gerät', wert: `${anfrage.geraeteart}${anfrage.marke ? ` · ${anfrage.marke}` : ''}` },
             { label: 'Terminwunsch', wert: wunsch ?? 'keiner' },
             { label: 'Foto', wert: anfrage.fotoName ?? 'keines', mono: true },

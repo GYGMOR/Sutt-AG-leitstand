@@ -1,7 +1,7 @@
 {
   "name": "sutt-webseite",
   "private": true,
-  "version": "0.6.0",
+  "version": "2.1.6",
   "description": "Website der Sutt AG – Neuaufbau (Startgerüst mit denselben Tokens wie Leitstand und App)",
   "author": "◆ JH",
   "type": "module",

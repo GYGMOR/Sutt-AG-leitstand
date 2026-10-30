@@ -5,7 +5,7 @@
    └────────────────────────────────────────────────────────────────────────┘ */
 
 import { describe, expect, it } from 'vitest';
-import { ANFRAGEN_SCHLUESSEL, anfrageNummer, ladeAnfragen, naechsteLaufnummer, neueAnfrage, pruefeAnfrage, speichereAnfragen } from './anfrage';
+import { ANFRAGEN_SCHLUESSEL, KURZINFO_MAX, ZEITWUNSCH_MAX, anfrageNummer, ladeAnfragen, naechsteLaufnummer, neueAnfrage, pruefeAnfrage, speichereAnfragen } from './anfrage';
 import type { AnfrageEntwurf } from './anfrage';
 
 // ── §1 · Testdaten ───────────────────────────────────────────────
@@ -47,6 +47,16 @@ describe('pruefeAnfrage', () => {
 
   it('weist Wunschtermine in der Vergangenheit ab', () => {
     expect(pruefeAnfrage({ ...GUELTIG, terminwunsch: { datum: '2026-10-29', zeitfenster: 'egal' } }, HEUTE).map((eintrag) => eintrag.feld)).toEqual(['terminwunsch']);
+  });
+
+  it('nimmt Kurzinfo und eigenes Zeitfenster an, solange sie kurz bleiben', () => {
+    const mitText = { ...GUELTIG, kurzinfo: 'Waschturm in der Waschküche neu einbauen', zeitwunsch: '12:00 – 16:00 zuhause' };
+    expect(pruefeAnfrage(mitText, HEUTE)).toEqual([]);
+    const ohneDatum: AnfrageEntwurf = { ...mitText };
+    delete ohneDatum.terminwunsch;
+    expect(pruefeAnfrage(ohneDatum, HEUTE)).toEqual([]);
+    const zuLang = { ...GUELTIG, kurzinfo: 'x'.repeat(KURZINFO_MAX + 1), zeitwunsch: 'y'.repeat(ZEITWUNSCH_MAX + 1) };
+    expect(pruefeAnfrage(zuLang, HEUTE).map((eintrag) => eintrag.feld)).toEqual(['kurzinfo', 'zeitwunsch']);
   });
 });
 

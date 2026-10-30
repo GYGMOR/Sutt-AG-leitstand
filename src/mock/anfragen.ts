@@ -23,6 +23,7 @@ function zeitpunkt(tageOffset: number, uhrzeit: string): IsoZeitpunkt {
 export const MOCK_ANFRAGEN: readonly Anfrage[] = [
   {
     id: 'W-0101', nummer: 'W-26-0101', eingegangenAm: zeitpunkt(0, '08:05'), status: 'neu', anliegen: 'reparatur', dringend: true,
+    kurzinfo: 'Geschirrspüler im Haus C, Mieterin hat heute Morgen gemeldet',
     geraeteart: 'Geschirrspüler', marke: 'V-ZUG', fehlerbild: 'Zieht kein Wasser mehr, Anzeige E15 blinkt. Die Wohnung ist tagsüber über den Hauswart zugänglich.',
     adresse: { strasse: 'Giebeleichstrasse 52', plz: '8152', ort: 'Opfikon', wohnung: 'W B.07' },
     terminwunsch: { datum: addDays(MOCK_HEUTE, 1), zeitfenster: 'vormittag' },
@@ -34,6 +35,7 @@ export const MOCK_ANFRAGEN: readonly Anfrage[] = [
     geraeteart: 'Waschmaschine', marke: 'Miele', fehlerbild: 'Schleudert nicht mehr, Fehler F53, Wasser bleibt in der Trommel. Gerät ist etwa sechs Jahre alt.',
     adresse: { strasse: 'Talackerstrasse 41', plz: '8152', ort: 'Glattbrugg', wohnung: 'W 1.05' },
     terminwunsch: { datum: addDays(MOCK_HEUTE, 3), zeitfenster: 'nachmittag' },
+    zeitwunsch: '13:30 – 17:00 zuhause',
     kontakt: { name: 'Nadia Keller', telefon: '079 655 21 44', email: 'nadia.keller@mail.example', rolle: 'Mieter' },
     fotoName: 'IMG_4471.jpg',
     datenschutzZugestimmtAm: zeitpunkt(-1, '17:42'), quelle: 'website',

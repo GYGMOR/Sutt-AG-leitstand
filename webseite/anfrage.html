@@ -51,6 +51,12 @@
               <label><input type="radio" name="anliegen" value="garantie" /> <span><strong>Garantiefall</strong><small>Gerät noch in Garantie</small></span></label>
               <label><input type="radio" name="anliegen" value="offerte" /> <span><strong>Offerte / Beratung</strong><small>reparieren oder ersetzen?</small></span></label>
             </div>
+            <div class="feld">
+              <label for="kurzinfo">Kurz in eigenen Worten <span class="optional">(optional)</span></label>
+              <textarea id="kurzinfo" name="kurzinfo" rows="2" maxlength="200" aria-describedby="kurzinfo-hilfe" placeholder="z. B. Waschturm in der Waschküche neu einbauen, altes Gerät bitte mitnehmen"></textarea>
+              <p class="feld-hilfe" id="kurzinfo-hilfe">Passt Ihr Anliegen in keine Kachel oder möchten Sie etwas ergänzen? Ein, zwei Sätze genügen (höchstens 200 Zeichen).</p>
+              <p class="feld-fehler" data-fehler="kurzinfo" hidden></p>
+            </div>
             <label class="haken"><input type="checkbox" name="dringend" /> <span>Dringend – Wasser läuft aus, Kühlgerät ausgefallen oder Waschküche einer Liegenschaft steht still</span></label>
             <p class="feld-fehler" data-fehler="anliegen" hidden></p>
           </fieldset>
@@ -124,6 +130,12 @@
                   <label><input type="radio" name="zeitfenster" value="egal" checked /> <span>ganzer Tag</span></label>
                 </div>
               </div>
+            </div>
+            <div class="feld">
+              <label for="zeitwunsch">Oder eigenes Zeitfenster <span class="optional">(optional)</span></label>
+              <input id="zeitwunsch" name="zeitwunsch" maxlength="80" autocomplete="off" aria-describedby="zeitwunsch-hilfe" placeholder="z. B. 12:00 – 16:00 zuhause" />
+              <p class="feld-hilfe" id="zeitwunsch-hilfe">Ersetzt die Auswahl Vormittag, Nachmittag oder ganzer Tag – mit oder ohne Datum.</p>
+              <p class="feld-fehler" data-fehler="zeitwunsch" hidden></p>
             </div>
           </fieldset>
 

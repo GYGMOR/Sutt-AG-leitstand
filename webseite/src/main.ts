@@ -253,4 +253,65 @@ function bandStarten(band: HTMLElement, spur: HTMLElement, liste: HTMLElement, s
 const markenBandElement = document.querySelector<HTMLElement>('.marken-band');
 if (markenBandElement) markenBand(markenBandElement);
 
+// ── §7 · Karte (Google Maps nach Zustimmung) ─────────────────────
+
+// jh› Die Karte von Google lädt erst nach dem Klick auf «Karte laden» – vorher geht nichts an Google (DSG,
+//     Datenschutzerklärung #karte). Die Wahl bleibt im Browser; «Karte wieder ausblenden» nimmt sie zurück.
+const KARTE_SCHLUESSEL = 'sl.website.karte.v1';
+
+function karteErlaubt(): boolean {
+  try {
+    return window.localStorage.getItem(KARTE_SCHLUESSEL) === 'ja';
+  } catch {
+    return false;
+  }
+}
+
+function karteMerken(erlaubt: boolean): void {
+  try {
+    if (erlaubt) window.localStorage.setItem(KARTE_SCHLUESSEL, 'ja');
+    else window.localStorage.removeItem(KARTE_SCHLUESSEL);
+  } catch {
+    // jh› Speicher gesperrt (privates Fenster) – die Karte lädt trotzdem, nur ohne Erinnerung.
+  }
+}
+
+function karte(rahmen: HTMLElement): void {
+  const laden = rahmen.querySelector<HTMLButtonElement>('[data-karte-laden]');
+  const aus = document.querySelector<HTMLButtonElement>('[data-karte-vergessen]');
+  const adresse = rahmen.dataset.karte;
+  if (!laden || !aus || !adresse) return;
+
+  const zeigen = (fokus: boolean) => {
+    if (!rahmen.querySelector('iframe')) {
+      const rahmenFenster = document.createElement('iframe');
+      rahmenFenster.src = adresse;
+      rahmenFenster.title = rahmen.dataset.karteTitel ?? 'Google Maps';
+      rahmenFenster.loading = 'lazy';
+      rahmenFenster.referrerPolicy = 'no-referrer-when-downgrade';
+      rahmenFenster.allowFullscreen = true;
+      rahmen.append(rahmenFenster);
+    }
+    rahmen.dataset.geladen = '1';
+    aus.hidden = false;
+    if (fokus) aus.focus();
+  };
+
+  laden.addEventListener('click', () => {
+    karteMerken(true);
+    zeigen(true);
+  });
+  aus.addEventListener('click', () => {
+    karteMerken(false);
+    rahmen.querySelector('iframe')?.remove();
+    rahmen.removeAttribute('data-geladen');
+    aus.hidden = true;
+    laden.focus();
+  });
+  if (karteErlaubt()) zeigen(false);
+}
+
+const karteElement = document.querySelector<HTMLElement>('.karte-rahmen');
+if (karteElement) karte(karteElement);
+
 /* ◆ jh · eof */

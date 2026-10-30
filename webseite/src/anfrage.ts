@@ -67,14 +67,18 @@ function entwurfAus(daten: FormData): AnfrageEntwurf {
   const fotoName = foto instanceof File && foto.name !== '' ? foto.name : undefined;
   const kundennummer = wert(daten, 'kundennummer');
   const wohnung = wert(daten, 'wohnung');
+  const kurzinfo = wert(daten, 'kurzinfo');
+  const zeitwunsch = wert(daten, 'zeitwunsch');
   return {
     anliegen: istAnliegen(anliegen) ? anliegen : 'reparatur',
+    ...(kurzinfo ? { kurzinfo } : {}),
     dringend: daten.get('dringend') === 'on',
     geraeteart: wert(daten, 'geraeteart'),
     marke: wert(daten, 'marke'),
     fehlerbild: wert(daten, 'fehlerbild'),
     adresse: { strasse: wert(daten, 'strasse'), plz: wert(daten, 'plz'), ort: wert(daten, 'ort'), ...(wohnung ? { wohnung } : {}) },
     ...(terminDatum ? { terminwunsch: { datum: terminDatum as IsoDatum, zeitfenster: istZeitfenster(zeitfenster) ? zeitfenster : 'egal' } } : {}),
+    ...(zeitwunsch ? { zeitwunsch } : {}),
     kontakt: { name: wert(daten, 'name'), telefon: wert(daten, 'telefon'), email: wert(daten, 'email'), rolle: istRolle(rolle) ? rolle : 'Mieter' },
     ...(kundennummer ? { kundennummer } : {}),
     ...(fotoName ? { fotoName } : {}),
@@ -83,6 +87,8 @@ function entwurfAus(daten: FormData): AnfrageEntwurf {
 
 const FELD_ZIEL: Readonly<Record<string, string>> = {
   anliegen: 'anliegen',
+  kurzinfo: 'kurzinfo',
+  zeitwunsch: 'zeitwunsch',
   geraeteart: 'geraeteart',
   fehlerbild: 'fehlerbild',
   strasse: 'strasse',
@@ -133,12 +139,29 @@ function fehlerZeigen(fehler: readonly AnfrageFehler[]): void {
   fehlerliste.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// jh› Entweder Auswahl oder eigene Worte: Wer ein Zeitfenster schreibt, hebt die Auswahl auf; wer wieder wählt,
+//     leert das Textfeld. So steht nie Widersprüchliches in der Anfrage.
+const zeitwunschFeld = document.getElementById('zeitwunsch');
+const zeitfensterWahl = document.querySelectorAll<HTMLInputElement>('input[name="zeitfenster"]');
+if (zeitwunschFeld instanceof HTMLInputElement) {
+  zeitwunschFeld.addEventListener('input', () => {
+    if (zeitwunschFeld.value.trim() === '') return;
+    for (const wahl of zeitfensterWahl) wahl.checked = false;
+  });
+  for (const wahl of zeitfensterWahl) {
+    wahl.addEventListener('change', () => {
+      zeitwunschFeld.value = '';
+    });
+  }
+}
+
 // ── §3 · Absenden ────────────────────────────────────────────────
 
 function bestaetigen(nummer: string, entwurf: AnfrageEntwurf): void {
   if (!formular || !erfolg) return;
   const kanal = entwurf.kontakt.email !== '' ? `per E-Mail an ${entwurf.kontakt.email}` : `per Telefon unter ${entwurf.kontakt.telefon}`;
-  const wunsch = entwurf.terminwunsch ? ` Ihren Wunsch (ab ${entwurf.terminwunsch.datum.split('-').reverse().join('.')}) haben wir notiert.` : '';
+  const teile = [entwurf.terminwunsch ? `ab ${entwurf.terminwunsch.datum.split('-').reverse().join('.')}` : '', entwurf.zeitwunsch ?? ''].filter((teil) => teil !== '');
+  const wunsch = teile.length > 0 ? ` Ihren Wunsch (${teile.join(', ')}) haben wir notiert.` : '';
   for (const feld of erfolg.querySelectorAll<HTMLElement>('[data-erfolg]')) {
     const schluessel = feld.dataset.erfolg;
     if (schluessel === 'name') feld.textContent = entwurf.kontakt.name;

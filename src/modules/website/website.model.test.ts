@@ -7,7 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import { MOCK_ANFRAGEN } from '../../mock';
 import { HEUTE, testState } from '../../test/testdaten';
-import { antwortVorlage, buildAnfrageViews, filterAnfragen, kundenTreffer, vorbelegungAus, zaehleAnfragen } from './website.model';
+import { antwortVorlage, buildAnfrageViews, filterAnfragen, kundenTreffer, terminwunschText, vorbelegungAus, zaehleAnfragen } from './website.model';
 
 // ── §1 · Erkennung ───────────────────────────────────────────────
 
@@ -70,6 +70,19 @@ describe('Anfragen-Sichten', () => {
     expect(vorbelegung.kundeId).toBe(view.treffer?.kunde.id);
     expect(vorbelegung.hinweis).toContain('W-26-0101');
     expect(vorbelegung.hinweis).toContain('Vormittag');
+    expect(vorbelegung.hinweis).toContain('«Geschirrspüler im Haus C');
+  });
+
+  it('nimmt das eigene Zeitfenster statt der Auswahl', () => {
+    const anfrage = MOCK_ANFRAGEN.find((kandidat) => kandidat.nummer === 'W-26-0100');
+    if (!anfrage) throw new Error('Testdaten: W-26-0100 fehlt');
+    expect(terminwunschText(anfrage)).toMatch(/^ab \d\d\.\d\d\.?, 13:30 – 17:00 zuhause$/);
+    const ohneDatum = { ...anfrage };
+    delete ohneDatum.terminwunsch;
+    expect(terminwunschText(ohneDatum)).toBe('13:30 – 17:00 zuhause');
+    const ohneText = { ...anfrage };
+    delete ohneText.zeitwunsch;
+    expect(terminwunschText(ohneText)).toContain('Nachmittag');
   });
 
   it('schreibt die Antwortvorlage mit Nummer und Frist', () => {

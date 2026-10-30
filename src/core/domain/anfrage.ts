@@ -82,12 +82,16 @@ export interface Anfrage {
   eingegangenAm: IsoZeitpunkt;
   status: AnfrageStatus;
   anliegen: AnfrageAnliegen;
+  /** Eigene Worte zum Anliegen (Schritt 1 des Formulars), optional. */
+  kurzinfo?: string;
   dringend: boolean;
   geraeteart: string;
   marke: string;
   fehlerbild: string;
   adresse: AnfrageAdresse;
   terminwunsch?: { datum: IsoDatum; zeitfenster: Zeitfenster };
+  /** Zeitfenster in eigenen Worten, z. B. «12:00 – 16:00 zuhause» – statt der Auswahl, auch ohne Datum. */
+  zeitwunsch?: string;
   kontakt: AnfrageKontakt;
   kundennummer?: string;
   /** Dateiname eines mitgeschickten Fotos – die Datei selbst bleibt im Browser (To-do 012). */
@@ -109,6 +113,10 @@ export interface AnfrageFehler {
 /** Schlüssel im Browser-Speicher – Website und Leitstand lesen und schreiben dieselbe Liste (gleiche Origin). */
 export const ANFRAGEN_SCHLUESSEL = 'sl.website.anfragen.v1';
 
+/** Längen der freien Felder – kurz genug für Karte und SMS, lang genug für einen Satz. */
+export const KURZINFO_MAX = 200;
+export const ZEITWUNSCH_MAX = 80;
+
 // ── §2 · Prüfung ─────────────────────────────────────────────────
 
 export function nurZiffern(text: string): string {
@@ -123,6 +131,7 @@ export function istEmail(text: string): boolean {
 export function pruefeAnfrage(entwurf: AnfrageEntwurf, heute: IsoDatum): AnfrageFehler[] {
   const fehler: AnfrageFehler[] = [];
   if (!ANFRAGE_ANLIEGEN.includes(entwurf.anliegen)) fehler.push({ feld: 'anliegen', text: 'Bitte ein Anliegen wählen.' });
+  if ((entwurf.kurzinfo ?? '').trim().length > KURZINFO_MAX) fehler.push({ feld: 'kurzinfo', text: `Die Kurzinfo bitte auf ${KURZINFO_MAX} Zeichen kürzen – Details passen in Schritt 2.` });
   if (entwurf.geraeteart.trim() === '') fehler.push({ feld: 'geraeteart', text: 'Um welches Gerät geht es?' });
   if (entwurf.fehlerbild.trim().length < 10) fehler.push({ feld: 'fehlerbild', text: 'Bitte das Problem in ein, zwei Sätzen beschreiben (mindestens 10 Zeichen).' });
   if (entwurf.adresse.strasse.trim() === '') fehler.push({ feld: 'strasse', text: 'Strasse und Hausnummer fehlen.' });
@@ -134,6 +143,7 @@ export function pruefeAnfrage(entwurf: AnfrageEntwurf, heute: IsoDatum): Anfrage
   if (!telefonOk && !emailOk) fehler.push({ feld: 'kontakt', text: 'Telefonnummer oder E-Mail-Adresse – eines von beiden brauchen wir für die Rückmeldung.' });
   if (entwurf.kontakt.email.trim() !== '' && !emailOk) fehler.push({ feld: 'email', text: 'E-Mail-Adresse prüfen.' });
   if (entwurf.terminwunsch && entwurf.terminwunsch.datum < heute) fehler.push({ feld: 'terminwunsch', text: 'Der Wunschtermin liegt in der Vergangenheit.' });
+  if ((entwurf.zeitwunsch ?? '').trim().length > ZEITWUNSCH_MAX) fehler.push({ feld: 'zeitwunsch', text: `Das Zeitfenster bitte auf ${ZEITWUNSCH_MAX} Zeichen kürzen, z. B. «12:00 – 16:00 zuhause».` });
   return fehler;
 }
 
