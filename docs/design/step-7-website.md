@@ -18,7 +18,7 @@ Anfragen (annehmen, ablehnen, beantworten) und die SMS-/Mail-Vorlagen des Betrie
 | Antworten | Mail, wenn eine Adresse da ist, sonst SMS; Text aus Vorlage `anfrage-antwort`; Ablehnung mit eigenem Text; Mock-Versand mit Eintrag an der Anfrage und im Journal | wie in Akte und App: Vorschau, Protokoll, kein echter Versand |
 | Vorlagen | im Mandanten (`nachrichtVorlagen`), je `NachrichtArt`, Platzhalter `{techniker} {kontakt} {datum} {zeit} {ankunft} {rapport} {anfrage} {telefon}`; Standard zurücksetzbar | eine Quelle für Akte, Rapportmodul, App und Anfragen |
 | Nummer | `W-26-0101`, fortlaufend je Jahr aus der Liste; Kennung aus dem Zeitpunkt | Kunde nennt die Nummer am Telefon, Büro findet sie sofort |
-| Dark Mode | nach Systemeinstellung (`data-theme` aus `prefers-color-scheme`), dieselben Tokens | kein Schalter auf einer Marketingseite, aber kein grelles Weiss am Abend |
+| Dark Mode | keiner – die Website ist immer hell (`data-theme="light"`, `color-scheme: light`), `tokens.dark.css` wird nicht geladen | zuerst nach Systemeinstellung; auf Handys im Dunkelmodus wirkte die Seite schwarz statt warm-weiss wie am Notebook – der Nutzer will überall denselben Look |
 | Foto | nur der Dateiname wird übergeben, Hinweis im Formular | Bildablage ist jh# 012; ehrlich statt scheinbar |
 
 ## Gestaltung – «Schweizer Industrie», aber als Schaufenster

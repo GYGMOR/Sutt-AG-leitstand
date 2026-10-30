@@ -51,10 +51,6 @@ html {
   color-scheme: light;
 }
 
-html[data-theme='dark'] {
-  color-scheme: dark;
-}
-
 html[data-menue] {
   overflow: hidden;
 }

@@ -475,7 +475,7 @@ Seitenleiste zeigt `v0.2.0 · ◆ JH`; der Tooltip trägt Build-Datum und Commit
   vollflächig hinter dem Text, abgedunkelt, mit Pausen-Knopf), Logo-Band mit 13 Herstellern (gleich grosse weisse Kacheln, endlos von links nach rechts, Links zu den Herstellern, anhaltbar), Leistungen als Karten mit Icons (Mietgeräte und Notfall inklusive),
   Ablauf in vier Schritten, «Warum Sutt», FAQ, Aktions-Band, Kontakt mit Öffnungszeiten und Schema-Karte; **Termin anfragen**, Karriere,
   Impressum, Datenschutz (DSG). Kopf bleibt oben und wird kompakt, Vollflächen-Menü und feste Kontaktleiste auf dem Handy, Einblenden beim
-  Scrollen, Dark Mode nach System, kein Framework, kein Tracking (ADR-009, `docs/design/step-7-website.md`).
+  Scrollen, immer hell (auch wenn das Gerät auf «dunkel» steht – Handy wie Notebook), kein Framework, kein Tracking (ADR-009, `docs/design/step-7-website.md`).
 - **Anfrage → Leitstand**: Das Formular prüft mit denselben Regeln wie der Leitstand (`pruefeAnfrage`), vergibt die Nummer `W-26-0101` und
   legt die Anfrage im Browser-Speicher ab, den der Leitstand sofort liest. Der Eingang der Plantafel zeigt «n neue Anfragen von der Website»;
   angenommene Anfragen stehen als Pendenz mit Chip **Website** im Eingang.

@@ -75,7 +75,7 @@ Leitstand-Proxy (`5173/webseite/`), auf Pages liegen alle drei unter `/<repo>/`.
 
 ## Massnahmen
 
-1. [x] `webseite/`: fünf Seiten, Teile-Plugin, Basis aus `SL_BASE`, Formular mit geteilter Prüfung, Schema-Karte, Dark Mode nach System.
+1. [x] `webseite/`: fünf Seiten, Teile-Plugin, Basis aus `SL_BASE`, Formular mit geteilter Prüfung, Schema-Karte, immer hell (auch wenn das Gerät auf «dunkel» steht – Handy wie Notebook).
 2. [x] `core/domain/anfrage.ts` (+ Tests), `modules/website/*` (Anfragen, Dossier, Antwort, Vorlagen), Eingang-Hinweis, Chip «Website», Vorbelegung der Schnellerfassung.
 3. [x] Vorlagen im Mandanten (`nachrichtVorlagen`), `vorlageText` mit Platzhaltern, neue Art `anfrage-antwort`.
 4. [x] Pages: `pages-site.mjs` nimmt `webseite/dist` auf; Dev-Proxy `/webseite`; `dev:alle` nennt die Proxy-Adresse.

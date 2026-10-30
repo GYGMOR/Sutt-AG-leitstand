@@ -10,7 +10,6 @@ import '@fontsource/ibm-plex-sans/600.css';
 import '@fontsource/ibm-plex-sans/700.css';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@sl/styles/tokens.css';
-import '@sl/styles/tokens.dark.css';
 import './styles/site.css';
 
 // ── §1 · Grundzustand ────────────────────────────────────────────
@@ -18,14 +17,10 @@ import './styles/site.css';
 const wurzel = document.documentElement;
 wurzel.dataset.js = '1';
 
-// jh› Dieselben Tokens wie Leitstand und App: dunkel über data-theme, hier nach Systemeinstellung.
-const dunkel = window.matchMedia('(prefers-color-scheme: dark)');
+// jh› Die Website ist immer hell – warmes Papier und Weiss, auf Handy, Tablet und Notebook gleich, auch wenn das
+//     Gerät auf «dunkel» steht (Wunsch rev 06). Leitstand und App behalten ihren Dunkelmodus.
+wurzel.dataset.theme = 'light';
 const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)');
-const themaSetzen = () => {
-  wurzel.dataset.theme = dunkel.matches ? 'dark' : 'light';
-};
-themaSetzen();
-dunkel.addEventListener('change', themaSetzen);
 
 for (const jahr of document.querySelectorAll<HTMLElement>('[data-jahr]')) jahr.textContent = String(new Date().getFullYear());
 for (const version of document.querySelectorAll<HTMLElement>('[data-version]')) version.textContent = __SL_VERSION__;
