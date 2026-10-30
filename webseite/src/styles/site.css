@@ -973,11 +973,13 @@ html[data-js] .marken-band[data-band] .marken-liste {
   transform: translateY(-2px);
 }
 
+/* jh› Breite je Logo aus main.ts (--logo-breite, gleiche Fläche statt gleicher Breite); die Höhe folgt dem Bild. */
 .logo img {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: var(--logo-breite, 100%);
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
 }
 
 .logo[data-voll] {
@@ -986,8 +988,11 @@ html[data-js] .marken-band[data-band] .marken-liste {
   color: #fff;
 }
 
+/* jh› Logos mit eigener Fläche (Miele): ganz zeigen, die Kachel trägt dasselbe Rot weiter – nichts wird abgeschnitten. */
 .logo[data-voll] img {
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .logo-wort {

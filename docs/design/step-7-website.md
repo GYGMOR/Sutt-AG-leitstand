@@ -43,7 +43,7 @@ Vorzeile steht auf einem eigenen dunklen Schild.
 
 ## Website (`webseite/`)
 
-- `index.html`: Hero (Video vollflächig im Hintergrund, Text darüber, drei Fakten ab Tablet, Pausen-Knopf, Pfeil nach unten), Logo-Band (`public/logos/<id>.svg|png|webp|jpg`, von `vite.config.ts` als `__SL_LOGOS__` gemeldet, ohne Datei der Name in Markenfarbe; Liste doppelt in der Spur, Kopie `aria-hidden`, Spur wandert eine halbe Breite nach rechts, rund 40 px/s, Halt bei Maus, Fokus und Knopf), Leistungen als Karten mit Icon
+- `index.html`: Hero (Video vollflächig im Hintergrund, Text darüber, drei Fakten ab Tablet, Pausen-Knopf, Pfeil nach unten), Logo-Band (`public/logos/<id>.svg|png|webp|jpg`, von `vite.config.ts` als `__SL_LOGOS__` gemeldet; die 13 Logos sind auf den Inhalt zugeschnitten und auf höchstens 480 × 200 px verkleinert, `main.ts` setzt die Breite nach gleicher Fläche – quadratisch füllt die Höhe, lange Schriftzüge werden breiter und flacher; ohne Datei der Name in Markenfarbe; Liste doppelt in der Spur, Kopie `aria-hidden`, Spur wandert eine halbe Breite nach rechts, rund 40 px/s, Halt bei Maus, Fokus und Knopf), Leistungen als Karten mit Icon
   (Reparatur · Installation/Montage · Lieferung · Mietgeräte · Garantie · Notfall, jede mit Tiefen-Link `anfrage.html?anliegen=…`),
   «So arbeiten wir» (vier Schritte, dunkel), «Warum Sutt» (drei Versprechen, Kopf bleibt stehen), FAQ (`<details>`), Band mit
   zwei Aktionen, Kontakt mit Öffnungszeiten, Route und Schema-Karte (SVG, «nicht massstäblich»).

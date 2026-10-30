@@ -187,6 +187,23 @@ if (video && knopf && quellen.length > 0) heroVideo(video, knopf);
 // jh› Jede Kachel zeigt das Logo aus public/logos/, sobald die Datei beim Bauen da war – sonst den Namen in der
 //     Markenfarbe. Für die Endlosschleife hängt eine Kopie der Liste dahinter (aria-hidden, Links nicht fokussierbar);
 //     Maus darüber, Fokus darin oder der Knopf halten das Band an (WCAG 2.2.2). «Bewegung reduzieren»: stehendes Raster.
+
+// jh› Gleich gross heisst gleiche Fläche, nicht gleiche Breite: Ein quadratisches Logo füllt die Höhe der Kachel,
+//     ein langer Schriftzug wird breiter und flacher. Masse in px der Innenfläche am Desktop (152 × 64), als
+//     Prozent gesetzt, damit die kleinere Kachel auf dem Handy mitzieht. Gilt nicht für Logos mit eigener Fläche.
+const LOGO_INNEN = { breite: 152, hoehe: 64, flaeche: 4000 };
+
+function einpassen(bild: HTMLImageElement): void {
+  const setzen = () => {
+    if (bild.naturalHeight === 0) return;
+    const verhaeltnis = bild.naturalWidth / bild.naturalHeight;
+    const breite = Math.min(Math.sqrt(LOGO_INNEN.flaeche * verhaeltnis), LOGO_INNEN.hoehe * verhaeltnis, LOGO_INNEN.breite);
+    bild.style.setProperty('--logo-breite', `${((breite / LOGO_INNEN.breite) * 100).toFixed(1)}%`);
+  };
+  if (bild.complete) setzen();
+  else bild.addEventListener('load', setzen, { once: true });
+}
+
 function markenBand(band: HTMLElement): void {
   for (const link of band.querySelectorAll<HTMLAnchorElement>('a[data-logo]')) {
     const datei = __SL_LOGOS__[link.dataset.logo ?? ''];
@@ -194,8 +211,6 @@ function markenBand(band: HTMLElement): void {
     const bild = document.createElement('img');
     bild.src = `${import.meta.env.BASE_URL}logos/${datei}`;
     bild.alt = '';
-    bild.width = 184;
-    bild.height = 92;
     bild.decoding = 'async';
     link.replaceChildren(bild);
     link.dataset.bild = '1';
@@ -204,7 +219,11 @@ function markenBand(band: HTMLElement): void {
   const spur = band.querySelector<HTMLElement>('.marken-spur');
   const liste = band.querySelector<HTMLElement>('.marken-liste');
   const schalter = band.querySelector<HTMLButtonElement>('.marken-pause');
-  if (ruhig.matches || !spur || !liste || !schalter) return;
+  if (!ruhig.matches && spur && liste && schalter) bandStarten(band, spur, liste, schalter);
+  for (const bild of band.querySelectorAll<HTMLImageElement>('.logo:not([data-voll]) img')) einpassen(bild);
+}
+
+function bandStarten(band: HTMLElement, spur: HTMLElement, liste: HTMLElement, schalter: HTMLButtonElement): void {
 
   const kopie = liste.cloneNode(true) as HTMLElement;
   kopie.setAttribute('aria-hidden', 'true');
