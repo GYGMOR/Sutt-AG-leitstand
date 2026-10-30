@@ -41,7 +41,10 @@ jeden Techniker ansehen (Profil → «Als Techniker ansehen»).
 
 **Start je Rolle (rev 04):** `rw` (Büro) und `admin` starten im Dashboard, `jh` (Disposition) in der Plantafel, `mb`/`sk` in der
 App. Kunden und Lager sind Innendienst-Module: Aussendienst sieht dort die Folgt-Seite mit Rollenhinweis.
-Eigene Skills für die Weiterarbeit liegen in `.claude/skills/` (`sutt-modul`, `sutt-pruefung`).
+Eigene Skills für die Weiterarbeit liegen in `.claude/skills/` (`sutt-modul`, `sutt-pruefung`); dazu zehn Agent-Skills aus
+`addyosmani/agent-skills` (MIT, nur Markdown – UI, API-Design, TDD, Review, Sicherheit, Performance, ADRs, Planung, Inkremente,
+Debugging; nachinstallieren mit `npx skills add addyosmani/agent-skills --copy -a claude-code`). Der nächste Ausbauschritt steht als
+Master-Prompt in `docs/prompts/master-prompt-rev06.md`.
 
 **Personal (rev 05):** Stempeluhr in jeder Topbar und als grosse Uhr (`/zeiterfassung/<eigene id>`, App-Tab «Zeit»); Admin und Büro
 sehen `/zeiterfassung?ansicht=woche|monat|jahr|tag`. `admin` meldet sich auch «Mit Microsoft-Konto» an (Mock-Dialog «Konto wählen»,
@@ -176,7 +179,8 @@ app/                            Techniker-App – eigenes Vite-Projekt, base /ap
 webseite/                       Website-Gerüst (Vite, Port 5175, Tokens aus src/styles) – Neuaufbau folgt
 scripts/jh-sign.mjs · contrast.jh.ts · demo.jh.mjs · dev-alle.mjs · basis.ts/.mjs (SL_BASE) · pages-site.mjs · pages-serve.mjs
 .github/workflows/pages.yml     GitHub Pages: Leitstand + App als eine Site
-docs/adr (001–008) · docs/design · docs/datenschutz · docs/tests · docs/prompts · docs/start.md · .claude/skills (sutt-modul, sutt-pruefung)
+docs/adr (001–008) · docs/design · docs/datenschutz · docs/tests · docs/prompts (step-2, master-prompt-rev06) · docs/start.md
+.claude/skills                  sutt-modul · sutt-pruefung · zehn agent-skills (addyosmani) · skills-lock.json im Root
 TODO.jh.md · CHANGELOG.jh.md
 ```
 
