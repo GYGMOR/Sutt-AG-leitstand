@@ -59,6 +59,11 @@ App mit `SL_BASE=/<repo>/` und veröffentlicht `site/`: Leitstand unter `https:/
 npm run pages:serve` (Mac/Linux `SL_BASE=/<repo>/ npm run …`) → `http://localhost:4175/<repo>/`. Eigene Domain: Repository-Variable
 `SL_BASE=/`. Einrichtung in GitHub: Settings → Pages → Source «GitHub Actions», dann pushen.
 
+**Hosting auf Vercel:** Repository in Vercel importieren, **Root Directory leer lassen** (Hauptordner, nicht `app/` – die App holt
+Domäne und Store aus `../src` und baut allein nicht). `vercel.json` übernimmt den Rest: `npm ci`, `npm run pages:build` mit Basis `/`,
+Ausgabe `site/` → Leitstand unter `https://<projekt>.vercel.app/`, Techniker-App unter `…/app/`, Website unter `…/webseite/`,
+gleiche Origin wie auf Pages. Tiefen-Links landen per Rewrite im richtigen Einstieg.
+
 **Techniker-App (rev 05):** eigenes Projekt `app/` – responsiv von A bis Z: unter 900 px Kopf oben und Tabs unten
 (Heute · Tour · Zeit · Kamera · Mehr), ab 900 px Rand links und zweispaltige Seiten (Tablet quer, Laptop). Alles, was der
 Aussendienst draussen braucht: Tagesplan mit Ein-Daumen-Status, Tour mit Karte, Stempeluhr, Kamera (Fotos zum Einsatz,

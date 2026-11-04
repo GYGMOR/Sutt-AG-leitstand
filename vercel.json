@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm ci",
+  "buildCommand": "npm run pages:build",
+  "outputDirectory": "site",
+  "redirects": [
+    { "source": "/app", "destination": "/app/", "permanent": false },
+    { "source": "/webseite", "destination": "/webseite/", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/app/:pfad*", "destination": "/app/index.html" },
+    { "source": "/((?!app/|webseite/).*)", "destination": "/index.html" }
+  ]
+}
